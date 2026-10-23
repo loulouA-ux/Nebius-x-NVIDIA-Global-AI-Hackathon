@@ -162,8 +162,14 @@ try {
     "POST",
     {
       mode: "live",
-      filename: "package.json",
-      content: '{"dependencies":{"lodash":"4.17.20"}}',
+      filename: "package-lock.json",
+      content: JSON.stringify({
+        lockfileVersion: 3,
+        packages: {
+          "": { name: "synthetic-acceptance" },
+          "node_modules/lodash": { version: "4.17.20" },
+        },
+      }),
       research: true,
       ...(targetProject ? { projectId: targetProject } : {}),
     },
@@ -179,6 +185,17 @@ try {
     assert.ok(live.body.findings.some((f: any) => f.id.startsWith("host-")));
     assert.ok(!JSON.stringify(live.body).includes("demo_preference=example"));
     console.log("PASS: four real passive host checks; cookie values omitted.");
+  }
+  for (const name of [
+    "OSV advisories",
+    "Live threat research",
+    "Source extraction",
+    "Nemotron explanations",
+  ]) {
+    assert.equal(
+      live.body.checks.find((c: any) => c.name === name)?.state,
+      "complete",
+    );
   }
   const rid = live.body.id;
   assert.ok(live.body.findings.length);
