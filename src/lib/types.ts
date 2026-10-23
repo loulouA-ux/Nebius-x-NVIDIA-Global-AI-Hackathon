@@ -34,6 +34,7 @@ export type Source = {
   retrievedAt: string;
   publishedAt?: string;
   extraction?: "extracted" | "search-only";
+  classification?: "matched-advisory" | "watch";
 };
 export type Explanation = { findingId: string; explanation: string };
 export type ScanReport = {

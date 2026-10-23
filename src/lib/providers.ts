@@ -172,9 +172,14 @@ export async function research(
       ),
     );
     for (const s of result.results) {
+      if (
+        !`${s.title} ${s.content}`.toLowerCase().includes(d.name.toLowerCase())
+      )
+        continue;
       if (new URL(s.url).protocol !== "https:") continue;
       sources.push({
         id: `source-${sources.length + 1}`,
+        classification: "watch",
         package: d.name,
         version: d.version,
         url: s.url,

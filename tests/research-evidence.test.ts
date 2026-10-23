@@ -13,7 +13,7 @@ const deps = [
 ];
 const url = "https://github.com/advisories/GHSA-test";
 const search = {
-  results: [{ url, title: "Advisory", content: "Search snippet" }],
+  results: [{ url, title: "Advisory", content: "lodash Search snippet" }],
 };
 const reply = (value: unknown) =>
   new Response(JSON.stringify(value), { status: 200 });
@@ -76,7 +76,7 @@ describe("bounded evidence extraction", () => {
       cache,
     );
     expect(r.extractionComplete).toBe(false);
-    expect(r.sources[0].excerpt).toBe("Search snippet");
+    expect(r.sources[0].excerpt).toBe("lodash Search snippet");
     expect(cache.putResearch).not.toHaveBeenCalled();
   });
   it("uses cache without network and preserves original evidence timestamps", async () => {
@@ -105,21 +105,52 @@ describe("bounded evidence extraction", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
   it("never extracts arbitrary search result hosts", async () => {
-    const fetcher = vi
-      .fn()
-      .mockResolvedValue(
-        reply({
-          results: [
-            {
-              url: "https://127.0.0.1/admin",
-              title: "Local",
-              content: "Untrusted",
-            },
-          ],
-        }),
-      );
+    const fetcher = vi.fn().mockResolvedValue(
+      reply({
+        results: [
+          {
+            url: "https://127.0.0.1/admin",
+            title: "Local",
+            content: "Untrusted",
+          },
+        ],
+      }),
+    );
     const r = await researchWithEvidence(deps, "synthetic-test-key", fetcher);
     expect(fetcher).toHaveBeenCalledOnce();
     expect(r.extractionComplete).toBe(false);
   });
+});
+
+it("drops unrelated results and never promotes a search result to a matched vulnerability", async () => {
+  const fetcher = vi.fn().mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        results: [
+          {
+            url: "https://github.com/issues/unrelated",
+            title: "Other library",
+            content: "Nothing relevant here",
+          },
+          {
+            url: "https://github.com/issues/watch",
+            title: "lodash discussion",
+            content: "Unconfirmed report for lodash",
+          },
+        ],
+      }),
+    ),
+  );
+  const r = await researchWithEvidence(deps, "synthetic-test-key", fetcher);
+  expect(r.sources).toHaveLength(1);
+  expect(r.sources[0].classification).toBe("watch");
+  expect(r.extractionComplete).toBe(false);
+});
+it("keeps an empty search as empty evidence, never a clean vulnerability verdict", async () => {
+  const fetcher = vi
+    .fn()
+    .mockResolvedValue(new Response(JSON.stringify({ results: [] })));
+  const r = await researchWithEvidence(deps, "synthetic-test-key", fetcher);
+  expect(r.sources).toEqual([]);
+  expect(r.extractionComplete).toBe(false);
 });

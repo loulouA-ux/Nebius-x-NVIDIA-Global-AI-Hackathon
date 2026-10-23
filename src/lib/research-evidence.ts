@@ -69,7 +69,9 @@ export async function researchWithEvidence(
     0,
     2,
   )) {
-    if (!sources.some((s) => s.url === url))
+    const linked = sources.find((s) => s.url === url);
+    if (linked) linked.classification = "matched-advisory";
+    if (!linked)
       sources.unshift({
         id: "",
         package: deps
@@ -82,6 +84,7 @@ export async function researchWithEvidence(
           .join(", "),
         url,
         title: "Scanner-linked advisory",
+        classification: "matched-advisory",
         excerpt: "See original advisory evidence; extraction pending.",
         retrievedAt: new Date().toISOString(),
       });
