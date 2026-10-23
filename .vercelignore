@@ -1,0 +1,6 @@
+.private
+.env*
+!.env.example
+test-results
+playwright-report
+.git

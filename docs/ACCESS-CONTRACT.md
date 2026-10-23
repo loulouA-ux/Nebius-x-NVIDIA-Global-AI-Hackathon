@@ -2,7 +2,7 @@
 
 ## Decisions
 
-- App: Next.js Node 22, Vercel HeySalad Inc / shipcheck. GitHub connection verified. Current project has no public deployment.
+- App: Next.js Node 22, Vercel HeySalad Inc / shipcheck. GitHub connection verified. Protected preview deployed; public production release remains separate.
 - Storage: dedicated Neon Postgres `shipcheck-db` / `odd-math-86003251`, US East 1. Connected to Development and Preview only. Schema `migrations/001_core.sql` applied and real project/scan/decision readback tested. No existing database reused.
 - Budget: Peter approved a maximum £15/month. Paid metered Launch plan; existing compute and project defaults set to fixed 0.25 CU with 5-minute autosuspend. Neon spending limits are alert-only, not an enforced billing ceiling. The £15 budget is not guaranteed by these settings.
 - App Actor: `{id: 'peter' | 'louise', workspaceId: 'shipcheck-team', role: 'member'}` obtained only with `requireActor(request, query)`. Never accept identity/owner/workspace from body, query, or proxy headers.
@@ -24,4 +24,8 @@ Create route may map `id` to public `projectId` as previously agreed. All mutati
 
 Implemented routes: GET/POST/DELETE `/api/session`, GET `/api/scans/{id}`, POST `/api/scans/{id}/decisions`; `/sign-in` provides the access-key form. Live POST `/api/scans` now requires session; existing offline demo remains anonymous. UI integration with sign-in/project history remains Louise's work.
 
-The chosen DB is provisioned; member hashes/provider keys and hosted acceptance remain separate gates. CLI scripts never print credentials. `node --env-file=.env.local --import tsx scripts/migrate.ts` applies additive schema; `scripts/db-smoke.ts` creates/removes only uniquely tagged synthetic acceptance rows.
+The chosen DB is provisioned; provider keys and distinct member hashes are configured for Development/Preview; hosted acceptance is a separate gate. CLI scripts never print credentials. `node --env-file=.env.local --import tsx scripts/migrate.ts` applies additive schema; `scripts/db-smoke.ts` creates/removes only uniquely tagged synthetic acceptance rows.
+
+## Provider acceptance
+
+23 October 2026: `scripts/provider-smoke.ts` passed against the Development credentials: Tavily HTTP 200 with three schema-valid sources and Nebius HTTP 200 with one schema-valid explanation on synthetic input. Default model: `nvidia/nemotron-3-super-120b-a12b`. No secrets or raw model/provider responses are printed. GET `/api/scans` lists the authenticated owner's latest 50 saved reports.
