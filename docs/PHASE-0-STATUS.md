@@ -12,9 +12,10 @@ Updated 23 October 2026. This is a working handoff alongside the team's project 
 | Setup guidance and env example | Present on working branch | Louise's branch has the app source, setup README and `.env.example`. The submitted repository URL must expose these files to judges after integration. |
 | Repeatable demo fixture | Present | The app uses a synthetic manifest and a dated OSV advisory snapshot; it does not install the vulnerable package. |
 | Live Nebius Token Factory and Tavily calls | Open — Peter | Record a successful runtime call to an NVIDIA open model through Token Factory and a Tavily Search call with the intended account. Confirm model ID, limits and failure behaviour. Do not mark the hackathon platform requirement complete from adapter code alone. |
-| Hosting and storage/session ownership | Open — together | The plan proposes Vercel and Neon. Peter's P3 contract decision must settle demo access, project storage and actor/session shape before Louise wires persistent project routes. ATR Cloudflare hosts the coordination room, not this app. |
+| App hosting | Reported ready for integration — Peter | Peter reported in ATR handoff 32 that the Vercel `hey-salad-inc/shipcheck` project exists with Node 22 and the build settings. No deployment exists. GitHub integration is unresolved, and Vercel deployment authentication is not app session authentication. |
+| Storage, actor/session and demo access | Open — together | Neon is still proposed and unprovisioned. Peter's P3 contract decision must settle project storage, actor/session shape and public demo access before Louise wires persistent project routes. ATR Cloudflare hosts the coordination room, not this app. |
 
-Phase 0 closes when the two open gates are settled and the team has a runnable demo path. Until then, Louise can refine product copy and the demo sequence without changing Peter's provider, shared finding type or scan route work.
+Phase 0 closes when live provider access, storage and the actor/session contract are settled and the team has a runnable demo path. Until then, Louise can refine product copy and the demo sequence without changing Peter's provider, shared finding type or scan route work.
 
 ## Branches and ownership
 
