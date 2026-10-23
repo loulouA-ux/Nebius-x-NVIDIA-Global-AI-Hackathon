@@ -6,7 +6,7 @@ Updated 23 October 2026. This is a working handoff alongside the team's project 
 
 | Item | Status | Evidence or next action |
 | --- | --- | --- |
-| Product name, scope and demo story | Confirmed | ShipCheck scans exact dependency versions and a verified staging host, adds Tavily source research and Nemotron explanation, and leaves remediation with the developer. The screen sequence and safety boundary are in [Partner A flow](PARTNER-A-FLOW.md). |
+| Product name, scope and demo story | Confirmed | ShipCheck scans exact dependency versions and a verified staging host, adds Tavily source research and Nemotron explanation, and leaves remediation with the developer. The screen sequence and safety boundary are in [Partner A flow](PARTNER-A-FLOW.md); the [demo walkthrough](DEMO-WALKTHROUGH.md) separates today's working demo from the target flow. |
 | Submission deadline | Confirmed | [Devpost rules](https://nebiusglobalaihackathon.devpost.com/rules): Friday 30 October 2026, 10:00 a.m. PDT = 17:00 London. Team target: noon London. The manually updated plan PDF still says 18:00 London. |
 | Public repository, MIT licence and setup guidance | Present | The shared GitHub repository contains `LICENSE`, `README.md` and `.env.example`. Keep all keys out of Git. |
 | Repeatable demo fixture | Present | The app uses a synthetic manifest and a dated OSV advisory snapshot; it does not install the vulnerable package. |
