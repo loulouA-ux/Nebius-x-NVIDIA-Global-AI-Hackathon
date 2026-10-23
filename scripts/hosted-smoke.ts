@@ -8,6 +8,7 @@ if (!deployment || !/^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(deployment))
 const dir = ".private/acceptance-" + randomUUID();
 mkdirSync(dir, { mode: 0o700, recursive: true });
 let sequence = 0;
+const loggedIn = new Set<string>();
 function request(
   path: string,
   method = "GET",
@@ -83,6 +84,7 @@ try {
     const login = request("/api/session", "POST", { key }, member);
     assert.equal(login.status, 200);
     assert.equal(login.body.actor.id, member);
+    loggedIn.add(member);
     assert.match(login.headers, /HttpOnly/i);
     assert.match(login.headers, /SameSite=Strict/i);
     assert.match(login.headers, /Secure/i);
@@ -237,5 +239,12 @@ try {
   );
   process.exitCode = 1;
 } finally {
+  for (const member of loggedIn) {
+    try {
+      request("/api/session", "DELETE", undefined, member);
+    } catch {
+      /* Sessions still expire server-side after eight hours. */
+    }
+  }
   rmSync(dir, { recursive: true, force: true });
 }

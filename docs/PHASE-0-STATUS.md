@@ -1,5 +1,8 @@
 # ShipCheck Phase 0 status
 
+> Historical planning snapshot below. See [current verified integration status](IMPLEMENTATION-STATUS.md) for live-provider, hosted-access and implementation updates.
+
+
 Updated 23 October 2026. This is a working handoff alongside the team's project plan, not a replacement for it.
 
 ## Phase 0 checkpoint

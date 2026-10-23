@@ -1,5 +1,8 @@
 # Partner A product flow — 23 October 2026
 
+> Historical planning snapshot below. See [current verified integration status](IMPLEMENTATION-STATUS.md) for live-provider, hosted-access and implementation updates.
+
+
 ## Phase and demo story
 
 Phase 0 remains open until live Nebius and Tavily calls and the hosting/storage/session boundary are confirmed. Peter's committed foundation already covers part of Phase 1: the dependency parser, OSV lookup, synthetic demo, masking and a first report. The planned project setup and verified staging host flow do not exist yet.
