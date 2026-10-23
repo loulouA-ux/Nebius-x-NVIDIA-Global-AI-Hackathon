@@ -26,6 +26,26 @@ The fixed demo input in `src/lib/pipeline.ts:9-25` contains a lockfile entry for
 
 This completes the **source-level offline-demo mapping**. It does not substitute for reviewing a real hosted report containing live provider output.
 
+## Historical hosted synthetic report review
+
+Peter delivered a sanitized report from the protected preview at code `23711d4` through ATR messages 84–86. The three chunks reconstructed to the stated SHA-256 (`d7525e53b6cbeb08c93add4ec70e7510cf4a160eceeb09c4e384454844f43c51`). The report has one exact `lodash@4.17.20` dependency, ten review-level findings, ten Nemotron notes, five source cards and ten completed coverage checks. This historical, one-package sample cannot validate PH3-01 or later code changes. The sanitized report itself remains outside Git.
+
+All five OSV finding descriptions point to the matched advisory and exact package/version; all five passive-host finding descriptions state the observed root/header/cookie/CORS configuration without claiming exploitability. The `Review required` verdict follows the recorded policy: no high findings and no incomplete checks. The source cards retain retrieval dates; publication dates are unknown. Three search-only issue cards remain unconfirmed context and do not change the verdict.
+
+The following **model sentences exceed the displayed evidence** in this sample:
+
+| Finding | Unsupported step in Nemotron note | Evidence-safe boundary |
+| --- | --- | --- |
+| 1, lodash ReDoS | Calls the mechanism “exponential backtracking”; the linked excerpt establishes ReDoS through named functions, not that mechanism. | State the reported ReDoS and affected version without a mechanism claim. |
+| 2, lodash command injection | Says “arbitrary shell commands”; the linked advisory excerpt says command injection via `template` but does not establish shell execution. | Use the advisory's narrower wording. |
+| 6, HSTS | Infers host-wide lack of HSTS enforcement from one root response without the header. | State that the checked root response lacked the header. |
+| 7, CSP | Infers that the whole page has no CSP mitigation from one missing response header. | State that no CSP response header was observed on the checked root response; other paths or a meta policy were not assessed. |
+| 8, MIME sniffing | Generalizes a missing root `X-Content-Type-Options` header to other resources. | Limit the observation to the checked response. |
+| 9, cookie flags | Infers potential theft from missing flags without knowing cookie purpose or authentication use. | Report the one cookie's missing flags and need for review. |
+| 10, wildcard CORS | Says the header permits any origin to make cross-origin requests. CORS controls browser response access, and only one root OPTIONS response was inspected. | State the observed `Access-Control-Allow-Origin: *` on that OPTIONS response; do not infer actual authenticated data exposure. |
+
+Notes 3–5 stay within the linked OSV advisory excerpts at this level of review. The UI's “AI-generated explanation” warning is helpful but does not satisfy the plan's every-claim-to-evidence checkpoint for the seven stronger statements. Peter owns the model adapter/guardrails; the draft needs a corrected synthetic report or a safe fallback that does not publish unsupported model prose before the joint Phase 3 gate can close.
+
 ## Finding PH3-01: scanner-linked advisory can carry the wrong package label
 
 `src/lib/research-evidence.ts:75-84` creates a Tavily research card for an OSV advisory URL absent from search results, but fills its `package` and `version` from *all first-three dependencies*. `src/app/page.tsx:572-577` presents that combined label beside the single advisory. With a multi-package manifest, the card can imply that unrelated packages match the advisory. A search result already linked to the advisory can also retain the package label of the search that returned it, without checking the OSV finding's package. The underlying OSV finding still has its own exact package/version evidence.
