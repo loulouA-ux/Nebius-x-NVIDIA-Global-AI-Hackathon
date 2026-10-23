@@ -489,6 +489,7 @@ main {
   font-weight: 500;
   margin: 18px 0 7px;
 }
+.scan-form input:not([type="checkbox"]),
 .scan-form select,
 .scan-form textarea {
   width: 100%;
@@ -801,6 +802,7 @@ footer span {
     gap: 9px;
     font-size: 10px;
   }
+  .scan-form input:not([type="checkbox"]),
   .scan-form textarea,
   .scan-form select {
     font-size: 16px;
