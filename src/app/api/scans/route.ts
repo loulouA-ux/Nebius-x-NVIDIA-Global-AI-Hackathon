@@ -4,7 +4,7 @@ import { runScan } from "@/lib/pipeline";
 import { database } from "@/lib/server/db";
 import { requireActor } from "@/lib/server/session";
 import { Store } from "@/lib/server/store";
-import { failure, ApiError } from "@/lib/server/http";
+import { failure, ApiError, json } from "@/lib/server/http";
 export const runtime = "nodejs";
 const inputSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("demo") }).strict(),
@@ -110,5 +110,15 @@ export async function POST(request: Request) {
     );
   } finally {
     active = false;
+  }
+}
+
+export async function GET(request: Request) {
+  try {
+    const query = database();
+    const actor = await requireActor(request, query);
+    return json({ scans: await new Store(query).listScans(actor) });
+  } catch (error) {
+    return failure(error);
   }
 }

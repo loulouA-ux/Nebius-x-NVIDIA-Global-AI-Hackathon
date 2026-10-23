@@ -1,0 +1,202 @@
+import { spawnSync } from "node:child_process";
+import { readFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import assert from "node:assert/strict";
+const deployment = process.argv[2];
+if (!deployment || !/^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(deployment))
+  throw new Error("Pass the exact preview deployment URL.");
+const dir = ".private/acceptance-" + randomUUID();
+mkdirSync(dir, { mode: 0o700, recursive: true });
+let sequence = 0;
+function request(
+  path: string,
+  method = "GET",
+  data?: unknown,
+  member?: string,
+) {
+  const id = ++sequence,
+    output = `${dir}/${id}.json`,
+    headers = `${dir}/${id}.headers`,
+    cookie = `${dir}/${member || "anonymous"}.cookies`;
+  const args = [
+    "curl",
+    path,
+    "--deployment",
+    deployment,
+    "--scope",
+    "hey-salad-inc",
+    "--",
+    "--silent",
+    "--show-error",
+    "--max-time",
+    "100",
+    "--request",
+    method,
+    "--output",
+    output,
+    "--dump-header",
+    headers,
+    "--cookie-jar",
+    cookie,
+  ];
+  if (member && method !== "LOGIN") args.push("--cookie", cookie);
+  if (data !== undefined)
+    args.push(
+      "--header",
+      "Content-Type: application/json",
+      "--header",
+      `Origin: ${deployment}`,
+      "--data-binary",
+      "@-",
+    );
+  const r = spawnSync("vercel", args, {
+    input: data === undefined ? undefined : JSON.stringify(data),
+    encoding: "utf8",
+    timeout: 110000,
+  });
+  if (r.status !== 0)
+    throw new Error("Preview request command failed (details suppressed).");
+  const hs = readFileSync(headers, "utf8");
+  const status = Number([...hs.matchAll(/^HTTP\/\S+ (\d+)/gm)].at(-1)?.[1]);
+  let body: any;
+  try {
+    body = JSON.parse(readFileSync(output, "utf8"));
+  } catch {
+    throw new Error("Preview response was not JSON.");
+  }
+  return { status, body, headers: hs };
+}
+try {
+  assert.equal(request("/api/health").status, 200);
+  const unauthorized = request("/api/scans", "POST", {
+    mode: "live",
+    filename: "package.json",
+    content: '{"dependencies":{"lodash":"4.17.20"}}',
+  });
+  assert.equal(unauthorized.status, 401);
+  const demo = request("/api/scans", "POST", { mode: "demo" });
+  assert.equal(demo.status, 200);
+  assert.equal(demo.body.mode, "demo");
+  console.log("PASS: hosted health, anonymous live denial and offline demo.");
+  for (const member of ["peter", "louise"]) {
+    const key = readFileSync(`.private/${member}-access-key`, "utf8").trim();
+    const login = request("/api/session", "POST", { key }, member);
+    assert.equal(login.status, 200);
+    assert.equal(login.body.actor.id, member);
+    assert.match(login.headers, /HttpOnly/i);
+    assert.match(login.headers, /SameSite=Strict/i);
+    assert.match(login.headers, /Secure/i);
+    assert.equal(
+      request("/api/session", "GET", undefined, member).body.actor.id,
+      member,
+    );
+  }
+  console.log("PASS: two distinct hosted member sessions and secure cookies.");
+  const project = request(
+    "/api/projects",
+    "POST",
+    {
+      name: "Acceptance " + new Date().toISOString(),
+      stagingUrl: "https://example.com",
+    },
+    "peter",
+  );
+  assert.equal(project.status, 201);
+  const pid = project.body.projectId;
+  assert.equal(
+    request(`/api/projects/${pid}`, "GET", undefined, "louise").status,
+    404,
+  );
+  assert.equal(
+    request("/api/projects", "GET", undefined, "peter").body.projects.some(
+      (p: any) => p.projectId === pid,
+    ),
+    true,
+  );
+  const refresh = request(
+    `/api/projects/${pid}/challenge`,
+    "POST",
+    undefined,
+    "peter",
+  );
+  assert.equal(refresh.status, 200);
+  assert.notEqual(
+    refresh.body.verification.challenge.value,
+    project.body.verification.challenge.value,
+  );
+  console.log(
+    "PASS: project create/list, challenge rotation and cross-member denial.",
+  );
+  const live = request(
+    "/api/scans",
+    "POST",
+    {
+      mode: "live",
+      filename: "package.json",
+      content: '{"dependencies":{"lodash":"4.17.20"}}',
+      research: true,
+    },
+    "peter",
+  );
+  assert.equal(live.status, 200);
+  const rid = live.body.id;
+  assert.ok(live.body.findings.length);
+  const persisted = request(`/api/scans/${rid}`, "GET", undefined, "peter");
+  assert.equal(persisted.status, 200);
+  assert.equal(persisted.body.report.id, rid);
+  assert.equal(
+    request(`/api/scans/${rid}`, "GET", undefined, "louise").status,
+    404,
+  );
+  const decision = request(
+    `/api/scans/${rid}/decisions`,
+    "POST",
+    {
+      findingId: live.body.findings[0].id,
+      action: "acknowledge",
+      reason: "Synthetic acceptance check; no remediation claim.",
+    },
+    "peter",
+  );
+  assert.equal(decision.status, 201);
+  const saved = request(`/api/scans/${rid}`, "GET", undefined, "peter");
+  assert.equal(saved.body.decisions.length, 1);
+  assert.equal(saved.body.report.status, live.body.status);
+  assert.equal(
+    request("/api/scans", "GET", undefined, "peter").body.scans.some(
+      (s: any) => s.id === rid,
+    ),
+    true,
+  );
+  console.log(
+    JSON.stringify({
+      status:
+        "PASS: live scan, persisted report, immutable decision and cross-member denial",
+      checks: live.body.checks.map((c: any) => ({
+        name: c.name,
+        state: c.state,
+      })),
+    }),
+  );
+  for (const member of ["peter", "louise"]) {
+    assert.equal(
+      request("/api/session", "DELETE", undefined, member).status,
+      200,
+    );
+    assert.equal(request("/api/session", "GET", undefined, member).status, 401);
+  }
+  console.log(
+    "PASS: logout invalidates both sessions. Synthetic acceptance project/report retained for review.",
+  );
+} catch {
+  console.log(
+    JSON.stringify({
+      status: "FAIL",
+      requestNumber: sequence,
+      detail: "Acceptance assertion failed; credentials/responses suppressed.",
+    }),
+  );
+  process.exitCode = 1;
+} finally {
+  rmSync(dir, { recursive: true, force: true });
+}
