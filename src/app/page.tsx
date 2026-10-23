@@ -98,11 +98,11 @@ export default function Home() {
   return (
     <div className="app">
       <header className="topbar">
-        <a className="brand" href="/" aria-label="Agent Shielda home">
+        <a className="brand" href="/" aria-label="ShipCheck home">
           <span className="brand-mark">
             <CheckCheck size={22} />
           </span>
-          Agent Shielda
+          ShipCheck
         </a>
         <span className="tagline">Check before you ship.</span>
         <span className="build-badge">
@@ -377,7 +377,7 @@ export default function Home() {
                   <div className="art-line" />
                   <div className="art-node center-node">
                     <CheckCheck size={30} />
-                    <span>Agent Shielda</span>
+                    <span>ShipCheck</span>
                   </div>
                   <div className="art-line" />
                   <div className="art-node">
@@ -578,7 +578,7 @@ export default function Home() {
           <footer>
             <span>
               <CheckCheck size={14} />
-              Agent Shielda · Evidence before deployment
+              ShipCheck · Evidence before deployment
             </span>
             <span>Local session only · Results are not saved</span>
           </footer>
