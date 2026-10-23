@@ -16,14 +16,17 @@
 - Member UI exposes saved reports, sign-out and append-only acknowledge/dismiss decisions. Original verdict remains unchanged.
 - Passive host module uses Louise's pinned HTTPS fetch helper for exactly four fixed requests: GET /, GET /robots.txt, GET /.well-known/security.txt, OPTIONS /. It does not follow redirects, retain bodies or cookie values, execute scripts, authenticate to targets, enumerate paths, exploit vulnerabilities or apply patches.
 - Host findings are configuration reviews, not exploitability claims. Failed/incomplete requests cannot become a passing assessment.
-- Live host acceptance against a dedicated synthetic Cloudflare Worker is pending final preview verification.
+- Protected preview acceptance at code commit `23711d4` passed all four real passive host checks, OSV, Tavily search/extraction and Nemotron explanation coverage. Target: dedicated synthetic Cloudflare Worker; no customer target was scanned.
+- Local validation: 81 unit/integration tests, six browser tests, typecheck and production build passed. GitHub CI passed.
+- Fixed Node 22 pinned DNS lookup array handling while retaining TLS hostname verification; regression tests cover array lookup, redirects, size limits and TLS options.
+- Verified preview: https://shipcheck-6v2ykt8yg-hey-salad-inc.vercel.app/
 
 ## Remaining release gates
 
-- Final preview acceptance of the current additions and independent partner review.
+- Independent partner review of the integrated changes; draft PR #1 targets main and remains unmerged.
 - Private delivery of Louise's member key and her successful sign-in.
-- Confirm public judging access policy and provision a separate Production database/credentials before public launch; current Preview protection is intentional.
+- Peter chose to keep the protected team preview on 23 October. Public judging access and Production provisioning are deferred; no public release is approved.
 - Integrate reviewed code into the submission branch (main is not yet the submitted product).
-- Final labelled benchmark/demo rehearsal, recording, screenshots, Devpost narrative and human submission. Do not describe these as completed.
+- Final labelled benchmark/demo rehearsal, recording, approved Devpost narrative and human submission. A submission draft and recording outline are in SUBMISSION-DRAFT.md; no video or submission is complete.
 
 The API smoke script retains labelled synthetic acceptance projects/reports for review. Test credentials, session cookies and API response files are never committed; temporary request files are removed after checks.
