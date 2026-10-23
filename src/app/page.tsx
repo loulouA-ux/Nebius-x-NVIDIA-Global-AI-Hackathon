@@ -20,7 +20,15 @@ import {
 } from "lucide-react";
 import type { Finding, ScanReport } from "@/lib/types";
 
-type View = "overview" | "scan" | "findings" | "actions";
+type View = "overview" | "project" | "scan" | "findings" | "actions";
+function stagingHostname(input: string): string | null {
+  try {
+    const url = new URL(input.trim());
+    if (url.protocol !== "https:" || url.username || url.password || url.port || url.search || url.hash || url.pathname !== "/") return null;
+    if (!url.hostname.includes(".") || url.hostname.endsWith(".local")) return null;
+    return url.hostname.toLowerCase();
+  } catch { return null; }
+}
 const defaultManifest = JSON.stringify(
   {
     name: "my-app",
@@ -42,6 +50,10 @@ export default function Home() {
   const [filename, setFilename] = useState("package-lock.json");
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const [stagingUrl, setStagingUrl] = useState("");
+  const [proofMethod, setProofMethod] = useState<"dns" | "file">("dns");
+  const host = stagingHostname(stagingUrl);
   function navigate(v: View) {
     setView(v);
     setSelected(null);
@@ -72,6 +84,7 @@ export default function Home() {
   }
   const nav = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "project", label: "Project setup", icon: FileSearch },
     { id: "scan", label: "New scan", icon: ScanLine },
     { id: "findings", label: "Findings", icon: ShieldAlert },
     { id: "actions", label: "Recommended actions", icon: ListChecks },
@@ -134,7 +147,9 @@ export default function Home() {
             WORKSPACE <ChevronRight size={12} />{" "}
             {selected
               ? "FINDING DETAILS"
-              : view === "scan"
+              : view === "project"
+                ? "PROJECT SETUP"
+                : view === "scan"
                 ? "NEW SCAN"
                 : view === "actions"
                   ? "RECOMMENDED ACTIONS"
@@ -211,6 +226,33 @@ export default function Home() {
                   </section>
                 ))}
             </>
+          ) : view === "project" ? (
+            <>
+              <h1>Set up a project.</h1>
+              <p className="intro">Name the release candidate and identify the exact staging host you control.</p>
+              <section className="panel scan-form">
+                <h2>Project details</h2>
+                <label htmlFor="project-name">Project name</label>
+                <input id="project-name" value={projectName} maxLength={80} onChange={(e) => setProjectName(e.target.value)} placeholder="e.g. Storefront staging" />
+                <label htmlFor="staging-url">Staging URL</label>
+                <input id="staging-url" type="url" value={stagingUrl} onChange={(e) => setStagingUrl(e.target.value)} placeholder="https://staging.example.com/" />
+                <p className="fineprint">Use the HTTPS origin of a public staging host. Paths, ports, query strings and credentials are not accepted.</p>
+                {stagingUrl && !host && <p role="alert" className="error">Enter a public HTTPS origin, such as https://staging.example.com/.</p>}
+                {host && <p className="quiet-note">Exact host to verify: <strong>{host}</strong></p>}
+              </section>
+              <section className="panel scan-form">
+                <h2>Prove control of the host</h2>
+                <p>Choose how you will publish a short-lived challenge. The server will provide the value and verify it before a URL scan.</p>
+                <label htmlFor="proof-method">Verification method</label>
+                <select id="proof-method" value={proofMethod} onChange={(e) => setProofMethod(e.target.value as "dns" | "file")}>
+                  <option value="dns">DNS TXT record</option>
+                  <option value="file">Well-known file</option>
+                </select>
+                <p className="quiet-note">{proofMethod === "dns" ? `Publish the server-issued challenge in a TXT record for ${host || "your exact staging host"}.` : `Publish the server-issued challenge under https://${host || "your exact staging host"}/.well-known/.`}</p>
+                <p className="fineprint">Challenge issuance and verification are being built. Host scans remain unavailable until proof can be checked again for every scan.</p>
+                <span className="neutral-badge">Verification pending</span>
+              </section>
+            </>
           ) : view === "scan" ? (
             <>
               <h1>Check a project.</h1>
@@ -285,6 +327,7 @@ export default function Home() {
                     Planned next: prove ownership of your staging host, then run
                     bounded passive checks.
                   </p>
+                  <button className="button" onClick={() => navigate("project")}>View project setup <ChevronRight size={16} /></button>
                   <span className="neutral-badge">Not available yet</span>
                 </section>
               </div>
