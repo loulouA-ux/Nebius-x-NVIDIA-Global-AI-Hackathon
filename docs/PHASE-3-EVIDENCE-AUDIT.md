@@ -13,6 +13,19 @@ The project plan's joint Phase 3 check is that every reported claim maps to scan
 | Tavily research cards | Search or extracted text retains URL, retrieval time, optional publication date and a watch or scanner-matched label. Research does not change the verdict. | Provenance is displayed, subject to the package-label issue below. |
 | Nemotron notes | The model receives existing findings and limited unconfirmed sources. Validation requires one note per supplied finding ID and rejects URLs/advisory IDs, while the UI marks notes as AI-generated. | **Needs a human evidence check on the actual synthetic hosted report.** The schema does not establish that each sentence is entailed by the displayed evidence. |
 
+## Independent offline-demo claim check
+
+The fixed demo input in `src/lib/pipeline.ts:9-25` contains a lockfile entry for `lodash@4.17.20`, a synthetic credential pattern and `productionBrowserSourceMaps: true`. The reported claims map as follows:
+
+| Displayed claim | Direct support | Limit shown to the user |
+| --- | --- | --- |
+| Two high findings require attention | One pattern match in `scanFiles` and one `lodash@4.17.20` match in `snapshotFindings`; `verdict` counts high findings as blocked. | The credential is synthetic; pattern matching does not prove validity. |
+| Lodash advisory | The pinned OSV fixture `GHSA-35jh-r3h4-6jhm` and the exact lockfile version; finding evidence links to the advisory and carries the snapshot retrieval date. | Demo describes this as one dated snapshot, not a live full OSV query or confirmed application exploitability. |
+| Production source-map review | The fixed `next.config.ts` text contains `productionBrowserSourceMaps: true`; `scanFiles` records that setting as code evidence. | It is a review finding, not proof of exposed secrets. |
+| No patch or target-system change | `runScan` reads fixed strings and creates a report; the UI states that resolution requires independent verification. | Demo decisions are temporary and do not persist. |
+
+This completes the **source-level offline-demo mapping**. It does not substitute for reviewing a real hosted report containing live provider output.
+
 ## Finding PH3-01: scanner-linked advisory can carry the wrong package label
 
 `src/lib/research-evidence.ts:75-84` creates a Tavily research card for an OSV advisory URL absent from search results, but fills its `package` and `version` from *all first-three dependencies*. `src/app/page.tsx:572-577` presents that combined label beside the single advisory. With a multi-package manifest, the card can imply that unrelated packages match the advisory. A search result already linked to the advisory can also retain the package label of the search that returned it, without checking the OSV finding's package. The underlying OSV finding still has its own exact package/version evidence.
