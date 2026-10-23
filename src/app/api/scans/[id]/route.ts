@@ -1,16 +1,15 @@
 import { database } from "@/lib/server/db";
 import { requireActor } from "@/lib/server/session";
 import { Store } from "@/lib/server/store";
-import { failure, json, ApiError } from "@/lib/server/http";
+import { failure, json } from "@/lib/server/http";
+import { validateScanId } from "@/lib/server/scan-id";
 export const runtime = "nodejs";
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
-    if (!/^[a-f0-9-]{36}$/.test(id))
-      throw new ApiError(400, "Invalid scan ID.");
+    const id = validateScanId((await params).id);
     const q = database(),
       actor = await requireActor(request, q),
       store = new Store(q);
