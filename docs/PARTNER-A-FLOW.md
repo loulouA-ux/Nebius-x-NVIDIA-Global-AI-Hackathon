@@ -2,7 +2,7 @@
 
 ## Phase and demo story
 
-The project is in Phase 1. Peter's committed foundation covers the dependency parser, OSV lookup, synthetic demo, masking and a first report. The planned project setup and verified staging host flow do not exist yet. Phase 0 remains open until live Nebius and Tavily calls, a hosting account and the final demo story are confirmed.
+Phase 0 remains open until live Nebius and Tavily calls and the hosting/storage/session boundary are confirmed. Peter's committed foundation already covers part of Phase 1: the dependency parser, OSV lookup, synthetic demo, masking and a first report. The planned project setup and verified staging host flow do not exist yet.
 
 Demo story: a small team checks a release candidate. They create a named project, prove control of its exact staging hostname, scan an exact dependency manifest and that verified host, then review evidence and choose whether to acknowledge or dismiss findings. A seeded offline example makes the flow visible to judges when external services are unavailable. The current build demonstrates the dependency portion only.
 
