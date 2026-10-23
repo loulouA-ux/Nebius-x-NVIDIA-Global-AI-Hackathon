@@ -560,6 +560,11 @@ export default function Home() {
                   {report.sources.map((s) => (
                     <article key={s.id} className="panel">
                       <h3>{s.title}</h3>
+                      <small>
+                        {s.classification === "matched-advisory"
+                          ? "Scanner-matched advisory · review applicability"
+                          : "Watch · unconfirmed"}
+                      </small>
                       <p>{s.excerpt}</p>
                       <a href={s.url} target="_blank" rel="noreferrer">
                         Read source <ExternalLink size={13} />
