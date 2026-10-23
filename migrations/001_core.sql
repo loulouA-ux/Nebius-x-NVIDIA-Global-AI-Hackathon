@@ -26,3 +26,7 @@ CREATE TABLE IF NOT EXISTS sc_quotas (
  bucket text NOT NULL, window_start bigint NOT NULL, used integer NOT NULL,
  PRIMARY KEY(bucket,window_start)
 );
+
+CREATE TABLE IF NOT EXISTS sc_research_cache (
+ cache_key text PRIMARY KEY, value jsonb NOT NULL, expires_at timestamptz NOT NULL
+);

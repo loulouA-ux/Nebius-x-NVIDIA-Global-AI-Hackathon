@@ -11,7 +11,7 @@ export async function GET() {
         process.env.SHIPCHECK_PETER_KEY_HASH &&
           process.env.SHIPCHECK_LOUISE_KEY_HASH,
       ),
-      urlScanning: false,
+      urlScanning: true,
       note: "Configuration presence only; not a live provider or database health check.",
     },
     { headers: { "Cache-Control": "no-store" } },

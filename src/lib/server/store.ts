@@ -1,3 +1,4 @@
+import type { ResearchEvidence } from "../research-evidence";
 import { randomUUID } from "node:crypto";
 import type { Query } from "./db";
 import { ApiError } from "./http";
@@ -31,6 +32,19 @@ function project(r: Record<string, unknown>): Project {
 }
 export class Store {
   constructor(readonly query: Query) {}
+  async getResearch(key: string): Promise<ResearchEvidence | null> {
+    const [r] = await this.query(
+      "SELECT value FROM sc_research_cache WHERE cache_key=$1 AND expires_at>now()",
+      [key],
+    );
+    return r ? (r.value as ResearchEvidence) : null;
+  }
+  async putResearch(key: string, value: ResearchEvidence) {
+    await this.query(
+      "INSERT INTO sc_research_cache(cache_key,value,expires_at) VALUES($1,$2::jsonb,now()+interval '24 hours') ON CONFLICT(cache_key) DO UPDATE SET value=excluded.value,expires_at=excluded.expires_at",
+      [key, maskSecrets(JSON.stringify(value))],
+    );
+  }
   async quota(
     bucket: string,
     limit: number,

@@ -1,7 +1,9 @@
+import type { HostCheckResult } from "./passive-host-checks";
+import { researchWithEvidence, type ResearchCache } from "./research-evidence";
 import { randomUUID } from "node:crypto";
 import { parseManifest } from "./parser";
 import { maskSecrets, scanFiles, snapshotFindings, verdict } from "./scanner";
-import { queryOsv, research, explain } from "./providers";
+import { queryOsv, explain } from "./providers";
 import type { Check, ScanInput, ScanReport } from "./types";
 
 export const demoFiles = {
@@ -22,7 +24,11 @@ export const demoFiles = {
     .replaceAll("_SYNTHETIC_", "SYNTHETIC")
     .replace("SHIPCHECK_", "SHIPCHECK"),
 };
-export async function runScan(input: ScanInput): Promise<ScanReport> {
+export async function runScan(
+  input: ScanInput,
+  cache?: ResearchCache,
+  hostResult?: HostCheckResult,
+): Promise<ScanReport> {
   const start = Date.now();
   const demo = input.mode === "demo";
   const files = demo ? demoFiles : { [input.filename!]: input.content! };
@@ -70,16 +76,38 @@ export async function runScan(input: ScanInput): Promise<ScanReport> {
       });
     }
   }
+  if (hostResult) {
+    findings.push(...hostResult.findings);
+    checks.push(...hostResult.checks);
+  }
   let sources: ScanReport["sources"] = [];
   let explanations: ScanReport["explanations"] = [];
   if (!demo && input.research && process.env.TAVILY_API_KEY) {
     try {
-      sources = await research(parsed.dependencies, process.env.TAVILY_API_KEY);
+      const evidence = await researchWithEvidence(
+        parsed.dependencies,
+        process.env.TAVILY_API_KEY,
+        fetch,
+        cache,
+        findings.flatMap((f) =>
+          f.evidence.flatMap((e) =>
+            e.kind === "advisory" && e.url ? [e.url] : [],
+          ),
+        ),
+      );
+      sources = evidence.sources;
+      checks.push({
+        name: "Source extraction",
+        state: evidence.extractionComplete ? "complete" : "incomplete",
+        detail: evidence.extractionComplete
+          ? `Up to two advisory-authority pages extracted; evidence remains unconfirmed context.${evidence.cached ? " Reused bounded 24-hour cache with original retrieval dates." : ""}`
+          : "No complete extraction of selected advisory-authority pages; search excerpts remain unconfirmed.",
+      });
       checks.push({
         name: "Live threat research",
         state: parsed.dependencies.length > 3 ? "incomplete" : "complete",
         detail:
-          "Search only, at most 3 packages. Retrieved reports are unconfirmed and never change the verdict.",
+          "Search at most 3 packages. Retrieved reports are unconfirmed and never change the verdict.",
       });
     } catch {
       checks.push({
@@ -107,9 +135,9 @@ export async function runScan(input: ScanInput): Promise<ScanReport> {
       );
       checks.push({
         name: "Nemotron explanations",
-        state: "complete",
+        state: findings.length > 12 ? "incomplete" : "complete",
         detail: findings.length
-          ? "Model notes are advisory; original findings and policy are preserved."
+          ? "At most 12 findings explained. Model notes are advisory; original findings and policy are preserved."
           : "No findings to explain; no inference call made.",
       });
     } catch {
@@ -128,12 +156,13 @@ export async function runScan(input: ScanInput): Promise<ScanReport> {
         ? "Not run in offline demo."
         : "Not requested or Nebius key is not configured.",
     });
-  checks.push({
-    name: "Staging URL / runtime",
-    state: "not-in-scope",
-    detail:
-      "URL verification and probing are not implemented in this milestone. No target site was contacted.",
-  });
+  if (!hostResult)
+    checks.push({
+      name: "Staging URL / runtime",
+      state: "not-in-scope",
+      detail:
+        "No verified staging project was selected. No target site was contacted.",
+    });
   const severityOrder = { high: 0, medium: 1, review: 2 };
   findings.sort(
     (a, b) => severityOrder[a.severity] - severityOrder[b.severity],

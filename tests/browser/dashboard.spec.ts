@@ -105,3 +105,83 @@ test("sign-in form rejects an invalid key without exposing it", async ({
   );
   await page.screenshot({ path: "test-results/sign-in.png", fullPage: true });
 });
+
+test("member can reopen a saved report and record a decision without changing its verdict", async ({
+  page,
+  request,
+}) => {
+  const response = await request.post("/api/scans", { data: { mode: "demo" } });
+  const report = await response.json();
+  report.mode = "live";
+  const decisions: Record<string, unknown>[] = [];
+  let signedIn = true;
+  await page.route("**/api/session", async (route) => {
+    if (route.request().method() === "DELETE") {
+      signedIn = false;
+      await route.fulfill({ json: { signedOut: true } });
+    } else
+      await route.fulfill({
+        status: signedIn ? 200 : 401,
+        json: signedIn ? { actor: { id: "peter" } } : { error: "Sign in" },
+      });
+  });
+  await page.route("**/api/scans", async (route) => {
+    if (route.request().method() === "GET")
+      await route.fulfill({
+        json: {
+          scans: [
+            {
+              id: report.id,
+              created_at: report.createdAt,
+              status: report.status,
+            },
+          ],
+        },
+      });
+    else await route.continue();
+  });
+  await page.route(`**/api/scans/${report.id}`, (route) =>
+    route.fulfill({ json: { report, decisions } }),
+  );
+  await page.route(`**/api/scans/${report.id}/decisions`, async (route) => {
+    const data = route.request().postDataJSON();
+    const item = {
+      id: "synthetic-decision",
+      finding_id: data.findingId,
+      action: data.action,
+      reason: data.reason,
+      created_at: new Date().toISOString(),
+    };
+    decisions.push(item);
+    await route.fulfill({ status: 201, json: item });
+  });
+  await page.goto("/");
+  await expect(page.getByText("Signed in as")).toBeVisible();
+  await page.getByLabel("Saved scans").selectOption(report.id);
+  await expect(
+    page.getByRole("heading", { name: "Manifest assessment" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: /Potential credential in supplied content/ })
+    .click();
+  await page
+    .getByLabel("Reason or review note")
+    .fill("Reviewed synthetic fixture; remediation still needed.");
+  await page.getByRole("button", { name: "Acknowledge", exact: true }).click();
+  await expect(
+    page.getByRole("list", { name: "Decision history" }),
+  ).toContainText("acknowledge");
+  expect(decisions).toHaveLength(1);
+  await page.screenshot({
+    path: "test-results/member-decision.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "Back to report" }).click();
+  await expect(
+    page.getByRole("heading", { name: "2 blockers need attention" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Member sign in" }),
+  ).toBeVisible();
+});

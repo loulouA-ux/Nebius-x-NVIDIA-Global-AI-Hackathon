@@ -156,6 +156,12 @@ export async function research(
           body: JSON.stringify({
             query: `"${d.name}" "${d.version}" security advisory compromised`,
             search_depth: "basic",
+            include_domains: [
+              "github.com",
+              "osv.dev",
+              "nvd.nist.gov",
+              "cisa.gov",
+            ],
             topic: "general",
             max_results: 3,
             include_answer: false,
@@ -184,7 +190,10 @@ export async function research(
 const outputSchema = z.object({
   explanations: z
     .array(
-      z.object({ findingId: z.string(), explanation: z.string().max(700) }),
+      z.object({
+        findingId: z.string(),
+        explanation: z.string().min(1).max(700),
+      }),
     )
     .max(30),
 });
@@ -194,6 +203,12 @@ export function validateExplanations(
 ): Explanation[] {
   const parsed = outputSchema.parse(data);
   const allowed = new Set(findings.map((f) => f.id));
+  const returned = new Set(parsed.explanations.map((e) => e.findingId));
+  if (
+    returned.size !== parsed.explanations.length ||
+    returned.size !== allowed.size
+  )
+    throw new Error("Missing or duplicate model explanations.");
   if (
     parsed.explanations.some(
       (e) =>
@@ -257,6 +272,6 @@ export async function explain(
     );
   return validateExplanations(
     JSON.parse(response.choices[0].message.content),
-    findings,
+    findings.slice(0, 12),
   );
 }
