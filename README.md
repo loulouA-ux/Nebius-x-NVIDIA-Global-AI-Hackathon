@@ -1,4 +1,4 @@
-# Agent Shielda
+# ShipCheck
 
 **Check before you ship.** A pre-deployment security assessment for small teams, built around evidence and explicit coverage.
 
@@ -6,7 +6,7 @@
 
 Implemented: Next.js dashboard, manifest input, exact dependency extraction, bounded live OSV queries, credential-pattern masking, an offline demo using a dated advisory snapshot, manual recommendations, and provider adapters for Tavily Search / NVIDIA Nemotron on Nebius Token Factory.
 
-Live Tavily and Nebius credentials have not been configured or tested. URL verification/probing, accounts, persistence, Extract, calibrated severity for live advisories, GitHub integration, patching and sandbox verification are not implemented. A successful local build is not a deployment approval.
+Live Tavily and Nebius credentials have not been configured or tested. Exact-host verification and safe-fetch primitives exist on Louise's branch, but project routes and staging scans are not wired into the product yet. Accounts, persistence, Extract, calibrated severity for live advisories, GitHub integration, patching and sandbox verification are not implemented. A successful local build is not a deployment approval.
 
 ## Run
 
@@ -57,7 +57,7 @@ Browser tests launch a separate production server on 127.0.0.1:3148. Tests inclu
 
 Suggested: Louise (A) owns product, feedback and submission; Peter (B) owns technical decisions, private accounts and release approval; Codex implements and tests both workstreams. These assignments await the team's confirmation.
 
-Next: live provider acceptance, safe verified-URL scanning, persistent projects, benchmark and public-demo hardening. Beyond the original brief: GitHub ingestion, CI policy and human-reviewed, independently verified patches. Agent Shielda is the current working name; internal package and environment-variable names retain the prototype name ShipCheck.
+Next: live provider acceptance, safe verified-URL scanning, persistent projects, benchmark and public-demo hardening. Beyond the original brief: GitHub ingestion, CI policy and human-reviewed, independently verified patches. ShipCheck is the project name; internal package and environment-variable names already use it.
 
 ## Sources and attribution
 

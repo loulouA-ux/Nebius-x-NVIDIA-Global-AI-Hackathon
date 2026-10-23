@@ -25,4 +25,4 @@ Suggested contract for joint review: `POST /api/projects` accepts a display name
 - Hosting account and public demo access owner (Louise and Peter).
 - Live Nebius/Nemotron and Tavily smoke calls (Peter); these gate the hackathon submission.
 - Final track by 29 October; Best Apps and Agents is the current default.
-- Deadline source of truth: plan says 30 October 18:00 London, team target noon. The foundation build plan says 17:00 and should be corrected after confirming the official event page.
+- Deadline source of truth: [official Devpost rules](https://nebiusglobalaihackathon.devpost.com/rules) say 30 October 2026 at 10:00 a.m. PDT. London is on GMT that day, so the deadline is 17:00 London. The team target remains noon London. The manually updated project plan PDF still says 18:00 London and needs a correction in its next revision.

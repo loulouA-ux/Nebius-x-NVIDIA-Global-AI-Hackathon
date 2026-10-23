@@ -1,6 +1,6 @@
-# Agent Shielda — first working milestone
+# ShipCheck — first working milestone
 
-Working product name: Agent Shielda. Internal identifiers retain the prototype name ShipCheck.
+Working product name: ShipCheck.
 
 Suggested ownership, pending Peter/Louise confirming their availability:
 
