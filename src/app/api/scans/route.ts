@@ -1,5 +1,10 @@
 import { z } from "zod";
+import { parseManifest } from "@/lib/parser";
 import { runScan } from "@/lib/pipeline";
+import { database } from "@/lib/server/db";
+import { requireActor } from "@/lib/server/session";
+import { Store } from "@/lib/server/store";
+import { failure, ApiError } from "@/lib/server/http";
 export const runtime = "nodejs";
 const inputSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("demo") }).strict(),
@@ -18,7 +23,7 @@ const inputSchema = z.discriminatedUnion("mode", [
 ]);
 let active = false;
 export async function POST(request: Request) {
-  // Local milestone only. Before public deployment add authentication, durable quotas and a job queue.
+  // Public demo uses only fixed fixtures. Live scans require an individual session and database quota.
   const url = new URL(request.url);
   const origin = request.headers.get("origin");
   // Next's internal request URL may use localhost while the browser uses 127.0.0.1.
@@ -40,6 +45,7 @@ export async function POST(request: Request) {
   if (!reader)
     return Response.json({ error: "Missing request body." }, { status: 400 });
   active = true;
+  let processing = false;
   try {
     let bytes = 0;
     const chunks: Uint8Array[] = [];
@@ -64,10 +70,37 @@ export async function POST(request: Request) {
         },
         { status: 400 },
       );
-    return Response.json(await runScan(parsed.data), {
+    let store: Store | undefined;
+    let actor;
+    if (parsed.data.mode === "live") {
+      // Reject anonymous calls before database/provider access.
+      if (!request.headers.get("cookie"))
+        throw new ApiError(401, "Sign in to run live scans.");
+      processing = true;
+      const query = database();
+      actor = await requireActor(request, query);
+      store = new Store(query);
+      await store.quota("scan-day:" + actor.id, 20, 86400000);
+      await store.quota("scan-global-minute", 4, 60000);
+    }
+    if (parsed.data.mode === "live") {
+      try {
+        parseManifest(parsed.data.filename, parsed.data.content);
+      } catch {
+        throw new ApiError(
+          400,
+          "Unable to parse this manifest. Check the format, exact versions and 50-dependency limit.",
+        );
+      }
+    }
+    processing = true;
+    const report = await runScan(parsed.data);
+    if (store && actor) await store.saveScan(actor, report);
+    return Response.json(report, {
       headers: { "Cache-Control": "no-store" },
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError || processing) return failure(error);
     return Response.json(
       {
         error:
