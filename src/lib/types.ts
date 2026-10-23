@@ -5,7 +5,7 @@ export type Dependency = {
   path: string;
 };
 export type Evidence = {
-  kind: "code" | "advisory";
+  kind: "code" | "advisory" | "http";
   location: string;
   excerpt: string;
   url?: string;
@@ -33,6 +33,7 @@ export type Source = {
   excerpt: string;
   retrievedAt: string;
   publishedAt?: string;
+  extraction?: "extracted" | "search-only";
 };
 export type Explanation = { findingId: string; explanation: string };
 export type ScanReport = {
@@ -53,4 +54,5 @@ export type ScanInput = {
   filename?: "package.json" | "package-lock.json" | "requirements.txt";
   content?: string;
   research?: boolean;
+  projectId?: string;
 };

@@ -19,6 +19,9 @@ import {
   Info,
 } from "lucide-react";
 import type { Finding, ScanReport } from "@/lib/types";
+import MemberControls from "./member-controls";
+import DecisionLog from "./decision-log";
+import ProjectScanChoice from "./project-scan-choice";
 import ProjectSetup from "./project-setup";
 
 type View = "overview" | "project" | "scan" | "findings" | "actions";
@@ -43,6 +46,7 @@ export default function Home() {
   const [filename, setFilename] = useState("package-lock.json");
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
+  const [projectId, setProjectId] = useState("");
   function navigate(v: View) {
     setView(v);
     setSelected(null);
@@ -57,7 +61,15 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
-          mode === "demo" ? { mode } : { mode, filename, content, research },
+          mode === "demo"
+            ? { mode }
+            : {
+                mode,
+                filename,
+                content,
+                research,
+                ...(projectId ? { projectId } : {}),
+              },
         ),
       });
       const data = await response.json();
@@ -95,7 +107,7 @@ export default function Home() {
         </a>
         <span className="tagline">Check before you ship.</span>
         <span className="build-badge">
-          Local build <span>0.1</span>
+          Preview <span>0.2</span>
         </span>
       </header>
       <div className="shell">
@@ -132,6 +144,13 @@ export default function Home() {
           </div>
         </aside>
         <main>
+          <MemberControls
+            refresh={report?.id || ""}
+            onReport={(saved) => {
+              setReport(saved);
+              navigate("overview");
+            }}
+          />
           <div className="breadcrumb">
             WORKSPACE <ChevronRight size={12} />{" "}
             {selected
@@ -139,12 +158,12 @@ export default function Home() {
               : view === "project"
                 ? "PROJECT SETUP"
                 : view === "scan"
-                ? "NEW SCAN"
-                : view === "actions"
-                  ? "RECOMMENDED ACTIONS"
-                  : view === "findings"
-                    ? "FINDINGS"
-                    : "OVERVIEW"}
+                  ? "NEW SCAN"
+                  : view === "actions"
+                    ? "RECOMMENDED ACTIONS"
+                    : view === "findings"
+                      ? "FINDINGS"
+                      : "OVERVIEW"}
           </div>
           {error && (
             <div role="alert" className="error">
@@ -202,6 +221,13 @@ export default function Home() {
                   verification.
                 </div>
               </section>
+              {report && (
+                <DecisionLog
+                  key={selected.id}
+                  report={report}
+                  findingId={selected.id}
+                />
+              )}
               {report?.explanations
                 .filter((e) => e.findingId === selected.id)
                 .map((e, i) => (
@@ -261,6 +287,10 @@ export default function Home() {
                     server-side provider keys; missing keys appear as incomplete
                     coverage. Do not paste credentials.
                   </p>
+                  <ProjectScanChoice
+                    value={projectId}
+                    onChange={setProjectId}
+                  />
                   <button
                     className="button primary"
                     onClick={() => scan("live")}
@@ -288,11 +318,16 @@ export default function Home() {
                   <hr />
                   <h2>Staging URL checks</h2>
                   <p>
-                    Planned next: prove ownership of your staging host, then run
+                    Prove ownership of your staging host, then select it for
                     bounded passive checks.
                   </p>
-                  <button className="button" onClick={() => navigate("project")}>View project setup <ChevronRight size={16} /></button>
-                  <span className="neutral-badge">Not available yet</span>
+                  <button
+                    className="button"
+                    onClick={() => navigate("project")}
+                  >
+                    View project setup <ChevronRight size={16} />
+                  </button>
+                  <span className="neutral-badge">Verified members only</span>
                 </section>
               </div>
             </>
@@ -387,7 +422,7 @@ export default function Home() {
                   <p className="intro">
                     {report.mode === "demo"
                       ? "Offline demonstration · real rules over synthetic inputs"
-                      : "Live dependency assessment · supplied manifest only"}
+                      : "Live assessment · see coverage for included checks"}
                   </p>
                 </div>
                 <button className="button" onClick={() => navigate("scan")}>
@@ -531,7 +566,10 @@ export default function Home() {
                       </a>
                       <small>
                         {s.package}@{s.version} ·{" "}
-                        {s.publishedAt ?? "Publication date unknown"}
+                        {s.publishedAt ?? "Publication date unknown"} ·
+                        Retrieved{" "}
+                        {new Date(s.retrievedAt).toLocaleString("en-GB")} ·{" "}
+                        {s.extraction || "search-only"}
                       </small>
                     </article>
                   ))}
@@ -544,7 +582,7 @@ export default function Home() {
               <CheckCheck size={14} />
               ShipCheck · Evidence before deployment
             </span>
-            <span>Local session only · Results are not saved</span>
+            <span>Offline demo is temporary · Member scans are saved</span>
           </footer>
         </main>
       </div>

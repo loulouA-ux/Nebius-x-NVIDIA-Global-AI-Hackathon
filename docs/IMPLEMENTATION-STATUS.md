@@ -1,0 +1,29 @@
+# ShipCheck integration status — 23 October 2026
+
+## Completed and observed
+
+- Vercel HeySalad Inc / shipcheck is connected to GitHub; protected previews deploy. Production credentials/public release are separate.
+- Dedicated Neon is connected to Development/Preview. Existing and default compute are 0.25 CU with five-minute autosuspend. £15 budget is not an enforced cap.
+- Distinct Peter and Louise key hashes are configured. Raw member keys remain only in ignored private local files; Louise still needs private delivery from Peter.
+- Live Development Tavily Search and Nebius NVIDIA Nemotron smoke passed. Model: nvidia/nemotron-3-super-120b-a12b.
+- Hosted acceptance on commit 8885cb5 passed login/logout for both members, secure cookies, anonymous demo, anonymous live denial, project create/list/challenge rotation, cross-member isolation, live providers, saved scans and immutable review decisions.
+- Louise's Phase 1 branch c8c80c8 is integrated, including DNS/file proof and per-scan proof recheck. Expired proof requires a refreshed challenge and new publication.
+
+## Current integration additions
+
+- Tavily extracts up to two scanner-linked or search-selected advisory-authority pages; 24-hour database cache retains original retrieval dates. Live extraction of two OSV-linked pages and cache readback passed. Search snippets stay explicitly unconfirmed.
+- Missing/duplicate model explanations fail validation; only supplied finding IDs accepted, with an explicit 12-finding coverage limit.
+- Member UI exposes saved reports, sign-out and append-only acknowledge/dismiss decisions. Original verdict remains unchanged.
+- Passive host module uses Louise's pinned HTTPS fetch helper for exactly four fixed requests: GET /, GET /robots.txt, GET /.well-known/security.txt, OPTIONS /. It does not follow redirects, retain bodies or cookie values, execute scripts, authenticate to targets, enumerate paths, exploit vulnerabilities or apply patches.
+- Host findings are configuration reviews, not exploitability claims. Failed/incomplete requests cannot become a passing assessment.
+- Live host acceptance against a dedicated synthetic Cloudflare Worker is pending final preview verification.
+
+## Remaining release gates
+
+- Final preview acceptance of the current additions and independent partner review.
+- Private delivery of Louise's member key and her successful sign-in.
+- Confirm public judging access policy and provision a separate Production database/credentials before public launch; current Preview protection is intentional.
+- Integrate reviewed code into the submission branch (main is not yet the submitted product).
+- Final labelled benchmark/demo rehearsal, recording, screenshots, Devpost narrative and human submission. Do not describe these as completed.
+
+The API smoke script retains labelled synthetic acceptance projects/reports for review. Test credentials, session cookies and API response files are never committed; temporary request files are removed after checks.

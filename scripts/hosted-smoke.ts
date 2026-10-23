@@ -127,6 +127,34 @@ try {
   console.log(
     "PASS: project create/list, challenge rotation and cross-member denial.",
   );
+  let targetProject: string | undefined;
+  if (process.argv.includes("--host")) {
+    targetProject = JSON.parse(
+      readFileSync(".private/fixture-project.json", "utf8"),
+    ).projectId;
+    const denied = request(
+      "/api/scans",
+      "POST",
+      {
+        mode: "live",
+        filename: "package.json",
+        content: '{"dependencies":{"lodash":"4.17.20"}}',
+        projectId: pid,
+      },
+      "peter",
+    );
+    assert.equal(denied.status, 409);
+    const proof = request(
+      `/api/projects/${targetProject}/verify`,
+      "POST",
+      { method: "file" },
+      "peter",
+    );
+    assert.equal(proof.status, 200);
+    console.log(
+      "PASS: unverified host scan denied and real public file proof verified.",
+    );
+  }
   const live = request(
     "/api/scans",
     "POST",
@@ -135,10 +163,21 @@ try {
       filename: "package.json",
       content: '{"dependencies":{"lodash":"4.17.20"}}',
       research: true,
+      ...(targetProject ? { projectId: targetProject } : {}),
     },
     "peter",
   );
   assert.equal(live.status, 200);
+  if (targetProject) {
+    const checks = live.body.checks.filter((c: any) =>
+      c.name.startsWith("Host "),
+    );
+    assert.equal(checks.length, 4);
+    assert.ok(checks.every((c: any) => c.state === "complete"));
+    assert.ok(live.body.findings.some((f: any) => f.id.startsWith("host-")));
+    assert.ok(!JSON.stringify(live.body).includes("demo_preference=example"));
+    console.log("PASS: four real passive host checks; cookie values omitted.");
+  }
   const rid = live.body.id;
   assert.ok(live.body.findings.length);
   const persisted = request(`/api/scans/${rid}`, "GET", undefined, "peter");

@@ -1,3 +1,8 @@
+import { verifyProjectForScan } from "@/lib/server/project-verification";
+import {
+  scanVerifiedHost,
+  type HostCheckResult,
+} from "@/lib/passive-host-checks";
 import { z } from "zod";
 import { parseManifest } from "@/lib/parser";
 import { runScan } from "@/lib/pipeline";
@@ -6,6 +11,7 @@ import { requireActor } from "@/lib/server/session";
 import { Store } from "@/lib/server/store";
 import { failure, ApiError, json } from "@/lib/server/http";
 export const runtime = "nodejs";
+export const maxDuration = 240;
 const inputSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("demo") }).strict(),
   z
@@ -18,6 +24,7 @@ const inputSchema = z.discriminatedUnion("mode", [
       ]),
       content: z.string().min(1).max(200_000),
       research: z.boolean().optional(),
+      projectId: z.string().uuid().optional(),
     })
     .strict(),
 ]);
@@ -66,11 +73,12 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error:
-            "Supply demo mode or a supported manifest (up to 200 KB). URL scanning is not available.",
+            "Supply demo mode or a supported manifest (up to 200 KB). Host checks require a saved, verified project.",
         },
         { status: 400 },
       );
     let store: Store | undefined;
+    let hostResult: HostCheckResult | undefined;
     let actor;
     if (parsed.data.mode === "live") {
       // Reject anonymous calls before database/provider access.
@@ -93,9 +101,28 @@ export async function POST(request: Request) {
         );
       }
     }
+    if (
+      parsed.data.mode === "live" &&
+      parsed.data.projectId &&
+      store &&
+      actor
+    ) {
+      const target = await verifyProjectForScan(
+        actor,
+        parsed.data.projectId,
+        store,
+      );
+      await store.quota("host-scan-day:" + actor.id, 10, 86400000);
+      hostResult = await scanVerifiedHost(target.hostname);
+    }
     processing = true;
-    const report = await runScan(parsed.data);
-    if (store && actor) await store.saveScan(actor, report);
+    const report = await runScan(parsed.data, store, hostResult);
+    if (store && actor)
+      await store.saveScan(
+        actor,
+        report,
+        parsed.data.mode === "live" ? parsed.data.projectId : undefined,
+      );
     return Response.json(report, {
       headers: { "Cache-Control": "no-store" },
     });
