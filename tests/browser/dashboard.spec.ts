@@ -38,7 +38,7 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
     fullPage: true,
   });
 });
-test("bad manifest is rejected without replacing the current report", async ({
+test("anonymous live scan is blocked before manifest processing", async ({
   page,
 }) => {
   await page.goto("/");
@@ -51,7 +51,7 @@ test("bad manifest is rejected without replacing the current report", async ({
     .getByRole("button", { name: "Scan manifest", exact: true })
     .click();
   await expect(page.locator('.error[role="alert"]')).toContainText(
-    "Unable to parse",
+    "Sign in to run live scans.",
   );
 });
 test("mobile flow has no horizontal overflow", async ({ page }) => {
@@ -89,4 +89,19 @@ test("desktop overview renders without client errors", async ({ page }) => {
     fullPage: true,
   });
   expect(errors).toEqual([]);
+});
+
+test("sign-in form rejects an invalid key without exposing it", async ({
+  page,
+}) => {
+  await page.goto("/sign-in");
+  await page.getByLabel("Individual access key").fill("invalid-test-key");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Invalid access key.",
+  );
+  await expect(page.getByRole("main").getByRole("alert")).not.toContainText(
+    "invalid-test-key",
+  );
+  await page.screenshot({ path: "test-results/sign-in.png", fullPage: true });
 });
