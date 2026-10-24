@@ -46,13 +46,14 @@ export async function researchWithEvidence(
   key: string,
   fetcher: typeof fetch = fetch,
   cache?: ResearchCache,
-  advisoryUrls: string[] = [],
+  advisories: { url: string; dependency?: Dependency }[] = [],
 ): Promise<ResearchEvidence> {
   const identity = createHash("sha256")
     .update(
       JSON.stringify([
+        "exact-advisory-attribution-v2",
         deps.slice(0, 3).map((d) => [d.ecosystem, d.name, d.version]),
-        advisoryUrls.filter(extractableSource).slice(0, 2),
+        advisories.filter((a) => extractableSource(a.url)),
       ]),
     )
     .digest("hex");
@@ -65,29 +66,24 @@ export async function researchWithEvidence(
     }
   }
   const sources = await research(deps, key, fetcher);
-  for (const url of [...new Set(advisoryUrls.filter(extractableSource))].slice(
-    0,
-    2,
-  )) {
-    const linked = sources.find((s) => s.url === url);
-    if (linked) linked.classification = "matched-advisory";
-    if (!linked)
-      sources.unshift({
-        id: "",
-        package: deps
-          .slice(0, 3)
-          .map((d) => d.name)
-          .join(", "),
-        version: deps
-          .slice(0, 3)
-          .map((d) => d.version)
-          .join(", "),
-        url,
-        title: "Scanner-linked advisory",
-        classification: "matched-advisory",
-        excerpt: "See original advisory evidence; extraction pending.",
-        retrievedAt: new Date().toISOString(),
-      });
+  for (const url of [...new Set(advisories.map((a) => a.url).filter(extractableSource))].slice(0, 2)) {
+    const matchedDependencies = [...new Map(advisories
+      .filter((a) => a.url === url && a.dependency)
+      .map((a) => [JSON.stringify(a.dependency), a.dependency!])).values()];
+    const linked = sources.filter((s) => s.url === url);
+    for (const source of linked) {
+      // A search query is not an advisory association. Replace, never inherit it.
+      delete source.package;
+      delete source.version;
+      source.matchedDependencies = matchedDependencies;
+      source.classification = "matched-advisory";
+    }
+    if (!linked.length) sources.unshift({
+      id: "", url, title: "Scanner-linked advisory",
+      matchedDependencies, classification: "matched-advisory",
+      excerpt: "See original advisory evidence; extraction pending.",
+      retrievedAt: new Date().toISOString(),
+    });
   }
   sources.forEach((source, index) => (source.id = `source-${index + 1}`));
   const urls = [

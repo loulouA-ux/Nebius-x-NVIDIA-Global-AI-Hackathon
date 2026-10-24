@@ -30,3 +30,11 @@
 - Final labelled benchmark/demo rehearsal, recording, approved Devpost narrative and human submission. A submission draft and recording outline are in SUBMISSION-DRAFT.md; no video or submission is complete.
 
 The API smoke script retains labelled synthetic acceptance projects/reports for review. Test credentials, session cookies and API response files are never committed; temporary request files are removed after checks.
+
+## Phase 3 remediation — 24 October 2026
+
+- API validation fixes are on 5ad047f and Louise reports both findings resolved.
+- Model notes now use an exact per-finding allowlist of scanner-authored descriptions/actions. Nemotron selects a note; it cannot add free-form claims. Unsupported wording is replaced with a labelled scanner fallback and model coverage becomes incomplete. Invalid identity/schema/reference output remains rejected. Legacy saved notes without provenance are displayed using the scanner description, not their old model prose.
+- Advisory sources receive structured dependencies from OSV finding evidence. Search-query package/version labels are removed from matched advisory cards; multiple exact associations remain separate tuples. Unknown attribution is explicitly unavailable. Search-only cards label their package as search context. A versioned cache key avoids old attribution entries.
+- Regression checks cover all seven audited model overstatements, cross-finding note substitution, multi-package and shared-advisory associations, wrong search labels and missing attribution.
+- Local gate: 126 tests, build/typecheck and six browser tests passed. Fresh hosted acceptance and Louise’s joint audit remain pending at this entry; no claim that Phase 3 is closed.

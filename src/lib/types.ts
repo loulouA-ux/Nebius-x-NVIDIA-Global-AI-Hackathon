@@ -6,6 +6,7 @@ export type Dependency = {
 };
 export type Evidence = {
   kind: "code" | "advisory" | "http";
+  dependency?: Dependency;
   location: string;
   excerpt: string;
   url?: string;
@@ -26,8 +27,9 @@ export type Check = {
 };
 export type Source = {
   id: string;
-  package: string;
-  version: string;
+  package?: string;
+  version?: string;
+  matchedDependencies?: Dependency[];
   url: string;
   title: string;
   excerpt: string;
@@ -36,7 +38,7 @@ export type Source = {
   extraction?: "extracted" | "search-only";
   classification?: "matched-advisory" | "watch";
 };
-export type Explanation = { findingId: string; explanation: string };
+export type Explanation = { findingId: string; explanation: string; basis?: "validated-selection" | "scanner-fallback" };
 export type ScanReport = {
   id: string;
   mode: "demo" | "live";
