@@ -26,8 +26,14 @@ Hosted test sessions were logged out and temporary credential/cookie files remov
 
 ## Remaining before P7/L4 closure
 
-1. Refresh the controlled synthetic host proof and run the hosted host-inclusive acceptance against the selected release candidate. Earlier host runs remain historical evidence, not a new run here.
+1. Host-inclusive rerun is recorded below; review its evidence alongside the earlier historical runs.
 2. Louise reviews this ledger and the current acceptance changes; jointly close Phase 4 only when gaps are resolved.
 3. Public judging access and Production live credentials remain separate decisions; protected access is unchanged.
 
 ATR #142 reports a successful isolated App Server synthetic acknowledgement with receipt/no-replay. This does not prove desktop attachment or cross-machine wake execution and is separate from ShipCheck P7.
+
+## Host-inclusive acceptance completed — 23:15 London
+
+Refreshed the proof on the existing controlled synthetic Worker, then ran the final current `scripts/hosted-smoke.ts` with `--host` against the same protected 4719078 preview. Exit code 0. Verified unverified-host denial, real public file proof, four passive host checks, omitted cookie values, two-package advisory associations, exact approved model notes, saved report and decision, cross-member report denial, and logout invalidation for both sessions. All 11 report checks were complete. Temporary test sessions/cookies were cleaned up. The synthetic project/report remain for review.
+
+GitHub PR #3 checks were green at this checkpoint (both verify runs and Vercel deployment). Peter's execution evidence is now ready for joint review; P7/L4 stay open for that acceptance decision. The regression additions do not change runtime code. No further paid Sandbox was used and no public release/access change was made.
