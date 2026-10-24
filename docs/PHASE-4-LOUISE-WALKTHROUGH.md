@@ -20,5 +20,13 @@ Peter's independent Phase 4 check reported that an expired session could leave t
 ## Remaining Phase 4 gates
 
 - Peter P7 owns Production protection, configuration, release security and post-merge deployment acceptance. A Production-ready Vercel build does not establish a public or approved release.
-- The fixed offline demo is available on Preview. The separate clean-browser public access check belongs to Phase 5 after release decisions.
+- The fixed offline demo is available on Preview. The plan's Phase 4 checkpoint includes public demo access; Phase 5 repeats a clean-browser check for submission.
 - This walkthrough used one synthetic manifest and one member account. It does not establish behavior for arbitrary applications or a verified staging host.
+
+## Follow-up on the current protected Preview — 24 October 2026, 23:18 London
+
+I reviewed draft PR #3 at `8e53fc6` against the Phase 4 plan. Its changes add proof-recheck and provider-failure regression tests, correct a property-order-sensitive assertion in the hosted smoke harness, and record Peter's acceptance evidence. They do not change ShipCheck runtime code. GitHub's two `verify` checks and Vercel Preview Comments check were green for that head when reviewed. Peter's P7 ledger separately records a successful host-inclusive protected-preview run; this Louise follow-up does not claim to have rerun his provider or host test.
+
+In Chrome on protected Preview `shipcheck-eqslt6fs3-hey-salad-inc.vercel.app`, I was signed out of the ShipCheck member session. The offline `salad-storefront` demo ran without member sign-in and showed three synthetic findings, two blockers, the dated single-advisory OSV snapshot, and explicit incomplete live-research/model coverage. The credential detail displayed a masked value (`sk_l••••••00`), and reload returned to the welcome screen. This confirms the seeded offline journey remains usable on the current protected Preview.
+
+An HTTP request without Vercel credentials to both that Preview and `shipcheck-rho.vercel.app` returned 302 to Vercel SSO. The Phase 4 public-demo access checkpoint is therefore still open. Vercel deployment protection and public judging access require a separate release decision; the protected-preview walkthrough, PR review, and Peter's hosted smoke do not count as public access. L4 remains open for that checkpoint. P7 stays open for Peter's independent acceptance decision and can be evaluated separately from public access.
