@@ -11,6 +11,7 @@
 5. Reloaded the page, selected the saved report, reopened the same finding, and confirmed the original acknowledgement and note remained in history.
 6. In Chrome's responsive mode at 400 CSS px, the member controls, finding, evidence, review form, buttons and history remained readable and usable. The card fit the viewport without a visible horizontal overflow.
 7. By keyboard alone, focused and opened the saved-report selector, moved among report findings, opened the finding with Return, and reached the advisory link, review note and Acknowledge button with Tab. A visible focus ring appeared on the action button.
+8. Ran the fixed offline `salad-storefront` demo on Preview. It showed three labelled synthetic findings, including two `Blocked` items, an OSV snapshot date, and incomplete optional-provider coverage. Reloading reset the temporary demo to the welcome screen; the member's one saved live scan remained available.
 
 ## Issue found and change proposed
 
