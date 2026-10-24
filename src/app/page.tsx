@@ -232,11 +232,10 @@ export default function Home() {
                 .filter((e) => e.findingId === selected.id)
                 .map((e, i) => (
                   <section className="panel" key={i}>
-                    <h2>Nemotron note</h2>
-                    <p>{e.explanation}</p>
+                    <h2>{e.basis === "validated-selection" ? "Nemotron-selected scanner note" : "Scanner evidence note"}</h2>
+                    <p>{e.basis ? e.explanation : selected.description}</p>
                     <small>
-                      AI-generated explanation. Check against the evidence
-                      above.
+                      {e.basis === "validated-selection" ? "Selected verbatim from scanner-authored notes; no generated claims." : "Scanner fallback. Unvalidated model wording is not displayed."}
                     </small>
                   </section>
                 ))}
@@ -570,7 +569,11 @@ export default function Home() {
                         Read source <ExternalLink size={13} />
                       </a>
                       <small>
-                        {s.package}@{s.version} ·{" "}
+                        {s.matchedDependencies?.length
+                          ? `OSV-matched: ${s.matchedDependencies.map((d) => `${d.ecosystem}: ${d.name}@${d.version}`).join("; ")}`
+                          : s.classification === "matched-advisory"
+                            ? "Package association unavailable"
+                            : s.package && s.version ? `Search context: ${s.package}@${s.version} (not an affected-package assertion)` : "Package association unavailable"} ·{" "}
                         {s.publishedAt ?? "Publication date unknown"} ·
                         Retrieved{" "}
                         {new Date(s.retrievedAt).toLocaleString("en-GB")} ·{" "}

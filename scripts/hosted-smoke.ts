@@ -168,6 +168,7 @@ try {
         packages: {
           "": { name: "synthetic-acceptance" },
           "node_modules/lodash": { version: "4.17.20" },
+          "node_modules/ms": { version: "2.1.3" },
         },
       }),
       research: true,
@@ -197,6 +198,24 @@ try {
       "complete",
     );
   }
+  assert.equal(live.body.dependencies.length, 2);
+  for (const note of live.body.explanations) {
+    const finding = live.body.findings.find((f: any) => f.id === note.findingId);
+    assert.ok(finding);
+    assert.ok([finding.description, finding.action].includes(note.explanation));
+    assert.equal(note.basis, "validated-selection");
+  }
+  const matched = live.body.sources.filter((s: any) => s.classification === "matched-advisory");
+  assert.ok(matched.length);
+  for (const source of matched) {
+    assert.equal(source.package, undefined);
+    assert.equal(source.version, undefined);
+    const expected = live.body.findings.flatMap((f: any) => f.evidence.filter((e: any) => e.url === source.url && e.dependency).map((e: any) => e.dependency));
+    assert.ok(expected.length);
+    for (const dependency of source.matchedDependencies) assert.ok(expected.some((d: any) => JSON.stringify(d) === JSON.stringify(dependency)));
+    assert.equal(source.matchedDependencies.length, new Set(expected.map((d: any) => JSON.stringify(d))).size);
+  }
+  console.log("PASS: two-package attribution matches OSV evidence; all model notes are exact approved scanner text.");
   const rid = live.body.id;
   assert.ok(live.body.findings.length);
   const persisted = request(`/api/scans/${rid}`, "GET", undefined, "peter");

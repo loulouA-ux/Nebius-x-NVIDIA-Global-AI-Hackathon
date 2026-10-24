@@ -154,3 +154,33 @@ it("keeps an empty search as empty evidence, never a clean vulnerability verdict
   expect(r.sources).toEqual([]);
   expect(r.extractionComplete).toBe(false);
 });
+
+const other = { name: "express", version: "4.17.1", ecosystem: "npm" as const, path: "node_modules/express" };
+it("binds a seeded advisory only to its actual finding dependency, not every search package", async () => {
+  const fetcher = vi.fn().mockResolvedValueOnce(reply({results:[]})).mockResolvedValueOnce(reply({results:[]}))
+    .mockResolvedValueOnce(reply({results:[{url,raw_content:"Evidence"}]}));
+  const r = await researchWithEvidence([...deps,other], "test", fetcher, undefined, [{url,dependency:other}]);
+  expect(r.sources[0].matchedDependencies).toEqual([other]);
+  expect(r.sources[0].package).toBeUndefined();
+  expect(r.sources[0].version).toBeUndefined();
+});
+it("replaces wrong searched-package labels on every matching advisory card", async () => {
+  const fetcher = vi.fn().mockResolvedValueOnce(reply(search)).mockResolvedValueOnce(reply({results:[]}))
+    .mockResolvedValueOnce(reply({results:[{url,raw_content:"Evidence"}]}));
+  const r = await researchWithEvidence([...deps,other], "test", fetcher, undefined, [{url,dependency:other}]);
+  expect(r.sources[0].matchedDependencies).toEqual([other]);
+  expect(r.sources[0].package).toBeUndefined();
+});
+it("retains exact tuples when the same advisory matches multiple dependencies", async () => {
+  const fetcher = vi.fn().mockResolvedValueOnce(reply({results:[]})).mockResolvedValueOnce(reply({results:[]}))
+    .mockResolvedValueOnce(reply({results:[{url,raw_content:"Evidence"}]}));
+  const r = await researchWithEvidence([...deps,other], "test", fetcher, undefined, [{url,dependency:deps[0]},{url,dependency:other}]);
+  expect(r.sources[0].matchedDependencies).toEqual([deps[0],other]);
+});
+it("omits attribution for a linked URL without a known dependency", async () => {
+  const fetcher = vi.fn().mockResolvedValueOnce(reply(search)).mockResolvedValueOnce(reply({results:[{url,raw_content:"Evidence"}]}));
+  const r = await researchWithEvidence(deps, "test", fetcher, undefined, [{url}]);
+  expect(r.sources[0].matchedDependencies).toEqual([]);
+  expect(r.sources[0].package).toBeUndefined();
+  expect(r.sources[0].version).toBeUndefined();
+});

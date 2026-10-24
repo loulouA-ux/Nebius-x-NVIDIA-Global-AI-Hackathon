@@ -91,7 +91,7 @@ export async function runScan(
         cache,
         findings.flatMap((f) =>
           f.evidence.flatMap((e) =>
-            e.kind === "advisory" && e.url ? [e.url] : [],
+            e.kind === "advisory" && e.url ? [{ url: e.url, dependency: e.dependency }] : [],
           ),
         ),
       );
@@ -135,9 +135,9 @@ export async function runScan(
       );
       checks.push({
         name: "Nemotron explanations",
-        state: findings.length > 12 ? "incomplete" : "complete",
+        state: findings.length > 12 || explanations.some((e) => e.basis === "scanner-fallback") ? "incomplete" : "complete",
         detail: findings.length
-          ? "At most 12 findings explained. Model notes are advisory; original findings and policy are preserved."
+          ? `At most 12 findings: ${explanations.filter((e) => e.basis === "validated-selection").length} exact scanner-note selections validated; ${explanations.filter((e) => e.basis === "scanner-fallback").length} scanner fallbacks. Free-form model claims are never displayed.`
           : "No findings to explain; no inference call made.",
       });
     } catch {

@@ -16,7 +16,7 @@ try {
   ];
   const findings = await queryOsv(deps);
   const urls = findings.flatMap((f) =>
-    f.evidence.flatMap((e) => (e.url ? [e.url] : [])),
+    f.evidence.flatMap((e) => (e.url ? [{ url: e.url, dependency: e.dependency }] : [])),
   );
   const r = await researchWithEvidence(deps, key, fetch, store, urls);
   console.log(
