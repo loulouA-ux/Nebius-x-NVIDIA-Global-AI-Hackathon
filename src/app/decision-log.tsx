@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
+import { notifySessionExpired } from "./session-expired";
 type Decision = {
   id: string;
   finding_id: string;
@@ -18,18 +19,24 @@ export default function DecisionLog({
   const [events, setEvents] = useState<Decision[]>([]),
     [reason, setReason] = useState(""),
     [error, setError] = useState(""),
+    [expired, setExpired] = useState(false),
     [busy, setBusy] = useState(false);
   useEffect(() => {
     let active = true;
     if (report.mode === "demo") return;
     fetch(`/api/scans/${report.id}`, { cache: "no-store" })
       .then(async (r) => {
+        if (r.status === 401) {
+          notifySessionExpired();
+          if (active) setExpired(true);
+          throw Error("Session expired. Sign in again to review decisions.");
+        }
         if (!r.ok) throw Error("Decision history unavailable.");
         const d = await r.json();
         if (active) setEvents(d.decisions);
       })
-      .catch(() => {
-        if (active) setError("Decision history unavailable.");
+      .catch((cause) => {
+        if (active) setError(cause instanceof Error ? cause.message : "Decision history unavailable.");
       });
     return () => {
       active = false;
@@ -44,6 +51,11 @@ export default function DecisionLog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ findingId, action, reason }),
       });
+      if (r.status === 401) {
+        notifySessionExpired();
+        setExpired(true);
+        throw Error("Session expired. Sign in again to save a decision.");
+      }
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Decision could not be saved.");
       setEvents((current) => [...current, d]);
@@ -65,6 +77,10 @@ export default function DecisionLog({
         <p>
           Decision history is available for saved member scans. This offline
           demo is temporary.
+        </p>
+      ) : expired ? (
+        <p role="alert" className="error">
+          Session expired. <a href="/sign-in">Sign in again</a> to review or save decisions.
         </p>
       ) : (
         <>
@@ -98,7 +114,7 @@ export default function DecisionLog({
               Dismiss with reason
             </button>
           </div>
-          {error && (
+          {error && !expired && (
             <p role="alert" className="error">
               {error}
             </p>

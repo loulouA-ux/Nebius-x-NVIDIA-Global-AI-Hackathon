@@ -50,9 +50,9 @@ test("anonymous live scan is blocked before manifest processing", async ({
   await page
     .getByRole("button", { name: "Scan manifest", exact: true })
     .click();
-  await expect(page.locator('.error[role="alert"]')).toContainText(
-    "Sign in to run live scans.",
-  );
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Sign in to run live scans." }),
+  ).toBeVisible();
 });
 test("mobile flow has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -184,4 +184,44 @@ test("member can reopen a saved report and record a decision without changing it
   await expect(
     page.getByRole("link", { name: "Member sign in" }),
   ).toBeVisible();
+});
+
+test("expired decision session clears stale member state and offers sign-in", async ({
+  page,
+  request,
+}) => {
+  const response = await request.post("/api/scans", { data: { mode: "demo" } });
+  const report = await response.json();
+  report.mode = "live";
+  await page.route("**/api/session", (route) =>
+    route.fulfill({ json: { actor: { id: "louise" } } }),
+  );
+  await page.route("**/api/scans", (route) =>
+    route.fulfill({
+      json: {
+        scans: [{
+          id: report.id,
+          created_at: report.createdAt,
+          status: report.status,
+        }],
+      },
+    }),
+  );
+  await page.route(`**/api/scans/${report.id}`, (route) =>
+    route.fulfill({ json: { report, decisions: [] } }),
+  );
+  await page.route(`**/api/scans/${report.id}/decisions`, (route) =>
+    route.fulfill({ status: 401, json: { error: "Session expired." } }),
+  );
+  await page.goto("/");
+  await expect(page.getByText("Signed in as")).toBeVisible();
+  await page.getByLabel("Saved scans").selectOption(report.id);
+  await page
+    .getByRole("button", { name: /Potential credential in supplied content/ })
+    .click();
+  await page.getByRole("button", { name: "Acknowledge", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Member sign in" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in again" })).toBeVisible();
+  await expect(page.getByText("Signed in as")).toHaveCount(0);
+  await expect(page.getByRole("list", { name: "Decision history" })).toHaveCount(0);
 });
