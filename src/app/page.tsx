@@ -23,6 +23,7 @@ import MemberControls from "./member-controls";
 import DecisionLog from "./decision-log";
 import ProjectScanChoice from "./project-scan-choice";
 import ProjectSetup from "./project-setup";
+import { notifySessionExpired } from "./session-expired";
 
 type View = "overview" | "project" | "scan" | "findings" | "actions";
 const defaultManifest = JSON.stringify(
@@ -72,6 +73,7 @@ export default function Home() {
               },
         ),
       });
+      if (response.status === 401 && mode === "live") notifySessionExpired();
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.error || "The scan could not finish.");

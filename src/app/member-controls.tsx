@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
+import { notifySessionExpired, sessionExpiredEvent } from "./session-expired";
 type Saved = { id: string; created_at: string; status: string };
 export default function MemberControls({
   refresh,
@@ -15,17 +16,39 @@ export default function MemberControls({
     [busy, setBusy] = useState(false),
     [loaded, setLoaded] = useState(false);
   useEffect(() => {
+    function expire() {
+      if (!member) return;
+      setMember("");
+      setScans([]);
+      setLoaded(true);
+      setError("Session expired. Sign in again to continue.");
+    }
+    window.addEventListener(sessionExpiredEvent, expire);
+    return () => window.removeEventListener(sessionExpiredEvent, expire);
+  }, [member]);
+  useEffect(() => {
     let active = true;
     async function load() {
       try {
         const r = await fetch("/api/session", { cache: "no-store" });
         if (r.status === 401) {
-          if (active) setMember("");
+          if (active) {
+            setMember("");
+            setScans([]);
+          }
           return;
         }
         if (!r.ok) throw Error("Member access temporarily unavailable.");
         const d = await r.json();
         const history = await fetch("/api/scans", { cache: "no-store" });
+        if (history.status === 401) {
+          if (active) {
+            setMember("");
+            setScans([]);
+            setError("Session expired. Sign in again to continue.");
+          }
+          return;
+        }
         if (!history.ok) throw Error("Saved scans could not be loaded.");
         const h = await history.json();
         if (active) {
@@ -53,6 +76,10 @@ export default function MemberControls({
     setError("");
     try {
       const r = await fetch(`/api/scans/${id}`, { cache: "no-store" });
+      if (r.status === 401) {
+        notifySessionExpired();
+        return;
+      }
       if (!r.ok) throw Error("Saved report unavailable.");
       const d = await r.json();
       onReport(d.report);

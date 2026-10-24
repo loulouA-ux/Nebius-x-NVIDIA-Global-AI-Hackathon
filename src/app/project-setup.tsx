@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { notifySessionExpired } from "./session-expired";
 
 type ProjectData = {
   projectId: string;
@@ -25,6 +26,10 @@ async function requestProject(
   options?: RequestInit,
 ): Promise<ProjectData> {
   const response = await fetch(url, options);
+  if (response.status === 401) {
+    notifySessionExpired();
+    throw new Error("Session expired. Sign in again to manage projects.");
+  }
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Project request failed.");
   return data as ProjectData;
@@ -108,6 +113,8 @@ export default function ProjectSetup() {
       setMessage(success);
       setNeedsSignIn(false);
     } catch (cause) {
+      if (cause instanceof Error && cause.message.startsWith("Session expired."))
+        setNeedsSignIn(true);
       setError(
         cause instanceof Error ? cause.message : "Project request failed.",
       );
