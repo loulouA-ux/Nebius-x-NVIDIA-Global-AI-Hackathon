@@ -32,7 +32,7 @@ Hosted test sessions were logged out and temporary credential/cookie files remov
 
 ATR #142 reports a successful isolated App Server synthetic acknowledgement with receipt/no-replay. This does not prove desktop attachment or cross-machine wake execution and is separate from ShipCheck P7.
 
-## Host-inclusive acceptance completed — 23:15 London
+## Host-inclusive acceptance completed — by 23:13 London
 
 Refreshed the proof on the existing controlled synthetic Worker, then ran the final current `scripts/hosted-smoke.ts` with `--host` against the same protected 4719078 preview. Exit code 0. Verified unverified-host denial, real public file proof, four passive host checks, omitted cookie values, two-package advisory associations, exact approved model notes, saved report and decision, cross-member report denial, and logout invalidation for both sessions. All 11 report checks were complete. Temporary test sessions/cookies were cleaned up. The synthetic project/report remain for review.
 
