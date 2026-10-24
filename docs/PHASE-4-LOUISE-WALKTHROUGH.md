@@ -15,12 +15,12 @@
 
 ## Issue found and change proposed
 
-Peter's independent Phase 4 check reported that an expired session could leave the header saying signed in until reload while the API correctly rejected a decision. This branch clears member state and offers a sign-in path when a saved-report, decision, project-action or live-scan request receives HTTP 401. A rejected decision remains unsaved. This change still requires review and deployment before it can be counted as a hosted fix.
+Peter's independent Phase 4 check reported that an expired session could leave the header saying signed in until reload while the API correctly rejected a decision. This branch clears member state and offers a sign-in path when a saved-report, decision, project-action or live-scan request receives HTTP 401. A rejected decision remains unsaved. The change was subsequently merged in PR #2, and Peter's hosted revoked-session browser check confirmed the sign-in prompt.
 
-## Remaining Phase 4 gates
+## Scope and release gates at the protected Preview walkthrough
 
 - Peter P7 owns Production protection, configuration, release security and post-merge deployment acceptance. A Production-ready Vercel build does not establish a public or approved release.
-- The fixed offline demo is available on Preview. The plan's Phase 4 checkpoint includes public demo access; Phase 5 repeats a clean-browser check for submission.
+- The fixed offline demo is available on Preview. The public-access follow-up below completes the plan's Phase 4 demo checkpoint; Phase 5 repeats a clean-browser check for submission.
 - This walkthrough used one synthetic manifest and one member account. It does not establish behavior for arbitrary applications or a verified staging host.
 
 ## Follow-up on the current protected Preview — 24 October 2026, 23:18 London
@@ -29,6 +29,14 @@ I reviewed draft PR #3 at `8e53fc6` against the Phase 4 plan. Its changes add pr
 
 In Chrome on protected Preview `shipcheck-eqslt6fs3-hey-salad-inc.vercel.app`, I was signed out of the ShipCheck member session. The offline `salad-storefront` demo ran without member sign-in and showed three synthetic findings, two blockers, the dated single-advisory OSV snapshot, and explicit incomplete live-research/model coverage. The credential detail displayed a masked value (`sk_l••••••00`), and reload returned to the welcome screen. This confirms the seeded offline journey remains usable on the current protected Preview.
 
-An HTTP request without Vercel credentials to both that Preview and `shipcheck-rho.vercel.app` returned 302 to Vercel SSO. The Phase 4 public-demo access checkpoint is therefore still open. Vercel deployment protection and public judging access require a separate release decision; the protected-preview walkthrough, PR review, and Peter's hosted smoke do not count as public access. L4 remains open for that checkpoint. P7 stays open for Peter's independent acceptance decision and can be evaluated separately from public access.
+An HTTP request without Vercel credentials to both that Preview and `shipcheck-rho.vercel.app` returned 302 to Vercel SSO. At this checkpoint, public-demo access was still open. Vercel deployment protection and public judging access required a separate release decision; the protected-preview walkthrough, PR review, and Peter's hosted smoke did not count as public access. P7 stayed open for Peter's independent acceptance decision and could be evaluated separately from public access.
 
 Vercel's recent Request Logs for this Preview showed successful `200` scan and project requests alongside `401` session, `404` cross-owner lookup, and `409` proof-gate responses from the acceptance journey. No `5xx` appeared in the visible 30-minute sample. The Overview error-rate indicator alone does not establish a runtime failure; this log sample does not replace a Production release check.
+
+## Public seeded Preview — 24 October 2026, 23:36 London
+
+Louise explicitly approved making only `shipcheck-git-codex-louise-phase4-hey-salad-inc.vercel.app` public. I added that exact domain to Vercel's Deployment Protection Exceptions. Vercel Authentication remains enabled for All Deployments and protected sourcemaps remain enabled. The Production alias and Peter's P7 Preview still returned Vercel SSO redirects; the selected Louise Preview returned HTTP 200 without Vercel credentials.
+
+From a fresh Codex in-app browser tab without a Vercel session, the public URL loaded the ShipCheck welcome screen and ran the fixed `salad-storefront` offline demo. It displayed three synthetic findings, two blockers, a dated OSV snapshot, and explicit incomplete Tavily/Nemotron coverage. The unauthenticated demo API returned a report; the member-session API returned HTTP 401. The public URL is therefore suitable for the Phase 4 seeded-demo access checkpoint. The user-facing public link is `https://shipcheck-git-codex-louise-phase4-hey-salad-inc.vercel.app/`.
+
+This is a single Preview-domain exception, not a Production launch. To revoke public access, remove that domain from Deployment Protection Exceptions. Peter's P7 acceptance and the later Phase 5 submission-browser check remain separate.
