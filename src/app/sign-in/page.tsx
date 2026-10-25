@@ -6,6 +6,8 @@ export default function SignIn() {
   return (
     <main style={{ maxWidth: 520, margin: "80px auto", padding: 24 }}>
       <h1>Sign in to ShipCheck</h1>
+      <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
+      <p>GitHub sign-in is available to invited preview members. Repository permissions are requested separately.</p>
       <p>
         Use your individual team access key for live scans. The offline demo is
         available without signing in.
@@ -56,7 +58,7 @@ export default function SignIn() {
         </button>
       </form>
       <p role="alert">{error}</p>
-      <a href="/">Return to demo</a>
+      <a href="/">Return to demo</a> · <a href="/repairs">Dependency repairs</a>
     </main>
   );
 }

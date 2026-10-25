@@ -30,3 +30,21 @@ CREATE TABLE IF NOT EXISTS sc_quotas (
 CREATE TABLE IF NOT EXISTS sc_research_cache (
  cache_key text PRIMARY KEY, value jsonb NOT NULL, expires_at timestamptz NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS sc_oauth_transactions (
+ state_hash text PRIMARY KEY, verifier text NOT NULL, browser_hash text NOT NULL,
+ expires_at timestamptz NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sc_github_accounts (
+ github_id text PRIMARY KEY, login text NOT NULL, disabled boolean NOT NULL DEFAULT false,
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS sc_repairs (
+ id uuid PRIMARY KEY, owner_id text NOT NULL, workspace_id text NOT NULL,
+ state text NOT NULL CHECK(state IN ('proposed','running','verified','failed','publishing','published')),
+ snapshot jsonb NOT NULL, plan jsonb NOT NULL, result jsonb, pr_url text,
+ created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE sc_repairs ADD COLUMN IF NOT EXISTS publication_commit text;
