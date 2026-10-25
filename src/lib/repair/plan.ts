@@ -15,6 +15,11 @@ export type RepairPlan = {
   limitations:string[];
 };
 export function contentHash(value:string){return createHash("sha256").update(value).digest("hex");}
+// All structured plan fields are arrays of strings; other values are primitives.
+// Sort keys so Postgres jsonb persistence cannot change the integrity digest.
+export function repairPlanHash(plan:Omit<RepairPlan,"planHash">){
+  return contentHash(JSON.stringify(Object.fromEntries(Object.entries(plan).sort(([a],[b])=>a<b?-1:a>b?1:0))));
+}
 const packagePattern=/^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/;
 export async function proposeDependencyRepair(input:{baseCommit:string;manifest:string;packageName:string;currentVersion:string;advisoryIds:string[]},fetcher:typeof fetch=fetch):Promise<RepairPlan>{
   if(!/^[a-f0-9]{40}$/.test(input.baseCommit))throw Error("A pinned Git commit is required.");
@@ -54,5 +59,5 @@ export async function proposeDependencyRepair(input:{baseCommit:string;manifest:
   manifest[section][input.packageName]=target;
   const manifestAfter=JSON.stringify(manifest,null,2)+"\n";
   const data={schemaVersion:1 as const,baseCommit:input.baseCommit,packageName:input.packageName,fromVersion:input.currentVersion,toVersion:target,section,advisoryIds:[...new Set(input.advisoryIds)].sort(),sourceUrls:[...new Set(input.advisoryIds)].sort().map(id=>`https://osv.dev/vulnerability/${id}`),manifestBefore:input.manifest,manifestAfter,manifestHash:contentHash(input.manifest),limitations:["OSV evidence is a point-in-time lookup, not a security guarantee.","Lockfile regeneration and isolated baseline/patched tests are required before approval.","Major-version changes may require application changes; test failures block handoff."]};
-  return {...data,planHash:contentHash(JSON.stringify(data))};
+  return {...data,planHash:repairPlanHash(data)};
 }

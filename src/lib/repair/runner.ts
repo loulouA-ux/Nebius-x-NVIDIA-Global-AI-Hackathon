@@ -1,7 +1,7 @@
 import type { Finding } from "../types";
 import { parseManifest } from "../parser";
 import { queryOsv } from "../providers";
-import { contentHash, type RepairPlan } from "./plan";
+import { contentHash, repairPlanHash, type RepairPlan } from "./plan";
 export type CommandEvidence={command:string;exitCode:number;output:string};
 export interface RepairSandbox {
   writeFiles(files:Record<string,string>):Promise<void>;
@@ -18,7 +18,7 @@ export type RepairRun={scans?:{before:DependencyScanEvidence;after?:DependencySc
 // Source is never executed by this trusted orchestrator on the application host.
 export async function verifyRepair(plan:RepairPlan,files:Record<string,string>,factory:SandboxFactory, fetcher:typeof fetch=fetch):Promise<RepairRun>{
  const {planHash,...unsigned}=plan;
- if(contentHash(JSON.stringify(unsigned))!==planHash)throw Error("Repair plan changed after proposal.");
+ if(repairPlanHash(unsigned)!==planHash)throw Error("Repair plan changed after proposal.");
  if(contentHash(files["package.json"]||"")!==plan.manifestHash)throw Error("Snapshot does not match repair plan.");
  if(!files["package-lock.json"])throw Error("A committed npm lockfile is required.");
  const manifest=JSON.parse(files["package.json"]);

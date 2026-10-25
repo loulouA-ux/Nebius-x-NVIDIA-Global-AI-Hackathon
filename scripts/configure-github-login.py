@@ -11,6 +11,13 @@ import tempfile
 from urllib.parse import urlparse
 
 
+def env_value(value):
+    # dotenv keeps backslash-escaped quotes literally; JSON mappings need single quotes.
+    if '"' in value and "'" not in value and "\n" not in value and "\r" not in value:
+        return "'" + value + "'"
+    return json.dumps(value)
+
+
 def update_env(path, values):
     path = Path(path)
     if path.is_symlink():
@@ -24,12 +31,12 @@ def update_env(path, values):
         key = match.group(1) if match else None
         if key in values:
             if key not in seen:
-                lines.append(f"{key}={json.dumps(values[key])}")
+                lines.append(f"{key}={env_value(values[key])}")
                 seen.add(key)
                 pending.pop(key, None)
         else:
             lines.append(line)
-    lines.extend(f"{key}={json.dumps(value)}" for key, value in pending.items())
+    lines.extend(f"{key}={env_value(value)}" for key, value in pending.items())
     temporary = None
     try:
         with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, prefix=".oauth-", delete=False) as stream:
