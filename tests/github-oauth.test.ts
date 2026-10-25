@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createHash } from "node:crypto";
-import { beginGitHubOAuth, validateGitHubTransaction, exchangeGitHubIdentity, OAUTH_TTL_MS } from "../src/lib/server/github-oauth";
+import { beginGitHubOAuth, validateGitHubTransaction, exchangeGitHubIdentity, OAUTH_TTL_MS, assertGitHubOrigin } from "../src/lib/server/github-oauth";
 const config = { clientId: "test-client", clientSecret: "test-only", origin: "https://shipcheck.example" };
 describe("GitHub sign-in boundary", () => {
   it("requests identity only and binds a fixed callback and S256 verifier", () => {
@@ -41,5 +41,17 @@ describe("bounded identity-provider responses",()=>{
   const fake=(async(_url,init)=>{redirect=init?.redirect;return new Response("",{status:302,headers:{location:"https://other.example"}});}) as typeof fetch;
   await expect(exchangeGitHubIdentity(config,"code","verifier",fake)).rejects.toThrow("Provider request failed");
   expect(redirect).toBe("error");
+ });
+});
+
+describe("Next loopback origin reconstruction",()=>{
+ it("accepts localhost only with the registered loopback host and port",()=>{
+  expect(()=>assertGitHubOrigin(new Request("http://localhost:3149/api/auth/github/start",{headers:{host:"127.0.0.1:3149"}}),"http://127.0.0.1:3149")).not.toThrow();
+ });
+ it.each(["localhost:3149","evil.example:3149","127.0.0.1:3153"])("rejects mismatched Host %s",host=>{
+  expect(()=>assertGitHubOrigin(new Request("http://localhost:3149/api/auth/github/start",{headers:{host}}),"http://127.0.0.1:3149")).toThrow();
+ });
+ it("does not extend alias handling to a hosted HTTPS origin",()=>{
+  expect(()=>assertGitHubOrigin(new Request("http://localhost:3149/api/auth/github/start",{headers:{host:"app.example"}}),"https://app.example")).toThrow();
  });
 });

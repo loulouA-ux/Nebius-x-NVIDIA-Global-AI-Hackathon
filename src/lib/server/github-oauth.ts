@@ -67,3 +67,11 @@ export async function exchangeGitHubIdentity(config: GitHubOAuthConfig, code: st
   // Identity only: deliberately do not persist or return the OAuth bearer token.
   return { githubId: String(user.id), login: user.login };
 }
+
+// Next's production server reconstructs loopback requests with localhost in request.url.
+// Accept that internal alias only when the actual Host is the registered loopback origin.
+export function assertGitHubOrigin(request:Request,origin:string){
+ const actual=new URL(request.url),expected=new URL(origin),host=request.headers.get("host");
+ const loopbackAlias=expected.protocol==="http:"&&expected.hostname==="127.0.0.1"&&actual.protocol==="http:"&&actual.hostname==="localhost"&&actual.port===expected.port&&host===expected.host;
+ if((actual.origin!==expected.origin&&!loopbackAlias)||(host!==null&&host!==expected.host))throw new ApiError(400,"Use the configured ShipCheck sign-in address.");
+}

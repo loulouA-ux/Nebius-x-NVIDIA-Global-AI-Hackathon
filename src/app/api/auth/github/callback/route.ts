@@ -1,5 +1,5 @@
 import { database } from "@/lib/server/db";
-import { githubOAuthConfig, GITHUB_OAUTH_COOKIE, exchangeGitHubIdentity } from "@/lib/server/github-oauth";
+import { githubOAuthConfig, GITHUB_OAUTH_COOKIE, exchangeGitHubIdentity, assertGitHubOrigin } from "@/lib/server/github-oauth";
 import { consumeOAuthTransaction, createGitHubSession } from "@/lib/server/github-session";
 import { sessionCookie } from "@/lib/server/session";
 import { failure, ApiError } from "@/lib/server/http";
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
     const config = githubOAuthConfig(), url = new URL(request.url);
-    if (url.origin !== config.origin) throw new ApiError(400,"Invalid callback origin.");
+    assertGitHubOrigin(request,config.origin);
     const values = (request.headers.get("cookie")||"").split(";").map(v=>v.trim()).filter(v=>v.startsWith(GITHUB_OAUTH_COOKIE+"="));
     if (values.length !== 1) throw new ApiError(400,"GitHub sign-in browser session missing.");
     const query = database();

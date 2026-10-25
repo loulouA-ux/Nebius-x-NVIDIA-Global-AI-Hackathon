@@ -86,3 +86,9 @@ Private helper checks passed with dummy values: unrelated settings preserved, du
 ## OAuth response boundary review — 25 October 2026
 
 Token exchange and identity lookup now use the shared bounded JSON reader (1 MB maximum, timeout, redirect rejection), with explicit bounded token and identity schemas. Tests reject oversized responses at both stages and assert that the secret-bearing request forbids redirects. 192 tests in 21 files, TypeScript and production build passed after this change. The prior 12 browser checks remain the latest UI evidence; no new UI change was made in this checkpoint. Live OAuth is still not tested because the private settings are missing.
+
+## Live development GitHub sign-in — 25 October 2026
+
+Peter privately saved the OAuth settings. The idempotent schema migration succeeded. A production-mode local server at http://127.0.0.1:3149 exercised GitHub authorization, code exchange and database-backed session creation. The dashboard displayed github:7957943 and retained the authenticated session after reload. The repair page then reported no connected repository installation, confirming that identity login did not silently grant repository access. Screenshot: ../outputs/shipcheck-github-login-success.png.
+
+The live run uncovered Next's local production request URL reconstruction (localhost internally versus the registered 127.0.0.1 Host). Both OAuth endpoints now permit that alias only for the exact configured HTTP loopback host/port and matching Host header; hosted-origin checks remain strict. Five regression cases cover the valid alias and rejected host/port/hosted-origin mismatches. Repository App configuration and a live repository-to-PR run remain outstanding. This is development login verification, not hosted deployment acceptance.
