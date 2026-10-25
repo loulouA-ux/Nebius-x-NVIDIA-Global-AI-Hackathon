@@ -442,7 +442,7 @@ export default function Home() {
                 </span>
                 <span>{report.id.slice(0, 8)}</span>
               </div>
-              <section className={"verdict " + (blocked ? "blocked" : "")}>
+              <section data-status={report.status} className={"verdict " + (blocked ? "blocked" : "")}>
                 <div className="verdict-icon">
                   <ShieldAlert size={24} />
                 </div>
@@ -534,7 +534,7 @@ export default function Home() {
                 </div>
                 <div className="coverage">
                   {report.checks.map((c) => (
-                    <div className="coverage-row" key={c.name}>
+                    <div className="coverage-row" data-state={c.state} key={c.name}>
                       {c.state === "complete" ? (
                         <CircleCheck size={17} />
                       ) : (
