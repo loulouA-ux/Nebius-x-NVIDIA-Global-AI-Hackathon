@@ -14,6 +14,10 @@ const query:Query=async(text)=>text.startsWith("SELECT")?[row]:[{id:"repair"}];
 beforeEach(()=>{vi.clearAllMocks();github.repos.mockResolvedValue([{id:1}]);github.token.mockResolvedValue("test-token");github.request.mockImplementation(async(path:string)=>path.includes("/commits/main")?{sha:plan.baseCommit}:path.endsWith("/pulls")?{html_url:"https://github.com/owner/demo/pull/1"}:{sha:"d".repeat(40)});});
 describe("human approval boundary",()=>{
  it("binds approval to the complete lockfile and command evidence",()=>{const h=approvalHash(plan,result);expect(()=>approvalHash(plan,{...result,lockfileAfter:"changed"})).toThrow("scan evidence");expect(approvalHash(plan,{...result,baseline:[{command:"test",exitCode:0,output:"different"}]})).not.toBe(h);});
+ it("preserves exact approval across nested database JSON key reordering",()=>{
+  const reordered=JSON.parse(JSON.stringify(result,(_key,value)=>value&&typeof value==="object"&&!Array.isArray(value)?Object.fromEntries(Object.entries(value).reverse()):value));
+  expect(approvalHash(plan,reordered)).toBe(approvalHash(plan,result));
+ });
  it("rejects failed or incomplete verification",()=>{expect(()=>approvalHash(plan,{...result,status:"failed"})).toThrow();expect(()=>approvalHash(plan,{...result,cleanupComplete:false})).toThrow();});
  it("never writes without the exact approval hash",async()=>{await expect(publishRepair(query,actor,"id","wrong")).rejects.toMatchObject({status:409});expect(github.request).not.toHaveBeenCalled();});
  it("rejects a moved base before writing",async()=>{github.request.mockResolvedValue({sha:"f".repeat(40)});await expect(publishRepair(query,actor,"id",approvalHash(plan,result))).rejects.toMatchObject({status:409});expect(github.request).toHaveBeenCalledTimes(1);});

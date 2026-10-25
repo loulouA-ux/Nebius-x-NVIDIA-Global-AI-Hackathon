@@ -4,13 +4,13 @@ import {ApiError} from "./http";
 import {Store,type Actor} from "./store";
 import {getRepair} from "./repairs";
 import {githubRequest,installationToken,listRepositories,type RepositorySnapshot} from "./github-repositories";
-import {contentHash,type RepairPlan} from "../repair/plan";
+import {contentHash,structuredHash,type RepairPlan} from "../repair/plan";
 import {verifyRepair,type RepairRun,type SandboxFactory} from "../repair/runner";
 import {vercelSandboxFactory} from "../repair/sandbox";
 export function approvalHash(plan:RepairPlan,result:RepairRun){
  if(!result.scans?.after||result.scans.after.findings.length||result.scans.after.lockfileHash!==contentHash(result.lockfileAfter||""))throw new ApiError(409,"Complete dependency scan evidence is required for approval.");
  if(result.status!=="passed"||!result.cleanupComplete||!result.lockfileAfter||result.planHash!==plan.planHash)throw new ApiError(409,"Repair is not verified for approval.");
- return contentHash(JSON.stringify({planHash:plan.planHash,manifest:plan.manifestAfter,lockfile:result.lockfileAfter,result}));
+ return structuredHash({planHash:plan.planHash,manifest:plan.manifestAfter,lockfile:result.lockfileAfter,result});
 }
 export function repairRunLimits(env:Record<string,string|undefined>=process.env){
  const read=(name:string)=>{

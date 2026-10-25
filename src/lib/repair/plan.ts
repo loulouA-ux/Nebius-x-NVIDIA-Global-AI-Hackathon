@@ -15,11 +15,13 @@ export type RepairPlan = {
   limitations:string[];
 };
 export function contentHash(value:string){return createHash("sha256").update(value).digest("hex");}
-// All structured plan fields are arrays of strings; other values are primitives.
-// Sort keys so Postgres jsonb persistence cannot change the integrity digest.
-export function repairPlanHash(plan:Omit<RepairPlan,"planHash">){
-  return contentHash(JSON.stringify(Object.fromEntries(Object.entries(plan).sort(([a],[b])=>a<b?-1:a>b?1:0))));
+// JSON persistence may reorder object keys at any depth. Arrays and string
+// contents retain their exact order/content so evidence changes remain bound.
+export function structuredHash(value:unknown){
+  return contentHash(JSON.stringify(value,(_key,item)=>item&&typeof item==="object"&&!Array.isArray(item)
+    ?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a<b?-1:a>b?1:0)):item));
 }
+export function repairPlanHash(plan:Omit<RepairPlan,"planHash">){return structuredHash(plan);}
 const packagePattern=/^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/;
 export async function proposeDependencyRepair(input:{baseCommit:string;manifest:string;packageName:string;currentVersion:string;advisoryIds:string[]},fetcher:typeof fetch=fetch):Promise<RepairPlan>{
   if(!/^[a-f0-9]{40}$/.test(input.baseCommit))throw Error("A pinned Git commit is required.");
