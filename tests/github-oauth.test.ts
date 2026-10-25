@@ -28,3 +28,18 @@ describe("GitHub sign-in boundary", () => {
     await expect(exchangeGitHubIdentity(config,"code","verifier",fake)).rejects.toThrow("did not authorize");
   });
 });
+
+describe("bounded identity-provider responses",()=>{
+ it.each(["token","identity"])("rejects oversized %s responses without exposing tokens",async phase=>{
+  let calls=0;
+  const fake=(async()=>{calls++;return calls===1&&phase==="identity"?new Response(JSON.stringify({access_token:"private-test",token_type:"bearer"})):new Response("x".repeat(1000001));}) as typeof fetch;
+  await expect(exchangeGitHubIdentity(config,"code","verifier",fake)).rejects.toThrow("response too large");
+  expect(calls).toBe(phase==="token"?1:2);
+ });
+ it("does not forward provider redirects with the OAuth secret",async()=>{
+  let redirect:RequestRedirect|undefined;
+  const fake=(async(_url,init)=>{redirect=init?.redirect;return new Response("",{status:302,headers:{location:"https://other.example"}});}) as typeof fetch;
+  await expect(exchangeGitHubIdentity(config,"code","verifier",fake)).rejects.toThrow("Provider request failed");
+  expect(redirect).toBe("error");
+ });
+});
