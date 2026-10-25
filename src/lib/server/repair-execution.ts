@@ -1,3 +1,4 @@
+import {auditRepairMutation} from "./repair-audit";
 import {z} from "zod";
 import type {Query} from "./db";
 import {ApiError} from "./http";
@@ -34,14 +35,14 @@ export async function executeRepair(query:Query,actor:Actor,id:string,factory?:S
  if(!(await listRepositories(actor,fetcher)).some(r=>r.id===snapshot.repository.id))throw new ApiError(403,"Repository access was revoked.");
  await new Store(query).quota("repair-runs-global",limits.daily,86400000);
  await reserveRepairRun(query,limits.total);
- const [claimed]=await query("UPDATE sc_repairs SET state='running',updated_at=now() WHERE id=$1 AND owner_id=$2 AND workspace_id=$3 AND state='proposed' RETURNING id",[id,actor.id,actor.workspaceId]);
+ const [claimed]=await auditRepairMutation(query,actor,id,"verification_started","UPDATE sc_repairs SET state='running',updated_at=now() WHERE id=$1 AND owner_id=$2 AND workspace_id=$3 AND state='proposed' RETURNING id",[id,actor.id,actor.workspaceId]);
  if(!claimed)throw new ApiError(409,"Repair has already started.");
  try{
   const result=await verifyRepair(plan,snapshot.files,make,fetcher);
-  await query("UPDATE sc_repairs SET state=$2,result=$3::jsonb,updated_at=now() WHERE id=$1",[id,result.status==="passed"?"verified":"failed",JSON.stringify(result)]);
+  await auditRepairMutation(query,actor,id,result.status==="passed"?"verification_passed":"verification_failed","UPDATE sc_repairs SET state=$2,result=$3::jsonb,updated_at=now() WHERE id=$1 RETURNING id",[id,result.status==="passed"?"verified":"failed",JSON.stringify(result)],{evidenceHash:structuredHash(result),cleanupComplete:result.cleanupComplete});
   return {id,state:result.status==="passed"?"verified":"failed",result,approvalHash:result.status==="passed"?approvalHash(plan,result):null};
  }catch{
-  await query("UPDATE sc_repairs SET state='failed',updated_at=now() WHERE id=$1",[id]);
+  await auditRepairMutation(query,actor,id,"verification_failed","UPDATE sc_repairs SET state='failed',updated_at=now() WHERE id=$1 RETURNING id",[id],{reasonCode:"execution_failed"});
   throw new ApiError(502,"Repair execution failed. Review evidence before retrying.");
  }
 }
@@ -53,17 +54,17 @@ export async function publishRepair(query:Query,actor:Actor,id:string,approvedHa
  const token=await installationToken(actor,snapshot.repository.id,true,fetcher),base=`/repos/${snapshot.repository.full_name}`;
  const head=shaSchema.parse(await githubRequest(`${base}/commits/${encodeURIComponent(snapshot.repository.default_branch)}`,token,{},fetcher));
  if(head.sha!==plan.baseCommit)throw new ApiError(409,"Base branch changed. Propose and verify a fresh repair.");
- const [claimed]=await query("UPDATE sc_repairs SET state='publishing',updated_at=now() WHERE id=$1 AND owner_id=$2 AND workspace_id=$3 AND state='verified' RETURNING id",[id,actor.id,actor.workspaceId]);
+ const [claimed]=await auditRepairMutation(query,actor,id,"patch_approved","UPDATE sc_repairs SET state='publishing',updated_at=now() WHERE id=$1 AND owner_id=$2 AND workspace_id=$3 AND state='verified' RETURNING id",[id,actor.id,actor.workspaceId],{approvalHash:approvedHash,planHash:plan.planHash,baseCommit:plan.baseCommit});
  if(!claimed)throw new ApiError(409,"PR handoff already started.");
  // Keep publishing state on unknown outcome. Never blindly retry writes or create duplicate PRs.
  const tree=shaSchema.parse(await githubRequest(`${base}/git/trees`,token,{method:"POST",body:JSON.stringify({base_tree:snapshot.tree,tree:[{path:"package.json",mode:"100644",type:"blob",content:plan.manifestAfter},{path:"package-lock.json",mode:"100644",type:"blob",content:result.lockfileAfter}]})},fetcher));
  const commit=shaSchema.parse(await githubRequest(`${base}/git/commits`,token,{method:"POST",body:JSON.stringify({message:`Fix ${plan.packageName} dependency: ${plan.fromVersion} to ${plan.toVersion}`,tree:tree.sha,parents:[plan.baseCommit]})},fetcher));
- await query("UPDATE sc_repairs SET publication_commit=$2,updated_at=now() WHERE id=$1 AND state='publishing'",[id,commit.sha]);
+ await auditRepairMutation(query,actor,id,"publication_commit_created","UPDATE sc_repairs SET publication_commit=$2,updated_at=now() WHERE id=$1 AND state='publishing' RETURNING id",[id,commit.sha],{commit:commit.sha});
  const branch=`codex/shipcheck-repair-${id}`;
  await githubRequest(`${base}/git/refs`,token,{method:"POST",body:JSON.stringify({ref:`refs/heads/${branch}`,sha:commit.sha})},fetcher);
  const pr=z.object({html_url:z.string().url()}).parse(await githubRequest(`${base}/pulls`,token,{method:"POST",body:JSON.stringify({title:`Fix ${plan.packageName}: ${plan.fromVersion} → ${plan.toVersion}`,head:branch,base:snapshot.repository.default_branch,draft:true,body:`Proposes a dependency upgrade based on OSV evidence.\n\n${plan.sourceUrls.join("\n")}\n\nBaseline and patched sandbox commands exited successfully; post-repair dependency lookup passed. This is not a guarantee of application security. Review the diff and CI before merging.\n\nApproved patch: ${approvedHash}\nSource commit: ${plan.baseCommit}\n\nNo automatic merge or deployment is performed.`})},fetcher));
  if(!pr.html_url.startsWith(`https://github.com/${snapshot.repository.full_name}/pull/`))throw Error("Unexpected PR URL.");
- await query("UPDATE sc_repairs SET state='published',pr_url=$2,updated_at=now() WHERE id=$1",[id,pr.html_url]);
+ await auditRepairMutation(query,actor,id,"draft_pr_created","UPDATE sc_repairs SET state='published',pr_url=$2,updated_at=now() WHERE id=$1 RETURNING id",[id,pr.html_url],{url:pr.html_url,commit:commit.sha});
  return {id,state:"published",url:pr.html_url};
 }
 
@@ -80,7 +81,7 @@ export async function reconcileRepair(query:Query,actor:Actor,id:string,fetcher:
  if(matches.length!==1)throw new ApiError(409,"No unique existing PR was found. No GitHub writes were repeated.");
  const pr=matches[0];
  if(pr.head.sha!==row.publication_commit||pr.head.ref!==branch||pr.head.repo?.id!==snapshot.repository.id||pr.base.repo.id!==snapshot.repository.id||pr.base.ref!==snapshot.repository.default_branch||pr.state!=="open"||!pr.draft||pr.merged_at!==null||!pr.html_url.startsWith(`https://github.com/${snapshot.repository.full_name}/pull/`))throw new ApiError(409,"Existing PR differs from the approved handoff. Manual review is required.");
- const updated=await query("UPDATE sc_repairs SET state='published',pr_url=$2,updated_at=now() WHERE id=$1 AND owner_id=$3 AND workspace_id=$4 AND state='publishing' RETURNING id",[id,pr.html_url,actor.id,actor.workspaceId]);
+ const updated=await auditRepairMutation(query,actor,id,"draft_pr_reconciled","UPDATE sc_repairs SET state='published',pr_url=$2,updated_at=now() WHERE id=$1 AND owner_id=$3 AND workspace_id=$4 AND state='publishing' RETURNING id",[id,pr.html_url,actor.id,actor.workspaceId],{url:pr.html_url,commit:row.publication_commit});
  if(!updated.length)throw new ApiError(409,"Repair state changed during reconciliation.");
  return {id,state:"published",url:pr.html_url};
 }

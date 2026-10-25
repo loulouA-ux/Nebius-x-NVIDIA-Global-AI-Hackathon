@@ -1,3 +1,4 @@
+import {auditRepairMutation} from "./repair-audit";
 import {randomUUID} from "node:crypto";
 import type {Query} from "./db";
 import {Store,type Actor} from "./store";
@@ -21,7 +22,7 @@ export async function proposeRepositoryRepair(query:Query,actor:Actor,repository
  const ids=findings.flatMap(f=>f.evidence.filter(e=>e.kind==="advisory"&&e.url?.startsWith("https://osv.dev/vulnerability/")).map(e=>e.url!.split("/").at(-1)!));
  const plan=await proposeDependencyRepair({baseCommit:snapshot.commit,manifest,packageName,currentVersion:dependency.version,advisoryIds:ids});
  const id=randomUUID();
- await query("INSERT INTO sc_repairs(id,owner_id,workspace_id,state,snapshot,plan) VALUES($1,$2,$3,'proposed',$4::jsonb,$5::jsonb)",[id,actor.id,actor.workspaceId,JSON.stringify(snapshot),JSON.stringify(plan)]);
+ await auditRepairMutation(query,actor,id,"proposal_created","INSERT INTO sc_repairs(id,owner_id,workspace_id,state,snapshot,plan) VALUES($1,$2,$3,'proposed',$4::jsonb,$5::jsonb) RETURNING id",[id,actor.id,actor.workspaceId,JSON.stringify(snapshot),JSON.stringify(plan)],{planHash:plan.planHash,baseCommit:plan.baseCommit,repositoryId});
  return {id,state:"proposed",repository:snapshot.repository,plan};
 }
 export async function getRepair(query:Query,actor:Actor,id:string){

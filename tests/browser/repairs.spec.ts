@@ -57,3 +57,17 @@ test("uncertain publication offers reconciliation rather than repeating approval
  await expect(page.getByRole("link",{name:"Open draft pull request"})).toHaveAttribute("href","https://github.com/team/demo/pull/2");
  expect(actions).toEqual(["reconcile"]);
 });
+
+test("audit history shows actor and evidence and exports without a mutation",async({page})=>{
+ let writes=0;
+ const events=[{id:"event-1",event_type:"patch_approved",actor_id:"github:123",created_at:"2026-10-25T21:00:00Z",details:{approvalHash:"a".repeat(64)}}];
+ await page.route("**/api/repositories",r=>r.fulfill({json:{repositories:[base.repository]}}));
+ await page.route("**/api/repairs",r=>r.fulfill({json:{repairs:[{id:base.id,state:"published",package_name:"lodash",repository_name:"team/demo",created_at:"2026-10-25T21:00:00Z"}]}}));
+ await page.route(`**/api/repairs/${base.id}`,r=>{if(r.request().method()!=="GET")writes++;return r.fulfill({json:{...base,state:"published",auditTrail:events}});});
+ await page.goto("/repairs");await page.getByRole("button",{name:"team/demo · lodash · published"}).click();
+ const audit=page.getByRole("region",{name:"Repair audit trail"});await expect(audit.getByText("Exact patch approved",{exact:true})).toBeVisible();await expect(audit.getByText("github:123",{exact:true})).toBeVisible();
+ await audit.getByText("Evidence references",{exact:true}).click();await expect(audit.getByText(/approvalHash/)).toBeVisible();
+ const download=page.waitForEvent("download");await audit.getByRole("button",{name:"Export audit trail"}).click();const file=await download;
+ const {readFile}=await import("node:fs/promises");const exported=JSON.parse(await readFile((await file.path())!,"utf8"));expect(exported.repairId).toBe(base.id);expect(exported.events).toEqual(events);expect(writes).toBe(0);
+ await page.screenshot({path:"test-results/repair-audit.png",fullPage:true});
+});

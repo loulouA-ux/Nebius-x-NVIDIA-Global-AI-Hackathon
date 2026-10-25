@@ -20,6 +20,11 @@ describe("human approval boundary",()=>{
  });
  it("rejects failed or incomplete verification",()=>{expect(()=>approvalHash(plan,{...result,status:"failed"})).toThrow();expect(()=>approvalHash(plan,{...result,cleanupComplete:false})).toThrow();});
  it("never writes without the exact approval hash",async()=>{await expect(publishRepair(query,actor,"id","wrong")).rejects.toMatchObject({status:409});expect(github.request).not.toHaveBeenCalled();});
+ it("does not publish when approval logging fails",async()=>{
+  const failing:Query=async(sql)=>{if(sql.startsWith("SELECT"))return [row];throw Error("Audit storage unavailable");};
+  await expect(publishRepair(failing,actor,"id",approvalHash(plan,result))).rejects.toThrow("Audit storage unavailable");
+  expect(github.request.mock.calls.every(call=>!call[2]?.method||call[2].method==="GET")).toBe(true);
+ });
  it("rejects a moved base before writing",async()=>{github.request.mockResolvedValue({sha:"f".repeat(40)});await expect(publishRepair(query,actor,"id",approvalHash(plan,result))).rejects.toMatchObject({status:409});expect(github.request).toHaveBeenCalledTimes(1);});
  it("writes only two files to a new branch and draft PR",async()=>{
   const r=await publishRepair(query,actor,"id",approvalHash(plan,result));expect(r.url).toContain("/pull/1");

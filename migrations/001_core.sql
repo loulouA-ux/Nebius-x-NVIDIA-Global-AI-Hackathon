@@ -48,3 +48,12 @@ CREATE TABLE IF NOT EXISTS sc_repairs (
 );
 
 ALTER TABLE sc_repairs ADD COLUMN IF NOT EXISTS publication_commit text;
+
+CREATE TABLE IF NOT EXISTS sc_repair_events (
+ sequence bigserial UNIQUE NOT NULL,
+ id uuid PRIMARY KEY, repair_id uuid NOT NULL REFERENCES sc_repairs(id),
+ actor_id text NOT NULL, workspace_id text NOT NULL,
+ event_type text NOT NULL CHECK(event_type IN ('proposal_created','verification_started','verification_passed','verification_failed','patch_approved','publication_commit_created','draft_pr_created','draft_pr_reconciled')),
+ details jsonb NOT NULL DEFAULT '{}', created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS sc_repair_event_history ON sc_repair_events(repair_id,sequence);

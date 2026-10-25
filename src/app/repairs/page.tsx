@@ -3,7 +3,9 @@ import {useEffect,useState} from "react";
 import type {RepairPlan} from "@/lib/repair/plan";
 import type {RepairRun} from "@/lib/repair/runner";
 type Repo={id:number;full_name:string};
-type Repair={id:string;state:string;plan:RepairPlan;result?:RepairRun;approvalHash?:string;url?:string;repository:Repo};
+type AuditEvent={id:string;event_type:string;actor_id:string;created_at:string;details:Record<string,string|number|boolean>};
+const eventLabels:Record<string,string>={proposal_created:"Repair proposed",verification_started:"Sandbox verification started",verification_passed:"Sandbox verification passed",verification_failed:"Verification failed",patch_approved:"Exact patch approved",publication_commit_created:"Git commit created",draft_pr_created:"Draft PR created",draft_pr_reconciled:"Existing draft PR confirmed"};
+type Repair={auditTrail?:AuditEvent[];id:string;state:string;plan:RepairPlan;result?:RepairRun;approvalHash?:string;url?:string;repository:Repo};
 type SavedRepair={id:string;state:string;package_name:string;repository_name:string;created_at:string};
 export default function Repairs(){
  const [saved,setSaved]=useState<SavedRepair[]>([]);
@@ -12,7 +14,7 @@ export default function Repairs(){
  async function refreshSaved(){const d=await api("/api/repairs");setSaved(d.repairs);}
  async function openSaved(id:string){setBusy("Loading saved repair…");setError("");setApproved(false);try{setRepair(await api(`/api/repairs/${id}`));}catch(e){setError(e instanceof Error?e.message:"Unable to load repair.");}finally{setBusy("");}}
  useEffect(()=>{api("/api/repositories").then(d=>setRepos(d.repositories)).catch(e=>setError(e.message));refreshSaved().catch(e=>setError(e.message));},[]);
- async function propose(event:React.FormEvent){event.preventDefault();setBusy("Preparing advisory evidence…");setError("");setApproved(false);try{setRepair(await api("/api/repairs",{repositoryId:Number(repo),packageName:pkg}));}catch(e){setError(e instanceof Error?e.message:"Proposal failed.");}finally{setBusy("");void refreshSaved().catch(()=>{});}}
+ async function propose(event:React.FormEvent){event.preventDefault();setBusy("Preparing advisory evidence…");setError("");setApproved(false);try{const proposed=await api("/api/repairs",{repositoryId:Number(repo),packageName:pkg});setRepair(await api(`/api/repairs/${proposed.id}`));}catch(e){setError(e instanceof Error?e.message:"Proposal failed.");}finally{setBusy("");void refreshSaved().catch(()=>{});}}
  async function action(kind:"verify"|"approve"|"reconcile"){
   if(!repair)return;setBusy(kind==="verify"?"Running baseline and patched sandboxes…":kind==="reconcile"?"Checking GitHub for the existing PR…":"Creating the approved draft PR…");setError("");
   try{await api(`/api/repairs/${repair.id}`,{action:kind,...(kind==="approve"?{approvalHash:repair.approvalHash}:{})});setRepair(await api(`/api/repairs/${repair.id}`));setApproved(false);}
@@ -48,6 +50,9 @@ export default function Repairs(){
     <label><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/> I reviewed the files and evidence and approve creating this draft PR.</label><p><button className="button primary" disabled={!approved||!!busy||!repair.approvalHash} onClick={()=>action("approve")}>Approve and create draft PR</button></p>
    </section>}
    {repair.state==="publishing"&&<p>PR creation needs reconciliation. This check reads GitHub without repeating publication. <button className="button" disabled={!!busy} onClick={()=>action("reconcile")}>Check existing draft PR</button></p>}
+   <section style={box} aria-label="Repair audit trail"><h2>Audit trail</h2><p>Recorded actors, actions and evidence fingerprints. Times are shown in UTC. Events have no edit or delete action in ShipCheck; this is not an independently tamper-proof archive.</p>
+    {!repair.auditTrail?.length?<p>No recorded audit events. This repair may predate event logging; earlier actions have not been reconstructed.</p>:<><button className="button" onClick={()=>{const blob=new Blob([JSON.stringify({schemaVersion:1,repairId:repair.id,exportedAt:new Date().toISOString(),scope:"Recorded repair events only; earlier actions may be absent",events:repair.auditTrail},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=`shipcheck-audit-${repair.id}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}}>Export audit trail</button><ol>{repair.auditTrail.map(event=><li key={event.id} style={{marginTop:16}}><strong>{eventLabels[event.event_type]||event.event_type}</strong><p><time dateTime={event.created_at}>{new Date(event.created_at).toISOString()}</time> · Actor: <code>{event.actor_id}</code></p><details><summary>Evidence references</summary><pre style={{overflow:"auto",whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{JSON.stringify(event.details,null,2)}</pre></details></li>)}</ol></>}
+   </section>
    {repair.url&&<p><a href={repair.url} target="_blank" rel="noreferrer">Open draft pull request</a></p>}
   </>}
  </main>;

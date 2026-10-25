@@ -10,6 +10,7 @@ export default defineConfig({
     command: "npx next start --hostname 127.0.0.1 --port 3148",
     url: "http://127.0.0.1:3148",
     reuseExistingServer: false,
+    env: { SHIPCHECK_APP_ORIGIN: "http://127.0.0.1:3148" },
   },
   workers: 1,
 });
