@@ -4,16 +4,18 @@ Active goal, 25 October 2026. This extends the accepted scanner; it does not reo
 
 ## Acceptance ledger
 
-- [ ] GitHub OAuth with state, PKCE, fixed callback origin, expiry and single-use authorization transactions. Prove rejection of replay, wrong state and wrong browser.
-- [ ] Stable GitHub numeric identity owns an isolated workspace. Existing Peter/Louise key sessions remain valid; no automatic account linking by email or mutable username.
-- [ ] Repository access is explicit and separate from sign-in. Prefer a GitHub App installation with selected repositories; no broad repo scope for login.
-- [ ] A repository snapshot is pinned to a commit and bounded by file/size limits. Repository contents are untrusted data.
-- [ ] Propose one supported npm dependency upgrade from an actual advisory. Preserve exact package/version/source provenance; model suggestions cannot determine security acceptance.
-- [ ] Build a patch in an ephemeral sandbox with no production credentials, no public ports, execution timeout and restricted network. Install without lifecycle scripts; run agreed tests with egress denied.
-- [ ] Record baseline and patched test outcomes, lockfile diff, scan delta, command exit codes, missing checks and cleanup outcome. Failed or absent tests never count as success.
-- [ ] Human explicitly approves the exact patch before a branch/PR is written. Never merge or deploy repairs automatically.
-- [ ] UI demonstrates sign-in, repository selection, proposed repair, sandbox progress, evidence and approval. Browser walkthrough and failure-path tests required.
-- [ ] Live GitHub callback and bounded cloud sandbox fixture verified separately from unit tests before claiming completion.
+- [x] GitHub OAuth with state, PKCE, fixed callback origin, expiry and single-use authorization transactions. Prove rejection of replay, wrong state and wrong browser.
+- [x] Stable GitHub numeric identity owns an isolated workspace. Existing Peter/Louise key sessions remain valid; no automatic account linking by email or mutable username.
+- [x] Repository access is explicit and separate from sign-in. Prefer a GitHub App installation with selected repositories; no broad repo scope for login.
+- [x] A repository snapshot is pinned to a commit and bounded by file/size limits. Repository contents are untrusted data.
+- [x] Propose one supported npm dependency upgrade from an actual advisory. Preserve exact package/version/source provenance; model suggestions cannot determine security acceptance.
+- [x] Build a patch in an ephemeral sandbox with no production credentials, no public ports, execution timeout and restricted network. Install without lifecycle scripts; run agreed tests with egress denied.
+- [x] Record baseline and patched test outcomes, lockfile diff, scan delta, command exit codes, missing checks and cleanup outcome. Failed or absent tests never count as success.
+- [x] Human explicitly approves the exact patch before a branch/PR is written. Never merge or deploy repairs automatically.
+- [x] UI demonstrates sign-in, repository selection, proposed repair, sandbox progress, evidence and approval. Browser walkthrough and failure-path tests required.
+- [x] Live GitHub callback and bounded cloud sandbox fixture verified separately from unit tests before claiming completion.
+
+Completion scope: supported development fixture, with evidence in the dated checkpoints below. Hosted rollout and broader repair support are separate work.
 
 ## Initial implementation decisions
 
@@ -118,3 +120,9 @@ Only package.json and package-lock.json differ: minimist 1.2.5 to 1.2.6, corresp
 A further pre-publication review reproduced an approval fingerprint mismatch when nested execution-evidence objects are reordered by jsonb. Both plan and approval digests now use deterministic recursive object-key sorting, preserving array order and exact file/log strings. The existing live plan digest remains valid. An actual Neon SELECT jsonb roundtrip of the saved result confirms identical approval fingerprints after reordered input; no paid rerun was needed. The regression failed before the fix, then all 199 tests passed, including existing changed-evidence rejection checks. Production build with TypeScript passed.
 
 GitHub main still matches the tested commit and the fixture has no pull requests. Exact reviewed patch is available at ../outputs/repair-review/verified-repair.diff. Human approval is still outstanding; the automated continuation does not authorize publication.
+
+## Live human-approved PR handoff — 25 October 2026
+
+Peter explicitly approved the draft PR in chat. Used the authenticated repair UI to reopen the verified record, apply that exact-patch approval and publish once. The app reports published and links to https://github.com/chilu18/shipcheck-repair-fixture/pull/1 . GitHub independently confirms OPEN, draft=true, mergedAt=null, authored by app/shipcheck-heysalad-dev-repairs, head 72bff84011c6697d51660de71b4aaf84a69937e2 and base abca9e9ffcff8f15901548e9d5f531ab86b7eeb7. Both remote file contents were compared byte-for-byte with the saved verified plan and generated lockfile: exact matches. Only package.json and package-lock.json changed. Main remains at the original tested commit. Screenshot: ../outputs/shipcheck-draft-pr-created.png.
+
+Development acceptance is complete for the supported small npm fixture workflow: live GitHub identity login, selected-repository App access, pinned advisory-backed proposal, baseline/patched isolated execution, saved evidence and explicit human-approved draft PR handoff. The fixture has functional tests but no build script; no fixture build result is claimed. The ShipCheck app production build and 199 unit/integration tests passed at 458e7ce; the existing browser suite and this live walkthrough provide UI evidence. This is not a production rollout, generalized autonomous repair, or proof of application-wide security. The application implementation remains local on codex/github-repair-loop. No existing demo deployment, repository access expansion, repair merge or repair deployment occurred.
