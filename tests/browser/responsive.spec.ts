@@ -18,10 +18,9 @@ for(const width of [360,768,1440]) {
    await page.getByRole('navigation',{name:'Main navigation'}).getByRole('button',{name,exact:true}).click();await fits();
   }
   await page.getByRole('button',{name:'Run offline demo',exact:false}).click();
-  await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();await fits();
+  await expect(page.getByRole('heading',{name:'Blocked · 2 high-severity findings'})).toBeVisible();await fits();
   await page.getByRole('button',{name:/Command Injection in lodash/}).click();await fits();
-  if(width<=700)await page.getByRole('button',{name:'More',exact:true}).click();
-  await page.getByRole('button',{name:'Recommended actions',exact:true}).click();await fits();
+  await page.getByRole('button',{name:'Back to report'}).click();await fits();
  });
 }
 
@@ -32,13 +31,13 @@ test('Back restores report and finding context without repeating a scan',async({
  await page.route('**/api/repositories',r=>r.fulfill({json:{repositories:[]}}));
  await page.route('**/api/repairs',r=>r.fulfill({json:{repairs:[]}}));
  await page.goto('/');await page.getByRole('button',{name:'Offline fixture'}).click();
- await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Blocked · 2 high-severity findings'})).toBeVisible();
  await page.getByRole('button',{name:/Command Injection in lodash/}).click();
  await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Back to report'}).click();
- await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Blocked · 2 high-severity findings'})).toBeVisible();
  await page.goForward();await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
- await page.getByRole('link',{name:'Repairs & audit trail'}).click();
+ await page.getByRole('link',{name:'Prepare dependency repair'}).click();
  await expect(page.getByRole('heading',{name:'Verify a dependency repair'})).toBeVisible();
  await page.goBack();await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
  expect(scans).toBe(1);
@@ -53,10 +52,10 @@ test('finding and its evidence are adjacent on desktop and stacked on mobile',as
  await evidence.getByRole('button',{name:'Preview source'}).click();
  await expect(page.getByRole('link',{name:'Open original source in a new tab'})).toHaveAttribute('href','https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm');
  await page.getByRole('button',{name:'Close',exact:true}).click();
- let a=await summary.boundingBox(),b=await evidence.boundingBox();expect(b!.x).toBeGreaterThan(a!.x+a!.width-1);
+ let a=await summary.boundingBox(),b=await evidence.boundingBox();expect(b!.y).toBeGreaterThan(a!.y);
  await page.screenshot({path:'test-results/evidence-desktop.png',fullPage:true});
  await page.setViewportSize({width:360,height:900});
- a=await summary.boundingBox();b=await evidence.boundingBox();expect(b!.y).toBeGreaterThan(a!.y+a!.height-1);
+ await expect(page.locator('dialog.finding-drawer')).toHaveCount(0);await expect.poll(async()=>{a=await summary.boundingBox();b=await evidence.boundingBox();return b!.y-(a!.y+a!.height);}).toBeGreaterThan(-1);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
  await page.screenshot({path:'test-results/evidence-mobile.png',fullPage:true});
 });

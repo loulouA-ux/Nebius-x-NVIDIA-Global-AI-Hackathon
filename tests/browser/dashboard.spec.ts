@@ -8,8 +8,9 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
+  await page.getByText("What this scan covers",{exact:true}).click();
   await expect(
     page.getByText("Single-advisory snapshot retrieved 23 Oct 2026.", {
       exact: false,
@@ -29,11 +30,9 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
   await expect(
     page.getByText("No code has been changed.", { exact: false }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Recommended actions", exact: true })
-    .click();
+  await page.getByRole("button", {name:"Back to report"}).click();
   await expect(
-    page.getByRole("heading", { name: "Work through the findings" }),
+    page.getByRole("heading", { name: "Scan report" }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/actions-desktop.png",
@@ -61,7 +60,7 @@ test("mobile flow has no horizontal overflow", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -84,7 +83,7 @@ test("desktop overview renders without client errors", async ({ page }) => {
   });
   await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/report-desktop.png",
@@ -161,7 +160,7 @@ test("member can reopen a saved report and record a decision without changing it
   await expect(page.getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await expect(
-    page.getByRole("heading", { name: "Manifest assessment" }),
+    page.getByRole("heading", { name: "Scan report" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: /Potential credential in supplied content/ })
@@ -180,7 +179,7 @@ test("member can reopen a saved report and record a decision without changing it
   });
   await page.getByRole("button", { name: "Back to report" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(

@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import FindingSurface from "./components/finding-surface";
+import ReportView from "./views/report";
 import HomeEmpty from "./views/home-empty";
 import AiTriage from "./components/ai-triage";
 import styles from "./findings.module.css";
@@ -53,6 +55,8 @@ export default function Home() {
   const [report, setReport] = useState<ScanReport | null>(null);
   const [selected, setSelected] = useState<Finding | null>(null);
   const [busy, setBusy] = useState(false);
+  const [desktop,setDesktop]=useState(false);
+  useEffect(()=>{const m=matchMedia("(min-width:1024px)");const update=()=>setDesktop(m.matches);update();m.addEventListener("change",update);return()=>m.removeEventListener("change",update);},[]);
   const [recorded,setRecorded]=useState<boolean|null>(null);
   useEffect(()=>{fetch("/api/demos?mode=availability").then(r=>r.json()).then(d=>setRecorded(d.recorded)).catch(()=>setRecorded(false));},[]);
   const [error, setError] = useState("");
@@ -62,6 +66,7 @@ export default function Home() {
   const [projectId, setProjectId] = useState("");
   const mainRef = useRef<HTMLElement>(null);
   const focusPending = useRef(false);
+  const [navigationRevision,setNavigationRevision]=useState(0);
   const [filters,setFilters] = useState<FindingFilters>({search:'',severity:'all',source:'all',package:'all',decision:'all'});
   const [decisionRevision,setDecisionRevision]=useState(0);
   const [decisions,setDecisions]=useState<Record<string,string>>({});
@@ -85,10 +90,10 @@ export default function Home() {
   },[report?.id,report?.mode,decisionRevision]);
   useEffect(() => {
     if(focusPending.current && !busy){
-      const heading=mainRef.current?.querySelector('h1');
+      const heading=mainRef.current?.querySelector<HTMLElement>(selected&&desktop?'dialog h1':'h1');
       if(heading){heading.tabIndex=-1;heading.focus();focusPending.current=false;}
     }
-  },[view,selected,report,busy]);
+  },[view,selected,report,busy,navigationRevision]);
   useEffect(() => {
     let active=true;
     let generation=0;
@@ -96,7 +101,8 @@ export default function Home() {
       const ticket=++generation;
       if(event)focusPending.current=true;
       const query=new URLSearchParams(window.location.search);
-      const requested=query.get("view") || "overview";
+      let requested=query.get("view") || "overview";
+      if(requested==='actions'||requested==='findings'){requested='overview';query.set('view',requested);window.history.replaceState(window.history.state,'',`/?${query}`);}
       setView((["overview","project","scan","findings","actions"].includes(requested)?requested:"overview") as View);
       setError("");
       const id=query.get("report") || latestReport()?.id, finding=query.get("finding");
@@ -115,7 +121,8 @@ export default function Home() {
     return ()=>{active=false;window.removeEventListener("popstate",restore);window.removeEventListener(sessionExpiredEvent,expire);};
   }, []);
   function navigate(v: View, current=report, finding:Finding|null=null) {
-    focusPending.current=true;
+    if(v==='actions'||v==='findings')v='overview';
+    focusPending.current=true;setNavigationRevision(n=>n+1);
     if(current){rememberReport(current);setFilters(recalledFilters(current.id));}
     const query=new URLSearchParams({view:v});
     if(current)query.set("report",current.id);
@@ -215,6 +222,8 @@ export default function Home() {
             </section>
           ) : selected ? (
             <>
+              {desktop&&report&&<ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>}
+              <FindingSurface desktop={desktop} close={()=>window.history.state?.shipcheckView ? window.history.back() : navigate('overview',report)}>
               <button className="back" onClick={() => window.history.state?.shipcheckView ? window.history.back() : navigate(view,report)}>
                 <ArrowLeft size={15} />
                 Back to report
@@ -224,7 +233,7 @@ export default function Home() {
               <span className={"severity " + selected.severity}>
                 {selected.severity === "review" ? "Review" : selected.severity}
               </span>
-              <h1 className="detail-title">{selected.title}</h1>
+              <h1 tabIndex={-1} className="detail-title">{selected.title}</h1>
               <p className="intro">{selected.description}</p>
               <section className="panel">
                 <h2>Recommended action</h2>
@@ -276,6 +285,7 @@ export default function Home() {
                     </small>
                   </section>
                 ))}
+              </FindingSurface>
             </>
           ) : view === "project" ? (
             <ProjectSetup />
@@ -363,196 +373,9 @@ export default function Home() {
           ) : !report ? (
             <HomeEmpty demo={offline=>scan("demo",!offline&&recorded===true)} scan={()=>navigate("scan")} recorded={recorded}/>
           ) : (
-            <>
-              <div className="page-heading">
-                <div>
-                  <h1>
-                    {view === "actions"
-                      ? "Recommended actions"
-                      : view === "findings"
-                        ? "Your findings"
-                        : report.mode === "demo"
-                          ? "salad-storefront"
-                          : "Manifest assessment"}
-                  </h1>
-                  <p className="intro">
-                    {report.mode === "demo"
-                      ? report.recording ? `Recorded live run · captured ${report.recording.recordedAt} · Nemotron on Nebius · replayed, no live requests` : "Offline demonstration · real rules over synthetic inputs"
-                      : "Live assessment · see coverage for included checks"}
-                  </p>
-                </div>
-                <button className="button" onClick={() => navigate("scan")}>
-                  <ScanLine size={17} />
-                  New scan
-                </button>
-              </div>
-              <div className="report-meta">
-                <span>
-                  {new Date(report.createdAt).toLocaleString("en-GB")}
-                </span>
-                <span>
-                  {report.durationMs < 1000
-                    ? "Under 1 second"
-                    : `${(report.durationMs / 1000).toFixed(1)} seconds`}
-                </span>
-                <span>{report.id.slice(0, 8)}</span>
-              </div>
-              {view === "findings" ? <p className={styles.compactVerdict}><strong>{report.status}</strong> · {blocked} high-severity findings · {incomplete} limited or incomplete checks. This assessment does not enforce a deployment gate. <button className="text-button" onClick={()=>navigate("overview")}>Review coverage</button></p> : <section data-status={report.status} className={"verdict " + (blocked ? "blocked" : "")}>
-                <div className="verdict-icon">
-                  <ShieldAlert size={24} />
-                </div>
-                <div>
-                  <span className="eyebrow">{report.status}</span>
-                  <h2>
-                    {blocked
-                      ? `${blocked} blocker${blocked === 1 ? "" : "s"} need attention`
-                      : report.status === "Incomplete"
-                        ? "Some checks could not be completed"
-                        : report.status === "Review required"
-                          ? "Review the evidence before shipping"
-                          : "No findings in completed checks"}
-                  </h2>
-                  <p>
-                    {incomplete > 0
-                      ? `${incomplete} checks use limited evidence or are incomplete. `
-                      : ""}
-                    This assessment is not a guarantee that the application is
-                    secure and does not enforce a deployment gate.
-                  </p>
-                </div>
-              </section>}
-              {view === "actions" ? (
-                <section className="section">
-                  <h2>Work through the findings</h2>
-                  {report.findings.map((f, i) => (
-                    <article className="panel action-panel" key={f.id}>
-                      <span className="step-number">{i + 1}</span>
-                      <div>
-                        <h3>{f.title}</h3>
-                        <p>{f.action}</p>
-                        <button
-                          className="text-button"
-                          onClick={() => navigate(view,report,f)}
-                        >
-                          Review evidence <ArrowUpRight size={14} />
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                  {!report.findings.length && (
-                    <p>
-                      No actions generated. Review incomplete coverage before
-                      relying on this result.
-                    </p>
-                  )}
-                </section>
-              ) : (
-                <section className="section">
-                  <div className="section-heading">
-                    <h2>{view === "findings" ? "Triage findings" : "Highest priority findings"}</h2>
-                    <span>{report.findings.length} findings</span>
-                  </div>
-                  {view === 'findings' && <div className={styles.filters} aria-label="Filter findings">
-                    <label className={styles.search}>Search findings<input type="search" value={filters.search} placeholder="Title, package or evidence location" onChange={e=>updateFilters({search:e.target.value})}/></label>
-                    <label>Severity<select aria-label="Severity" value={filters.severity} onChange={e=>updateFilters({severity:e.target.value})}><option value="all">All severities</option><option value="high">High</option><option value="medium">Medium</option><option value="review">Review</option></select></label>
-                    <label>Evidence type<select aria-label="Evidence type" value={filters.source} onChange={e=>updateFilters({source:e.target.value})}><option value="all">All evidence</option><option value="advisory">Advisory</option><option value="code">Code</option><option value="http">HTTP observation</option></select></label>
-                    <label>Package<select aria-label="Package" value={filters.package} onChange={e=>updateFilters({package:e.target.value})}><option value="all">All packages</option>{packageOptions.map(p=><option key={p}>{p}</option>)}</select></label>
-                    <label>Review decision<select aria-label="Review decision" disabled={decisionState!=='ready'} value={decisionState==='ready'?filters.decision:'all'} onChange={e=>updateFilters({decision:e.target.value})}><option value="all">All decisions</option><option value="unreviewed">No decision</option><option value="acknowledge">Acknowledged</option><option value="dismiss">Dismissed</option></select></label>
-                    <p className={styles.decisionNote}>{decisionState==='demo'?'Demo decisions are not saved.':decisionState==='loading'?'Loading review decisions…':decisionState==='unavailable'?'Decision history unavailable. Findings are still shown.':'Review decisions do not resolve findings or change the scan verdict.'}{decisionState==='unavailable'&&<button className="text-button" onClick={()=>setDecisionRevision(n=>n+1)}>Retry decision history</button>}</p>
-                    <div className={styles.filterSummary}><span role="status">{filteredFindings.length} of {report.findings.length} findings</span><button className="text-button" onClick={()=>updateFilters({search:'',severity:'all',source:'all',package:'all',decision:'all'})}>Clear filters</button></div>
-                  </div>}
-                  <div className="finding-list bounded-findings" tabIndex={0} aria-label="Findings list">
-                    {(view === 'findings' ? filteredFindings : [...report.findings].sort((a,b)=>({high:0,medium:1,review:2}[a.severity]-{high:0,medium:1,review:2}[b.severity])).slice(0,3)).map((f) => (
-                      <div className="finding-with-preview" key={f.id}><button
-                        className="finding-row"
-                        onClick={() => navigate(view,report,f)}
-                      >
-                        <span className={"severity " + f.severity}>
-                          {f.severity === "review" ? "Review" : f.severity}
-                        </span>
-                        <span className="finding-copy">
-                          <strong>{f.title}</strong>
-                          <small>{f.evidence[0]?.location}{view==='findings' && decisionState==='ready' ? ` · ${decisions[f.id]==='acknowledge'?'Acknowledged':decisions[f.id]==='dismiss'?'Dismissed':'No decision recorded'}` : ''}</small>
-                        </span>
-                        <ArrowUpRight size={17} />
-                      </button><Preview label="Quick view" title={f.title}><p>{f.description}</p><h3>Recommended action</h3><p>{f.action}</p><h3>Recorded evidence</h3>{f.evidence.map((e,i)=><section className="evidence" key={i}><strong>{e.location}</strong><pre>{e.excerpt}</pre></section>)}</Preview></div>
-                    ))}
-                    {view === 'findings' && report.findings.length>0 && !filteredFindings.length && <p className="empty">No findings match these filters. Clear filters or try a different search.</p>}
-                    {!report.findings.length && (
-                      <p className="empty">
-                        No findings returned. Check the coverage below.
-                      </p>
-                    )}
-                  </div>
-                  {view === 'overview' && <button className="button" onClick={()=>navigate('findings')}>Review all {report.findings.length} findings <ArrowUpRight size={16}/></button>}
-                </section>
-              )}
-              {view === 'overview' && <>
-              <ReportInsights report={report}/>
-              <section className="section">
-                <div className="section-heading">
-                  <h2>Coverage & confidence</h2>
-                  <span>
-                    {report.dependencies.length} resolved{" "}
-                    {report.dependencies.length === 1
-                      ? "dependency"
-                      : "dependencies"}
-                  </span>
-                </div>
-                <div className="coverage">
-                  {report.checks.map((c) => (
-                    <div className="coverage-row" data-state={c.state} key={c.name}>
-                      {c.state === "complete" ? (
-                        <CircleCheck size={17} />
-                      ) : (
-                        <CircleDashed size={17} />
-                      )}
-                      <div>
-                        <strong>{c.name}</strong>
-                        <p>{c.detail}</p>
-                      </div>
-                      <span className="coverage-state">
-                        {c.state.replaceAll("-", " ")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-              {report.sources.length > 0 && (
-                <section className="section">
-                  <h2>Live research · unconfirmed</h2>
-                  <p className="muted">
-                    Search results do not establish that a version is affected
-                    and never change the verdict.
-                  </p>
-                  {report.sources.map((s) => (
-                    <article key={s.id} className="panel">
-                      <h3>{s.title}</h3>
-                      <small>
-                        {s.classification === "matched-advisory"
-                          ? "Scanner-matched advisory · review applicability"
-                          : "Watch · unconfirmed"}
-                      </small>
-                      <p>{s.excerpt}</p>
-                      <SourcePreview title={s.title} excerpt={s.excerpt} url={s.url} retrievedAt={s.retrievedAt}/>
-                      <small>
-                        {s.matchedDependencies?.length
-                          ? `OSV-matched: ${s.matchedDependencies.map((d) => `${d.ecosystem}: ${d.name}@${d.version}`).join("; ")}`
-                          : s.classification === "matched-advisory"
-                            ? "Package association unavailable"
-                            : s.package && s.version ? `Search context: ${s.package}@${s.version} (not an affected-package assertion)` : "Package association unavailable"} ·{" "}
-                        {s.publishedAt ?? "Publication date unknown"} ·
-                        Retrieved{" "}
-                        {new Date(s.retrievedAt).toLocaleString("en-GB")} ·{" "}
-                        {s.extraction || "search-only"}
-                      </small>
-                    </article>
-                  ))}
-                </section>
-              )}
-              </>}
-            </>
+            <ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>
           )}
+
           <footer>
             <span>
               <CheckCheck size={14} />
