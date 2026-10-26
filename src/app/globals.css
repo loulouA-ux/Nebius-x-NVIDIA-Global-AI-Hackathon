@@ -73,3 +73,5 @@ small {
 input,textarea{caret-color:var(--accent)}
 
 .theme-light-logo{display:none!important}:root[data-theme="light"] .theme-dark-logo{display:none!important}:root[data-theme="light"] .theme-light-logo{display:block!important}
+
+h1,h2,h3,h4,h5,h6,strong,b{font-weight:600}

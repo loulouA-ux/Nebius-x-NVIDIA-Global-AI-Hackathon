@@ -1,3 +1,3 @@
 import Link from 'next/link';
-import {ShieldCheck} from 'lucide-react';
-export default function Wordmark(){return <Link className="brand" href="/" aria-label="ShipCheck home"><ShieldCheck size={27} strokeWidth={1.8} aria-hidden="true"/>ShipCheck</Link>}
+import Logo from './logo';
+export default function Wordmark({intro=false}:{intro?:boolean}){return <Link className="brand" href="/" aria-label="ShipCheck home"><Logo intro={intro}/>ShipCheck</Link>}

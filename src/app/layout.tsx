@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./brand-motion.css";
 import {Geist, Geist_Mono} from "next/font/google";
 import styles from "./workspace-styles.module.css";
 const geist=Geist({subsets:["latin"],variable:"--font-geist"});
@@ -8,9 +9,11 @@ import RouteFocus from "./route-focus";
 import SkipLink from "./skip-link";
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 export const metadata: Metadata = {
-  title: "ShipCheck — Scan. Check. Ship.",
-  icons: { icon: "/brand/favicon.svg" },
-  description: "Evidence-backed security checks for your next release.",
+  title: "ShipCheck — Check before you ship",
+  icons: { icon: "/brand/favicon.svg", apple: "/brand/app-icon.svg" },
+  manifest: "/manifest.webmanifest",
+  openGraph: {title:"ShipCheck — Check before you ship.", description:"Evidence for every finding. Tests for every fix."},
+  description: "Pre-release security checks for small teams. ShipCheck scans your lockfile, secrets and staging host, shows the evidence for every finding and tests fixes before you approve them.",
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

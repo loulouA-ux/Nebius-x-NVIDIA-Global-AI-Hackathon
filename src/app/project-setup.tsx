@@ -171,7 +171,7 @@ export default function ProjectSetup() {
         </p>
         {stagingUrl && !host && (
           <p role="alert" className="error">
-            Enter a public HTTPS origin, such as https://staging.example.com/.
+            Use a public HTTPS origin, such as https://staging.example.com/.
           </p>
         )}
         {host && (
@@ -269,7 +269,7 @@ export default function ProjectSetup() {
                         body: JSON.stringify({ method }),
                       },
                     ),
-                  "Control of this exact host was verified.",
+                  `${selected.hostname} is verified. Proof is rechecked before every host scan.`,
                 )
               }
             >

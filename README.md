@@ -82,3 +82,11 @@ Run `node --env-file=.env.local --import tsx scripts/capture-recorded-run.ts` lo
 Set `SHIPCHECK_PUBLIC_DEMO=1` on the server to allow only the landing page, reports index and fixture-backed report/finding replay. Live scans, sign-in, project/host management, repository and repair APIs return 403 before authentication, database or provider work. The health response exposes no configured-provider state in this mode. This flag does not deploy the app or change Vercel protection.
 
 Verify the running-server boundary with `npx playwright test -c playwright.public-demo.config.ts` after a production build. Normal member workflows require this flag to be unset. The npm library, CLI and MCP tools remain **IN DEVELOPMENT** and are not published.
+
+## Brand boilerplate
+
+ShipCheck helps small teams check a release before it ships. Paste or drop a lockfile and it resolves exact versions, matches them against OSV advisories, looks for exposed credentials and, once you prove you own a staging host, runs passive checks against it. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds live research, but deterministic rules set the verdict, and no model can remove a finding. Every report says what was checked and what wasn't. For supported npm fixes, ShipCheck tests the patch in an isolated sandbox and opens a draft pull request only after you approve it. ShipCheck is open source under MIT, built by HeySalad.
+
+## Hackathon summary
+
+ShipCheck is a pre-release security check for small teams. It matches exact dependency versions against OSV, masks secrets and checks verified staging hosts. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds dated research, while deterministic rules keep the verdict honest. Supported npm fixes are tested in a sandbox before a person approves the pull request.

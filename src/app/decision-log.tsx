@@ -1,4 +1,5 @@
 "use client";
+import Toast from "./components/toast";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
 import { notifySessionExpired } from "./session-expired";
@@ -16,6 +17,7 @@ export default function DecisionLog({
   report: ScanReport;
   findingId: string;
 }) {
+  const [success,setSuccess]=useState(0);
   const [events, setEvents] = useState<Decision[]>([]),
     [reason, setReason] = useState(""),
     [error, setError] = useState(""),
@@ -64,7 +66,7 @@ export default function DecisionLog({
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Decision could not be saved.");
       setEvents((current) => [...current, d]);
-      setReason("");
+      setReason("");setSuccess(n=>n+1);
       window.dispatchEvent(new CustomEvent("shipcheck:decision-recorded", { detail: { reportId: report.id } }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Decision could not be saved.");
@@ -74,13 +76,13 @@ export default function DecisionLog({
   }
   return (
     <section className="panel">
-      <h2>Review decision</h2>
+      <h2>Review decision</h2>{success>0&&<Toast key={success} message="Decision recorded. The finding and verdict are unchanged."/>}
       <p>
         Record your assessment. This does not resolve the finding or change the
         scan verdict.
       </p>
       {report.mode === "demo" ? (
-        <div><p>Sign in to record decisions. Demo decisions are not saved.</p><button className="button" disabled>Acknowledge</button> <button className="button" disabled>Dismiss with reason</button> <a href="/sign-in">Sign in</a></div>
+        <div><p>Sign in to record a decision. Demo decisions are not saved.</p><button className="button" disabled>Acknowledge</button> <button className="button" disabled>Dismiss with reason</button> <a href="/sign-in">Sign in</a></div>
       ) : expired ? (
         <p role="alert" className="error">
           Session expired. <a href="/sign-in">Sign in again</a> to review or save decisions.

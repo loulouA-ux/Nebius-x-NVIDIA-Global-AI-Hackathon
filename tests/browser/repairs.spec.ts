@@ -18,7 +18,7 @@ test("repair flow requires evidence review and explicit approval before PR reque
  await expect(page.getByText("OSV reports lodash@4.17.20 as affected.")).toBeVisible();
  await expect(page.getByText("1 resolved dependency checked · 0 advisory findings",{exact:false})).toBeVisible();
  const approve=page.getByRole("button",{name:"Approve and create draft PR"});await expect(approve).toBeDisabled();expect(writes).toBe(0);
- await page.getByLabel("I reviewed the files and evidence",{exact:false}).check();await expect(approve).toBeEnabled();
+ await page.getByLabel("I reviewed the diff and the test evidence",{exact:false}).check();await expect(approve).toBeEnabled();
  await page.screenshot({path:"test-results/repair-review-desktop.png",fullPage:true});
  await approve.click();await expect(page.getByRole("link",{name:"Open draft pull request"})).toHaveAttribute("href","https://github.com/team/demo/pull/1");expect(writes).toBe(1);
 });

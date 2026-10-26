@@ -12,7 +12,7 @@ import WorkspaceSidebar from "./workspace-sidebar";
 import {rememberFilters, type FindingFilters} from "./report-memory";
 import BrandHeader from "./brand-header";
 import MobileNavigation from "./mobile-navigation";
-import {CheckCheck,ShieldAlert} from "lucide-react";
+import {CheckCheck,TriangleAlert} from "lucide-react";
 import type { ScanReport } from "@/lib/types";
 import MemberControls, {type Saved} from "./member-controls";
 import ProjectSetup from "./project-setup";
@@ -124,7 +124,7 @@ export default function Home() {
           />
           {error && (
             <div role="alert" className="error">
-              <ShieldAlert size={18} />
+              <TriangleAlert size={18} />
               {error}
             </div>
           )}
