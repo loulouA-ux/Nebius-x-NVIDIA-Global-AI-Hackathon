@@ -1,0 +1,32 @@
+[
+  {
+    "file": "nvidia-logo-dark.svg",
+    "sha256": "7893fdda83e95ab283313b597c9765cbea33a3876a83121b62a0b1ea786cdb62",
+    "matchesHandoff": true
+  },
+  {
+    "file": "nebius-white.svg",
+    "sha256": "17a24835af7cb3640d908efd4a2268360f3c1c83249a8654f8a813ae4c647f37",
+    "matchesHandoff": true
+  },
+  {
+    "file": "tavily-full-offwhite.svg",
+    "sha256": "4d3bacb8e49563f37e9dcfeab4042759ad39df517f63b7a921750cf9be017d39",
+    "matchesHandoff": true
+  },
+  {
+    "file": "nvidia-logo-light.svg",
+    "sha256": "307f334828c94148a2f0ebe60616521c4d52162c653e94039a62d4e657d34570",
+    "matchesHandoff": true
+  },
+  {
+    "file": "nebius-black.svg",
+    "sha256": "87f3a405c3cb200541a90ea582c96fbf472299ec9f00dbaf81b4de379b849d1a",
+    "matchesHandoff": true
+  },
+  {
+    "file": "tavily-full.svg",
+    "sha256": "a482ea651b406945d488570ae195410aa70a41745e6b99b5fe4734ea394c296c",
+    "matchesHandoff": true
+  }
+]

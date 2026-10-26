@@ -1,6 +1,8 @@
-# ShipCheck dark-design rebuild review
+# ShipCheck UI rebuild review
 
 26 October 2026 · Europe/London · `codex/branded-dashboard`.
+
+**Latest update:** `3d0ae88` implements the revised theme brief: light/dark mode, theme-aware official logos and “Check before you ship.” hero. See [theme review](../design-handoff-review/THEME-REPORT.md) for 12 new screenshots, 68 contrast checks and final verification (206 unit, 50 main browser, 1 public-demo browser test; typecheck/build pass). The detailed rebuild review below records the preceding dark-only milestone; its explicit remaining limitations are unchanged.
 
 Implemented and tested locally against the final master prompt. The actual starting commit was `1edc9f5`, newer than the prompt's `5a24d0c`; existing work was preserved. The new approved dark-logo instruction supersedes the earlier white-tile instruction. Nothing was pushed or deployed. This is not a claim of pixel-perfect approval or new hosted acceptance.
 
