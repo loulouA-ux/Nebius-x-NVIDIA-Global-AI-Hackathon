@@ -18,12 +18,14 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
   await page
     .getByRole("button", { name: /Command Injection in lodash/ })
     .click();
+  await page.getByRole("button", {name:"Preview source"}).click();
   await expect(
-    page.getByRole("link", { name: "Read source advisory" }),
+    page.getByRole("link", { name: "Open original source in a new tab" }),
   ).toHaveAttribute(
     "href",
     "https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm",
   );
+  await page.getByRole("button", {name:"Close",exact:true}).click();
   await expect(
     page.getByText("No code has been changed.", { exact: false }),
   ).toBeVisible();

@@ -1033,3 +1033,9 @@ time, .count { font-variant-numeric:tabular-nums; }
 .auth-story img {width:100px;padding:12px;}
 @media(min-width:701px){.project-form {max-width:720px;}}
 @media(max-width:700px){.welcome{margin-top:20px;}.auth-story,.auth-panel{padding:24px;}}
+
+/* Viewport-bounded data surfaces retain all information through local scrolling. */
+.bounded-findings{max-height:clamp(240px,48dvh,560px);overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;}
+.finding-with-preview{display:flex;align-items:center;border-bottom:1px solid var(--line);background:#fff;gap:8px;padding-right:12px;min-width:0;}.finding-with-preview:last-child{border-bottom:0}.finding-with-preview>.finding-row{flex:1;min-width:0;border:0}.finding-with-preview>.button{flex-shrink:0}.finding-with-preview .finding-copy strong{overflow-wrap:anywhere}
+.loading-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:min(700px,100%);margin:24px auto}.loading-cards>div{height:100px;border:1px solid var(--line);border-radius:12px;background:#eef2f6}
+@media(max-width:700px){.finding-with-preview{flex-wrap:wrap;padding:0 12px 12px}.finding-with-preview>.finding-row{flex-basis:100%;padding-inline:4px}.finding-with-preview>.button{margin-left:4px}.loading-cards{grid-template-columns:1fr}.loading-cards>div{height:48px}}

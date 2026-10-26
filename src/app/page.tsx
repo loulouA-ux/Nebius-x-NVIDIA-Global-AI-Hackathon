@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import styles from "./findings.module.css";
+import ReportInsights, {SourcePreview, Preview} from "./report-insights";
 import WorkspaceSidebar from "./workspace-sidebar";
 import {rememberReport,recalledReport,clearReportMemory,latestReport,setDashboardLocation,recalledFilters,rememberFilters, type FindingFilters} from "./report-memory";
 import {sessionExpiredEvent} from "./session-expired";
@@ -202,7 +203,7 @@ export default function Home() {
             <section className="loading" role="status">
               <LoaderCircle className="spin" size={30} />
               <h1>Checking your next release.</h1>
-              <p>Reading inputs and collecting evidence.</p>
+              <p>Reading inputs and collecting evidence.</p><div className="loading-cards" aria-hidden="true"><div/><div/><div/></div>
               <p className="muted">
                 Live requests are bounded. Findings appear when the scan
                 finishes.
@@ -241,9 +242,7 @@ export default function Home() {
                     {e.dependency && <p className="evidence-dependency">{e.dependency.name}@{e.dependency.version}<br/><code>{e.dependency.path}</code></p>}
                     <pre>{e.excerpt}</pre>
                     {e.url && (
-                      <a href={e.url} target="_blank" rel="noreferrer">
-                        Read source advisory <ExternalLink size={13} />
-                      </a>
+                      <SourcePreview title={e.location} excerpt={e.excerpt} url={e.url} retrievedAt={e.retrievedAt}/>
                     )}
                     {e.retrievedAt && (
                       <small>
@@ -541,11 +540,10 @@ export default function Home() {
                     <p className={styles.decisionNote}>{decisionState==='demo'?'Demo decisions are not saved.':decisionState==='loading'?'Loading review decisions…':decisionState==='unavailable'?'Decision history unavailable. Findings are still shown.':'Review decisions do not resolve findings or change the scan verdict.'}{decisionState==='unavailable'&&<button className="text-button" onClick={()=>setDecisionRevision(n=>n+1)}>Retry decision history</button>}</p>
                     <div className={styles.filterSummary}><span role="status">{filteredFindings.length} of {report.findings.length} findings</span><button className="text-button" onClick={()=>updateFilters({search:'',severity:'all',source:'all',package:'all',decision:'all'})}>Clear filters</button></div>
                   </div>}
-                  <div className="finding-list">
+                  <div className="finding-list bounded-findings" tabIndex={0} aria-label="Findings list">
                     {(view === 'findings' ? filteredFindings : [...report.findings].sort((a,b)=>({high:0,medium:1,review:2}[a.severity]-{high:0,medium:1,review:2}[b.severity])).slice(0,3)).map((f) => (
-                      <button
+                      <div className="finding-with-preview" key={f.id}><button
                         className="finding-row"
-                        key={f.id}
                         onClick={() => navigate(view,report,f)}
                       >
                         <span className={"severity " + f.severity}>
@@ -556,7 +554,7 @@ export default function Home() {
                           <small>{f.evidence[0]?.location}{view==='findings' && decisionState==='ready' ? ` · ${decisions[f.id]==='acknowledge'?'Acknowledged':decisions[f.id]==='dismiss'?'Dismissed':'No decision recorded'}` : ''}</small>
                         </span>
                         <ArrowUpRight size={17} />
-                      </button>
+                      </button><Preview label="Quick view" title={f.title}><p>{f.description}</p><h3>Recommended action</h3><p>{f.action}</p><h3>Recorded evidence</h3>{f.evidence.map((e,i)=><section className="evidence" key={i}><strong>{e.location}</strong><pre>{e.excerpt}</pre></section>)}</Preview></div>
                     ))}
                     {view === 'findings' && report.findings.length>0 && !filteredFindings.length && <p className="empty">No findings match these filters. Clear filters or try a different search.</p>}
                     {!report.findings.length && (
@@ -569,6 +567,7 @@ export default function Home() {
                 </section>
               )}
               {view === 'overview' && <>
+              <ReportInsights report={report}/>
               <section className="section">
                 <div className="section-heading">
                   <h2>Coverage & confidence</h2>
@@ -614,9 +613,7 @@ export default function Home() {
                           : "Watch · unconfirmed"}
                       </small>
                       <p>{s.excerpt}</p>
-                      <a href={s.url} target="_blank" rel="noreferrer">
-                        Read source <ExternalLink size={13} />
-                      </a>
+                      <SourcePreview title={s.title} excerpt={s.excerpt} url={s.url} retrievedAt={s.retrievedAt}/>
                       <small>
                         {s.matchedDependencies?.length
                           ? `OSV-matched: ${s.matchedDependencies.map((d) => `${d.ecosystem}: ${d.name}@${d.version}`).join("; ")}`

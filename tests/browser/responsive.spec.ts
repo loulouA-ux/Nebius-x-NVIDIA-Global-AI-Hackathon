@@ -50,7 +50,9 @@ test('finding and its evidence are adjacent on desktop and stacked on mobile',as
  await page.getByRole('button',{name:/Command Injection in lodash/}).click();
  const summary=page.getByRole('region',{name:'Finding and recommended action'});
  const evidence=page.getByRole('region',{name:'Source evidence'});
- await expect(evidence.getByRole('link',{name:'Read source advisory'})).toHaveAttribute('href','https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm');
+ await evidence.getByRole('button',{name:'Preview source'}).click();
+ await expect(page.getByRole('link',{name:'Open original source in a new tab'})).toHaveAttribute('href','https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm');
+ await page.getByRole('button',{name:'Close',exact:true}).click();
  let a=await summary.boundingBox(),b=await evidence.boundingBox();expect(b!.x).toBeGreaterThan(a!.x+a!.width-1);
  await page.screenshot({path:'test-results/evidence-desktop.png',fullPage:true});
  await page.setViewportSize({width:360,height:900});
