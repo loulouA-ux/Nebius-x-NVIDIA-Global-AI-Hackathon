@@ -5,7 +5,7 @@ import {rememberReport,recalledReport,clearReportMemory,latestReport,setDashboar
 import {sessionExpiredEvent} from './session-expired';
 export type View='overview'|'project'|'scan'|'findings'|'actions';
 function navigationUrl(query:URLSearchParams){
- if(window.location.pathname==='/')return `/?${query}`;
+
  const view=query.get('view');if(view==='scan')return '/scan';if(view==='project')return '/hosts';
  const id=query.get('report'),finding=query.get('finding');
  return id?`/reports/${encodeURIComponent(id)}${finding?`/findings/${encodeURIComponent(finding)}`:''}`:'/reports';
@@ -14,8 +14,8 @@ export default function useReportNavigation(busy:boolean,setError:(s:string)=>vo
   const [view, setView] = useState<View>("overview");
   const [report, setReport] = useState<ScanReport | null>(null);
   const [selected, setSelected] = useState<Finding | null>(null);
-  const [desktop,setDesktop]=useState(false);
-  useEffect(()=>{const m=matchMedia("(min-width:1024px)");const update=()=>setDesktop(m.matches && window.location.pathname==='/');update();m.addEventListener("change",update);return()=>m.removeEventListener("change",update);},[]);
+  const desktop=false;
+
   const [unavailable,setUnavailable]=useState(false);
   const mainRef = useRef<HTMLElement>(null);
   const focusPending = useRef(false);

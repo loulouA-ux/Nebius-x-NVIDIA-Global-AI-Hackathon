@@ -137,7 +137,7 @@ export default function Home() {
           ) : view === "project" ? (
             <ProjectSetup />
           ) : view === "scan" ? (
-            <NewScan filename={filename} setFilename={setFilename} content={content} setContent={setContent} research={research} setResearch={setResearch} projectId={projectId} setProjectId={setProjectId} scan={()=>scan('live')} demo={()=>scan('demo',recorded===true)} project={()=>navigate('project')}/>
+            <NewScan filename={filename} setFilename={setFilename} content={content} setContent={setContent} research={research} setResearch={setResearch} projectId={projectId} setProjectId={setProjectId} scan={()=>scan('live')} demo={offline=>scan('demo',!offline&&recorded===true)} project={()=>navigate('project')}/>
           ) : unavailable ? (
             <section className="home-empty"><h1>Report unavailable</h1><p>This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.</p><Link className="button primary" href="/sign-in">Sign in</Link> <button className="button" onClick={()=>scan('demo')}>Run offline demo</button></section>
           ) : !report ? (
@@ -146,13 +146,7 @@ export default function Home() {
             <ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>
           )}
 
-          <footer>
-            <span>
-              <CheckCheck size={14} />
-              ShipCheck · Evidence before deployment
-            </span>
-            <span>Built by HeySalad</span>
-          </footer>
+
         </main>
       </div>
     </div>
