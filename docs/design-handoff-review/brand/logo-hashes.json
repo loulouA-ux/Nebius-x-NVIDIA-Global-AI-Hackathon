@@ -1,0 +1,22 @@
+[
+  {
+    "file": "symbol.svg",
+    "source": "shipcheck-mark-dark-bg.svg",
+    "sha256": "19f664dbc8165aed1610db6f0846e11d848e4661687aa98d145693ab5dc14813"
+  },
+  {
+    "file": "logo-compact.svg",
+    "source": "shipcheck-mark-compact-dark-bg.svg",
+    "sha256": "e69b904e8af9fa6840dffe939c851f1fb985c8cce124937b0ca212b5920e2298"
+  },
+  {
+    "file": "favicon.svg",
+    "source": "favicon.svg",
+    "sha256": "9dbb55a5db138db55489aa3701952ba9a6c40c6035ebf11b903009aaac4503cd"
+  },
+  {
+    "file": "app-icon.svg",
+    "source": "shipcheck-app-icon.svg",
+    "sha256": "1286b0bdf5383888518e33ad0948cfe261bc0afa91c5ee306b2e067fe8d5eaa4"
+  }
+]
