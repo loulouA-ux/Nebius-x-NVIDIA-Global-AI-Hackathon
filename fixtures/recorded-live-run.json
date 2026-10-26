@@ -1,0 +1,267 @@
+{
+  "recordedAt": "2026-10-26T09:08:16.729Z",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "region": "us-central1",
+  "commit": "a7a49c7a0d4f035ba5d8661f99d6bb300702f0ff",
+  "report": {
+    "id": "ff5ab1b4-bd15-44fc-a77a-4e57548fe61f",
+    "mode": "live",
+    "createdAt": "2026-10-26T09:08:16.729Z",
+    "status": "Review required",
+    "dependencies": [
+      {
+        "name": "lodash",
+        "version": "4.17.20",
+        "ecosystem": "npm",
+        "path": "node_modules/lodash"
+      }
+    ],
+    "findings": [
+      {
+        "id": "GHSA-29mw-wpgm-hmr9:lodash@4.17.20",
+        "title": "Regular Expression Denial of Service (ReDoS) in lodash",
+        "severity": "review",
+        "description": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "action": "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
+        "evidence": [
+          {
+            "kind": "advisory",
+            "dependency": {
+              "name": "lodash",
+              "version": "4.17.20",
+              "ecosystem": "npm",
+              "path": "node_modules/lodash"
+            },
+            "location": "node_modules/lodash · lodash@4.17.20",
+            "excerpt": "All versions of package lodash prior to 4.17.21 are vulnerable to Regular Expression Denial of Service (ReDoS) via the `toNumber`, `trim` and `trimEnd` functions. \n\nSteps to reproduce (provided by reporter Liyuan Chen):\n```js\nvar lo = require('lodash');\n\nfunction build_blank(n) {\n    var ret = \"1\"\n    for (var i = 0; i < n; i++) {\n        ret += \" \"\n    }\n    return ret + \"1\";\n}\nvar s = build_blank(50000) var time0 = Date.now();\nlo.trim(s) \nvar time_cost0 = Date.now() - time0;\nconsole.log(\"time_cost0: \" + time_cost0);\nvar time1 = Date.now();\nlo.toNumber(s) var time_cost1 = Date.now() - time1;\nconsole.log(\"time_cost1: \" + time_cost1);\nvar time2 = Date.now();\nlo.trimEnd(s);\nvar time_cost2 = Date.now() - time2;\nconsole.log(\"time_cost2: \" + time_cost2);\n```",
+            "url": "https://osv.dev/vulnerability/GHSA-29mw-wpgm-hmr9",
+            "retrievedAt": "2026-10-26T09:08:09.558Z"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-35jh-r3h4-6jhm:lodash@4.17.20",
+        "title": "Command Injection in lodash",
+        "severity": "review",
+        "description": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "action": "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
+        "evidence": [
+          {
+            "kind": "advisory",
+            "dependency": {
+              "name": "lodash",
+              "version": "4.17.20",
+              "ecosystem": "npm",
+              "path": "node_modules/lodash"
+            },
+            "location": "node_modules/lodash · lodash@4.17.20",
+            "excerpt": "`lodash` versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+            "url": "https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm",
+            "retrievedAt": "2026-10-26T09:08:09.559Z"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-f23m-r3pf-42rh:lodash@4.17.20",
+        "title": "lodash vulnerable to Prototype Pollution via array path bypass in `_.unset` and `_.omit`",
+        "severity": "review",
+        "description": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "action": "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
+        "evidence": [
+          {
+            "kind": "advisory",
+            "dependency": {
+              "name": "lodash",
+              "version": "4.17.20",
+              "ecosystem": "npm",
+              "path": "node_modules/lodash"
+            },
+            "location": "node_modules/lodash · lodash@4.17.20",
+            "excerpt": "### Impact\n\nLodash versions 4.17.23 and earlier are vulnerable to prototype pollution in the `_.unset` and `_.omit` functions. The fix for [CVE-2025-13465](https://github.com/lodash/lodash/security/advisories/GHSA-xxjr-mmjv-4gpg) only guards against string key members, so an attacker can bypass the check by passing array-wrapped path segments. This allows deletion of properties from built-in prototypes such as `Object.prototype`, `Number.prototype`, and `String.prototype`.\n\nThe issue permits deletion of prototype properties but does not allow overwriting their original behavior.\n\n### Patches\n\nThis issue is patched in 4.18.0.\n\n### Workarounds\n\nNone. Upgrade to the patched version.",
+            "url": "https://osv.dev/vulnerability/GHSA-f23m-r3pf-42rh",
+            "retrievedAt": "2026-10-26T09:08:09.559Z"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-r5fr-rjxr-66jc:lodash@4.17.20",
+        "title": "lodash vulnerable to Code Injection via `_.template` imports key names",
+        "severity": "review",
+        "description": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "action": "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
+        "evidence": [
+          {
+            "kind": "advisory",
+            "dependency": {
+              "name": "lodash",
+              "version": "4.17.20",
+              "ecosystem": "npm",
+              "path": "node_modules/lodash"
+            },
+            "location": "node_modules/lodash · lodash@4.17.20",
+            "excerpt": "### Impact\n\nThe fix for [CVE-2021-23337](https://github.com/advisories/GHSA-35jh-r3h4-6jhm) added validation for the `variable` option in `_.template` but did not apply the same validation to `options.imports` key names. Both paths flow into the same `Function()` constructor sink.\n\nWhen an application passes untrusted input as `options.imports` key names, an attacker can inject default-parameter expressions that execute arbitrary code at template compilation time.\n\nAdditionally, `_.template` uses `assignInWith` to merge imports, which enumerates inherited properties via `for..in`. If `Object.prototype` has been polluted by any other vector, the polluted keys are copied into the imports object and passed to `Function()`.\n\n### Patches\n\nUsers should upgrade to version 4.18.0.\n\nThe fix applies two changes:\n1. Validate `importsKeys` against the existing `reForbiddenIdentifierChars` regex (same check already used for the `variable` option)\n2. Replace `assignInWith` with `assignWith` when merging imports, so only own properties are enumerated\n\n### Workarounds\n\nDo not pass untrusted input as key names in `options.imports`. Only use developer-controlled, static key names.",
+            "url": "https://osv.dev/vulnerability/GHSA-r5fr-rjxr-66jc",
+            "retrievedAt": "2026-10-26T09:08:09.559Z"
+          }
+        ]
+      },
+      {
+        "id": "GHSA-xxjr-mmjv-4gpg:lodash@4.17.20",
+        "title": "Lodash has Prototype Pollution Vulnerability in `_.unset` and `_.omit` functions",
+        "severity": "review",
+        "description": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "action": "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
+        "evidence": [
+          {
+            "kind": "advisory",
+            "dependency": {
+              "name": "lodash",
+              "version": "4.17.20",
+              "ecosystem": "npm",
+              "path": "node_modules/lodash"
+            },
+            "location": "node_modules/lodash · lodash@4.17.20",
+            "excerpt": "### Impact\n\nLodash versions 4.0.0 through 4.17.22 are vulnerable to prototype pollution in the `_.unset` and `_.omit` functions. An attacker can pass crafted paths which cause Lodash to delete methods from global prototypes. \n\nThe issue permits deletion of properties but does not allow overwriting their original behavior.  \n\n### Patches\n\nThis issue is patched on 4.17.23.",
+            "url": "https://osv.dev/vulnerability/GHSA-xxjr-mmjv-4gpg",
+            "retrievedAt": "2026-10-26T09:08:09.559Z"
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "name": "Dependency coverage",
+        "state": "complete",
+        "detail": "1 exact dependency versions resolved."
+      },
+      {
+        "name": "Credential patterns",
+        "state": "complete",
+        "detail": "Four supported patterns in supplied text only. No git history or credential validity checks."
+      },
+      {
+        "name": "OSV advisories",
+        "state": "complete",
+        "detail": "Live exact-version queries. Matched advisories require severity and applicability review."
+      },
+      {
+        "name": "Source extraction",
+        "state": "complete",
+        "detail": "Up to two advisory-authority pages extracted; evidence remains unconfirmed context."
+      },
+      {
+        "name": "Live threat research",
+        "state": "complete",
+        "detail": "Search at most 3 packages. Retrieved reports are unconfirmed and never change the verdict."
+      },
+      {
+        "name": "Nemotron explanations",
+        "state": "complete",
+        "detail": "At most 12 findings: 5 exact scanner-note selections validated; 0 scanner fallbacks. Free-form model claims are never displayed."
+      },
+      {
+        "name": "Staging URL / runtime",
+        "state": "not-in-scope",
+        "detail": "No verified staging project was selected. No target site was contacted."
+      }
+    ],
+    "sources": [
+      {
+        "id": "source-1",
+        "url": "https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm",
+        "title": "Scanner-linked advisory",
+        "matchedDependencies": [
+          {
+            "name": "lodash",
+            "version": "4.17.20",
+            "ecosystem": "npm",
+            "path": "node_modules/lodash"
+          }
+        ],
+        "classification": "matched-advisory",
+        "excerpt": "Affected ranges\nType\n:   ECOSYSTEM\nEvents\n:   Introduced\n0 Unknown introduced version / All previous versions are affected\nFixed\n4.17.21\nAffected versions\n0.\\\n0.7.0\n0.8.1\n0.8.2\n0.9.0\n0.9.1\n0.9.2\n0.10.0\n1.\\\n1.0.0.rc.1\n1.0.0.rc.2\n1.0.0.rc.3\n1.0.1\n1.1.0\n1.1.1\n1.2.0\n1.2.1\n1.3.1\n2.\\\n2.0.0\n2.1.0\n2.2.0\n2.2.1\n2.3.0\n2.4.0\n2.4.1\n3.\\\n3.1.0\n3.2.0\n3.3.0\n3.3.1\n3.3.1.1\n3.4.0\n3.5.0\n3.6.0\n3.7.0\n3.9.3\n3.10.0\n3.10.1\n4.\\\n4.0.0\n4.3.0\n4.5.1\n4.6.1\n4.11.2\nDatabase specific\nsource\n\"\nGHSA-35jh-r3h4-6jhm - OSV [...] Fixed\n4.17.21\nDatabase specific\nsource\n\"\nnpm / lodash.template\nPackage\nName\n:   lodash.template\n:   View open source insights on deps.dev\nPurl\n:   pkg:npm/lodash.template\nAffected ranges\nType\n:   SEMVER\nEvents\n:   Introduced\n0 Unknown introduced version / All previous versions are affected\nLast Affected\n4.5.0\nDatabase specific\nsource\n\"\nnpm / lodash-template\nPackage\nName\n:   lodash-template\n:   View open source insights on deps.dev\nPurl\n:   pkg:npm/lodash-template\nAffected ranges\nType\n:   SEMVER\nEvents\n:   Introduced\n0 Unknown introduced version / All previous versions are affected\nLast Affected\n1.0.0\nDatabase specific\nsource\n\"\nRubyGems / lodash-rails\nPackage\nName\n:   lodash-rails\nPurl\n:   pkg:gem/lodash-rails\nAffected ranges\nType\n:   ECOSYSTEM\nEvents\n:   Introduced [...] Database specific\n:       { \"cwe_ids\": [ \"CWE-77\", \"CWE-94\" ], \"github_reviewed\": true, \"github_reviewed_at\": \"2021-03-31T23:59:26Z\", \"nvd_published_at\": \"2021-02-15T13:15:00Z\", \"severity\": \"HIGH\" }\n    References\n:    \n \n ",
+        "retrievedAt": "2026-10-26T09:08:12.905Z",
+        "extraction": "extracted"
+      },
+      {
+        "id": "source-2",
+        "url": "https://osv.dev/vulnerability/GHSA-29mw-wpgm-hmr9",
+        "title": "Scanner-linked advisory",
+        "matchedDependencies": [
+          {
+            "name": "lodash",
+            "version": "4.17.20",
+            "ecosystem": "npm",
+            "path": "node_modules/lodash"
+          }
+        ],
+        "classification": "matched-advisory",
+        "excerpt": "source\n\"\nnpm / lodash.trim\nPackage\nName\n:   lodash.trim\n:   View open source insights on deps.dev\nPurl\n:   pkg:npm/lodash.trim\nAffected ranges\nType\n:   SEMVER\nEvents\n:   Introduced\n4.0.0\nLast Affected\n4.5.1\nDatabase specific\nsource\n\"\nRubyGems / lodash-rails\nPackage\nName\n:   lodash-rails\nPurl\n:   pkg:gem/lodash-rails\nAffected ranges\nType\n:   ECOSYSTEM\nEvents\n:   Introduced\n4.0.0\nFixed\n4.17.21\nAffected versions\n4.\\\n4.0.0\n4.3.0\n4.5.1\n4.6.1\n4.11.2\n4.12.0\n4.13.1\n4.14.1\n4.15.0\n4.16.1\n4.16.3\nDatabase specific\nsource\n\"\nGHSA-29mw-wpgm-hmr9 - OSV [...] References\n:    \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nAffected packages\nnpm / lodash\nPackage\nName\n:   lodash\n:   View open source insights on deps.dev\nPurl\n:   pkg:npm/lodash\nAffected ranges\nType\n:   SEMVER\nEvents\n:   Introduced\n4.0.0\nFixed\n4.17.21\nDatabase specific\nsource\n\"\nnpm / lodash-es\nPackage\nName\n:   lodash-es\n:   View open source insights on deps.dev\nPurl\n:   pkg:npm/lodash-es\nAffected ranges\nType\n:   SEMVER\nEvents\n:   Introduced\n4.0.0\nFixed\n4.17.21\nDatabase specific\nsource\n\"\nnpm / lodash.trimend\nPackage\nName\n:   lodash.trimend\n:   View open source insights on deps.dev\nPurl\n:   pkg:npm/lodash.trimend\nAffected ranges\nType\n:   SEMVER\nEvents\n:   Introduced\n4.0.0\nLast Affected\n4.5.1\nDatabase specific\nsource\n\"\nnpm / lodash.trim\nPackage\nName\n:   lodash.trim [...] OSV logo OSV logo\n Vulnerability Database\n Blog\n FAQ\n Docs\nGHSA-29mw-wpgm-hmr9\nSuggest an improvement\nSource\n:   \nImport Source\n:   \nJSON Data\n:   \nAliases\n:    CVE-2020-2850",
+        "retrievedAt": "2026-10-26T09:08:12.905Z",
+        "extraction": "extracted"
+      },
+      {
+        "id": "source-3",
+        "classification": "watch",
+        "package": "lodash",
+        "version": "4.17.20",
+        "url": "https://github.com/DSB-117/brainblast",
+        "title": "GitHub - DSB-117/brainblast: Predict the silent integration traps an AI agent would ship (zero-revenue configs, auth bypasses, immutable wrong choices) — then enforce, in CI, that they stay fixed. Research skill + npx brainblast CLI. · GitHub",
+        "excerpt": "## Upgrade risk diff (v0.6.0)\n\n```\nbrainblast diff lodash@4.17.20 lodash@4.17.21 brainblast diff stripe@12.0.0 stripe@13.0.0 --ecosystem npm brainblast diff serde@1.0.0 serde@1.0.195 --ecosystem crates.io\n```\n\nCompares OSV advisory profiles between two versions — shows introduced advisories (new risk), resolved advisories (fixed), and a signed risk score. Exits non-zero when the upgrade increases risk so it can gate a lockfile bump in CI.\n\nBe clear-eyed about what this is and is not:",
+        "retrievedAt": "2026-10-26T09:08:12.905Z",
+        "extraction": "search-only"
+      },
+      {
+        "id": "source-4",
+        "classification": "watch",
+        "package": "lodash",
+        "version": "4.17.20",
+        "url": "https://github.com/matteo-sung/lockvet",
+        "title": "GitHub - matteo-sung/lockvet: Explain any lockfile change: bumps release-verified against 22 registries, vulns (OSV), ages, deprecations, typosquats, integrity tampering — 61 formats incl. pdm.lock, vcpkg, mise.lock, build.gradle, pom.xml, go.sum, GitHub Actions, GitLab CI, Dockerfiles, Kubernetes, Helm, SBOMs. CLI + CI gate + MCP server + playground. By an AI agent. · GitHub",
+        "excerpt": "to denial of service ... ↑ path-to-regexp 0.1.7 → 8.4.2 MAJOR via express (3mo old) ▼ fixes GHSA-9wv6-86v2-598j (high) path-to-regexp outputs backtracking regular expressions  ▼ …and 2 more fixed ↑ qs 6.7.0 → 6.15.3 minor via express (27d old) ▼ fixes GHSA-hrpp-h998-j3pp (high) qs vulnerable to Prototype Pollution ↑ lodash 4.17.20 → 4.17.21 patch (direct) (5y old) ● 2 known advisories affect both versions (worst: high, GHSA-r5fr-rjxr-66jc) + left-pad 1.3.0 (added) (direct) (8y old) ● deprecated [...] ```\n‼ lodash 4.17.21 REPINNED (version unchanged) (direct) ‼ integrity changed: 4.17.21 same version, different content hash — registries never change a published artifact, so the tarball this pin expects was replaced; do not trust this without finding out why \n``` [...] Integrity changed, version didn't ‼ — registries never change a published artifact. If a diff keeps `lodash 4.17.21` but swaps its `sha512-…`, the tarball that pin expects has been replaced: registry-side tampering, a hijacked mirror, or a hand-edited lockfile. All of them are \"stop and find out why\" events:",
+        "retrievedAt": "2026-10-26T09:08:12.905Z",
+        "extraction": "search-only"
+      },
+      {
+        "id": "source-5",
+        "classification": "watch",
+        "package": "lodash",
+        "version": "4.17.20",
+        "url": "https://github.com/Tetra4ge/GitHygiene",
+        "title": "GitHub - Tetra4ge/GitHygiene: AI-powered repository intelligence, dynamic dependency mapping, and live vulnerability scanning for deep, actionable insights into your GitHub repositories. · GitHub",
+        "excerpt": "Loading\n\n### Neo4j — Cross-Repository Dependency Graph\n\n```\ngraph LR R1[\"🗂️ :Repository\\nuser/api\"] -->|DEPENDS_ON| P1[\"📦 :Package\\nnpm:lodash@4.17.20\"] R2[\"🗂️ :Repository\\nuser/web\"] -->|DEPENDS_ON| P1 P1 -->|DEPENDS_ON| P3[\"📦 :Package\\nnpm:minimist@1.2.5\"] P3 -->|AFFECTED_BY| V1[\"⚠️ :Vulnerability\\nGHSA-xvch-5gv4-984h · CRITICAL\"] P1 -->|AFFECTED_BY| V2[\"⚠️ :Vulnerability\\nGHSA-p6mc-m468-83gw · HIGH\"] \n```\n\n  Loading",
+        "retrievedAt": "2026-10-26T09:08:12.905Z",
+        "extraction": "search-only"
+      }
+    ],
+    "explanations": [
+      {
+        "findingId": "GHSA-29mw-wpgm-hmr9:lodash@4.17.20",
+        "explanation": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "basis": "validated-selection"
+      },
+      {
+        "findingId": "GHSA-35jh-r3h4-6jhm:lodash@4.17.20",
+        "explanation": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "basis": "validated-selection"
+      },
+      {
+        "findingId": "GHSA-f23m-r3pf-42rh:lodash@4.17.20",
+        "explanation": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "basis": "validated-selection"
+      },
+      {
+        "findingId": "GHSA-r5fr-rjxr-66jc:lodash@4.17.20",
+        "explanation": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "basis": "validated-selection"
+      },
+      {
+        "findingId": "GHSA-xxjr-mmjv-4gpg:lodash@4.17.20",
+        "explanation": "OSV reports lodash@4.17.20 as affected. Severity and application-level exploitability require review; no severity is inferred by the model.",
+        "basis": "validated-selection"
+      }
+    ],
+    "durationMs": 8586,
+    "policy": "shipcheck-v0.1: high findings block; incomplete coverage cannot pass; other findings require review."
+  }
+}

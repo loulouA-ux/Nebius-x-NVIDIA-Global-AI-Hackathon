@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import AiTriage from "./components/ai-triage";
 import styles from "./findings.module.css";
 import ReportInsights, {SourcePreview, Preview} from "./report-insights";
 import WorkspaceSidebar from "./workspace-sidebar";
@@ -120,12 +121,12 @@ export default function Home() {
     window.history.pushState({...window.history.state,shipcheckView:true},"",`/?${query}`);
     setView(v);setReport(current);setSelected(finding);setError("");
   }
-  async function scan(mode: "demo" | "live") {
+  async function scan(mode: "demo" | "live", replay=false) {
     setBusy(true);
     setError("");
     setSelected(null);
     try {
-      const response = await fetch("/api/scans", {
+      const response = replay ? await fetch("/api/demos?mode=recorded") : await fetch("/api/scans", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
@@ -306,14 +307,7 @@ export default function Home() {
                     onChange={(e) => setContent(e.target.value)}
                     rows={13}
                   />
-                  <label className="checkbox">
-                    <input
-                      type="checkbox"
-                      checked={research}
-                      onChange={(e) => setResearch(e.target.checked)}
-                    />
-                    Include Tavily research and Nemotron notes
-                  </label>
+                  <AiTriage enabled={research} onChange={setResearch}/>
                   <p className="fineprint">
                     Package names and versions go to OSV. Optional research uses
                     server-side provider keys; missing keys appear as incomplete
@@ -331,7 +325,7 @@ export default function Home() {
                     Scan manifest
                   </button>
                 </section>
-                <section className="panel demo-panel">
+                <section className="panel demo-panel"><button className="button" onClick={()=>scan("demo",true)}>Recorded live run</button>
                   <div className="illustration">
                     <FlaskConical size={29} />
                   </div>
@@ -456,7 +450,7 @@ export default function Home() {
                   </h1>
                   <p className="intro">
                     {report.mode === "demo"
-                      ? "Offline demonstration · real rules over synthetic inputs"
+                      ? report.recording ? `Recorded live run · captured ${report.recording.recordedAt} · Nemotron on Nebius · replayed, no live requests` : "Offline demonstration · real rules over synthetic inputs"
                       : "Live assessment · see coverage for included checks"}
                   </p>
                 </div>

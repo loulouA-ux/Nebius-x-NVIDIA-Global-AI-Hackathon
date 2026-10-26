@@ -72,3 +72,7 @@ Remaining: independent partner review, private member-key delivery, public judgi
 - Lucide icons and Figtree font retain their upstream licences; Google Fonts is requested by the browser with a system-font fallback.
 
 MIT applies to original ShipCheck code. Third-party dependencies and advisory data retain their licences.
+
+## Recorded live demo capture
+
+Run `node --env-file=.env.local --import tsx scripts/capture-recorded-run.ts` locally with both provider keys configured. This makes one pipeline scan using only the existing synthetic lockfile. It refuses incomplete provider evidence, checks that configured secret values are absent, and never overwrites a capture. Review the sanitized fixture before committing. `/api/demos?mode=recorded` returns an honest unavailable state if no fixture exists; `mode=offline` rebuilds the stable offline demo.

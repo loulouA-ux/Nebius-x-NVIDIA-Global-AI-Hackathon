@@ -40,6 +40,7 @@ export type Source = {
 };
 export type Explanation = { findingId: string; explanation: string; basis?: "validated-selection" | "scanner-fallback" };
 export type ScanReport = {
+  recording?: {recordedAt:string;model:string;region:string;commit:string};
   id: string;
   mode: "demo" | "live";
   createdAt: string;
