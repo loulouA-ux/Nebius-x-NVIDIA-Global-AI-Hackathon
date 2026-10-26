@@ -1,4 +1,5 @@
 "use client";
+import {usePathname} from 'next/navigation';
 import {useState,useEffect,useRef} from 'react';
 import type {Finding,ScanReport} from '@/lib/types';
 import {rememberReport,recalledReport,clearReportMemory,latestReport,setDashboardLocation,recalledFilters,type FindingFilters} from './report-memory';
@@ -11,6 +12,7 @@ function navigationUrl(query:URLSearchParams){
  return id?`/reports/${encodeURIComponent(id)}${finding?`/findings/${encodeURIComponent(finding)}`:''}`:'/reports';
 }
 export default function useReportNavigation(busy:boolean,setError:(s:string)=>void){
+  const pathname=usePathname();
   const [view, setView] = useState<View>("overview");
   const [report, setReport] = useState<ScanReport | null>(null);
   const [selected, setSelected] = useState<Finding | null>(null);
@@ -60,7 +62,7 @@ export default function useReportNavigation(busy:boolean,setError:(s:string)=>vo
     function expire(){clearReportMemory();}
     void restore();window.addEventListener("popstate",restore);window.addEventListener(sessionExpiredEvent,expire);
     return ()=>{active=false;window.removeEventListener("popstate",restore);window.removeEventListener(sessionExpiredEvent,expire);};
-  }, []);
+  }, [pathname]);
   function navigate(v: View, current=report, finding:Finding|null=null) {
     if(v==='actions'||v==='findings')v='overview';
     lastFinding.current=finding?.id||null;returnRow.current=null;

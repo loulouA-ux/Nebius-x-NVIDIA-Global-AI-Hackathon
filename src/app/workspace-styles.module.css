@@ -831,3 +831,5 @@
 @media(min-width:768px){:global(.shell>main>section:first-child){display:none}:global(.shell){display:flex}:global(.shell>aside){flex:0 0 220px}:global(.shell>main){flex:999 1 560px}}
 
 :global(.report-tools){display:flex;gap:10px}:global(.report-row),:global(.table-heading){grid-template-columns:85px minmax(0,2fr) minmax(0,1fr) 45px minmax(0,1fr) 80px 16px;gap:12px}@media(max-width:1023px){:global(.row-package),:global(.row-cvss){display:none}:global(.report-row){grid-template-columns:75px minmax(0,1fr) 16px;min-height:64px;padding:10px 12px}}
+
+:global(.finding-pager){display:flex;gap:8px;margin-left:auto}:global(.external-source){display:inline-flex;min-height:44px;align-items:center;margin-right:12px}@media(max-width:767px){:global(.finding-repair-action){position:sticky;bottom:86px;z-index:2;background:var(--surface);padding:12px 0}:global(.finding-repair-action .button){width:100%}}
