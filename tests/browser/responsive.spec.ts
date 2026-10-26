@@ -24,3 +24,22 @@ for(const width of [360,768,1440]) {
   await page.getByRole('button',{name:'Recommended actions',exact:true}).click();await fits();
  });
 }
+
+test('Back restores report and finding context without repeating a scan',async({page})=>{
+ let scans=0;
+ page.on('request',r=>{if(r.method()==='POST'&&r.url().endsWith('/api/scans'))scans++;});
+ await page.route('**/api/session',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
+ await page.route('**/api/repositories',r=>r.fulfill({json:{repositories:[]}}));
+ await page.route('**/api/repairs',r=>r.fulfill({json:{repairs:[]}}));
+ await page.goto('/');await page.getByRole('button',{name:'Explore the demo'}).click();
+ await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();
+ await page.getByRole('button',{name:/Command Injection in lodash/}).click();
+ await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Back to report'}).click();
+ await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();
+ await page.goForward();await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
+ await page.getByRole('link',{name:'Repairs & audit trail'}).click();
+ await expect(page.getByRole('heading',{name:'Verify a dependency repair'})).toBeVisible();
+ await page.goBack();await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
+ expect(scans).toBe(1);
+});

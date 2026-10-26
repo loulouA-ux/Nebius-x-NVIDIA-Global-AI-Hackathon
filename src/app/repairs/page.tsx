@@ -1,5 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
+import WorkspaceSidebar from "../workspace-sidebar";
+import MemberControls from "../member-controls";
 import BrandHeader from "../brand-header";
 import MobileNavigation from "../mobile-navigation";
 import type {RepairPlan} from "@/lib/repair/plan";
@@ -22,7 +24,7 @@ export default function Repairs(){
   try{await api(`/api/repairs/${repair.id}`,{action:kind,...(kind==="approve"?{approvalHash:repair.approvalHash}:{})});setRepair(await api(`/api/repairs/${repair.id}`));setApproved(false);}
   catch(e){setError(e instanceof Error?e.message:"Action failed.");try{setRepair(await api(`/api/repairs/${repair.id}`));}catch{ /* Keep the last known evidence; do not repeat writes. */ }}finally{setBusy("");void refreshSaved().catch(()=>{});}
  }
- return <div className="with-mobile-navigation"><BrandHeader /><MobileNavigation view="repairs"/><main className="repair-workspace">
+ return <div className="with-mobile-navigation"><BrandHeader /><MobileNavigation view="repairs"/><div className="shell"><WorkspaceSidebar view="repairs"/><main className="repair-workspace"><MemberControls refresh="" accountOnly onReport={()=>{}}/>
   <a href="/">← ShipCheck dashboard</a><h1>Verify a dependency repair</h1>
   <p>Choose an authorised repository, inspect the proposal, and test the change in isolated compute before approving a draft pull request.</p>
   <p><a href="/sign-in">Sign in with GitHub</a> · Repository access is separate from sign-in. This preview supports small npm projects with direct dependencies with supported semver ranges and a committed lockfile.</p>
@@ -56,5 +58,5 @@ export default function Repairs(){
    </section>
    {repair.url&&<p><a href={repair.url} target="_blank" rel="noreferrer">Open draft pull request</a></p>}
   </>}
- </main></div>;
+ </main></div></div>;
 }

@@ -1,4 +1,5 @@
 "use client";
+import {clearReportMemory} from "./report-memory";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
 import { notifySessionExpired, sessionExpiredEvent } from "./session-expired";
@@ -6,7 +7,9 @@ type Saved = { id: string; created_at: string; status: string };
 export default function MemberControls({
   refresh,
   onReport,
+  accountOnly=false,
 }: {
+  accountOnly?: boolean;
   refresh: string;
   onReport: (report: ScanReport) => void;
 }) {
@@ -90,7 +93,7 @@ export default function MemberControls({
     }
   }
   return (
-    <section aria-label="Member access" style={{ marginBottom: 24 }}>
+    <section aria-label="Member access" className="member-access">
       <div
         style={{
           display: "flex",
@@ -104,7 +107,7 @@ export default function MemberControls({
             <span>
               Signed in as <strong>{member}</strong>
             </span>
-            <label htmlFor="saved-scan">Saved scans</label>
+            {!accountOnly&&<><label htmlFor="saved-scan">Saved scans</label>
             <select
               id="saved-scan"
               aria-label="Saved scans"
@@ -119,7 +122,7 @@ export default function MemberControls({
                   {new Date(s.created_at).toLocaleString("en-GB")} · {s.status}
                 </option>
               ))}
-            </select>
+            </select></>}
             <button
               className="button"
               disabled={busy}
@@ -128,6 +131,7 @@ export default function MemberControls({
                 try {
                   const r = await fetch("/api/session", { method: "DELETE" });
                   if (!r.ok) throw Error("Sign-out failed.");
+                  clearReportMemory();
                   location.assign("/");
                 } catch {
                   setError("Sign-out failed. Please try again.");
@@ -139,7 +143,7 @@ export default function MemberControls({
             </button>
           </>
         ) : loaded ? (
-          <a href="/sign-in">Member sign in</a>
+          <a className="button" href="/sign-in">Member sign in</a>
         ) : (
           <span>Checking member session…</span>
         )}

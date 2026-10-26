@@ -987,3 +987,7 @@ time,code {font-variant-numeric:tabular-nums;}
  .auth-story h2 {font-size:32px;margin:0 0 12px;}
  .auth-story p {margin:12px 0;}
 }
+.member-access {margin-bottom:24px;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:12px;}
+.nav-link[aria-current] {color:var(--accent);background:var(--soft);font-weight:600;}
+.with-mobile-navigation>.shell>.repair-workspace {margin:0 auto;}
+@media(max-width:700px){.with-mobile-navigation>.shell>aside{display:none;}.member-access{padding:14px;}.member-access strong{overflow-wrap:anywhere;}}

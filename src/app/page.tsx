@@ -1,5 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import WorkspaceSidebar from "./workspace-sidebar";
+import {rememberReport,recalledReport,clearReportMemory} from "./report-memory";
+import {sessionExpiredEvent} from "./session-expired";
 import BrandHeader from "./brand-header";
 import MobileNavigation from "./mobile-navigation";
 import {
@@ -42,10 +46,6 @@ const defaultManifest = JSON.stringify(
 );
 export default function Home() {
   const [view, setView] = useState<View>("overview");
-  useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("view");
-    if (["overview", "project", "scan", "findings", "actions"].includes(requested || "")) setView(requested as View);
-  }, []);
   const [report, setReport] = useState<ScanReport | null>(null);
   const [selected, setSelected] = useState<Finding | null>(null);
   const [busy, setBusy] = useState(false);
@@ -54,10 +54,32 @@ export default function Home() {
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
   const [projectId, setProjectId] = useState("");
-  function navigate(v: View) {
-    setView(v);
-    setSelected(null);
-    setError("");
+  useEffect(() => {
+    let active=true;
+    async function restore() {
+      const query=new URLSearchParams(window.location.search);
+      const requested=query.get("view") || "overview";
+      setView((["overview","project","scan","findings","actions"].includes(requested)?requested:"overview") as View);
+      setError("");
+      const id=query.get("report"), finding=query.get("finding");
+      if(!id){setReport(null);setSelected(null);return;}
+      let loaded=recalledReport(id);
+      if(!loaded){try{const r=await fetch(`/api/scans/${encodeURIComponent(id)}`);if(r.ok)loaded=(await r.json()).report;}catch{/* Offer recovery below. */}}
+      if(!active)return;
+      if(loaded){rememberReport(loaded);setReport(loaded);setSelected(loaded.findings.find(f=>f.id===finding)||null);}
+      else {setReport(null);setSelected(null);setError("This report is unavailable. Sign in and reopen a saved report, or run the offline demo again.");}
+    }
+    function expire(){clearReportMemory();}
+    void restore();window.addEventListener("popstate",restore);window.addEventListener(sessionExpiredEvent,expire);
+    return ()=>{active=false;window.removeEventListener("popstate",restore);window.removeEventListener(sessionExpiredEvent,expire);};
+  }, []);
+  function navigate(v: View, current=report, finding:Finding|null=null) {
+    if(current)rememberReport(current);
+    const query=new URLSearchParams({view:v});
+    if(current)query.set("report",current.id);
+    if(finding)query.set("finding",finding.id);
+    window.history.pushState({...window.history.state,shipcheckView:true},"",`/?${query}`);
+    setView(v);setReport(current);setSelected(finding);setError("");
   }
   async function scan(mode: "demo" | "live") {
     setBusy(true);
@@ -83,21 +105,13 @@ export default function Home() {
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.error || "The scan could not finish.");
-      setReport(data);
-      setView("overview");
+      navigate("overview",data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to run scan.");
     } finally {
       setBusy(false);
     }
   }
-  const nav = [
-    { id: "overview", label: "Overview", icon: LayoutDashboard },
-    { id: "project", label: "Project setup", icon: FileSearch },
-    { id: "scan", label: "New scan", icon: ScanLine },
-    { id: "findings", label: "Findings", icon: ShieldAlert },
-    { id: "actions", label: "Recommended actions", icon: ListChecks },
-  ] as const;
   const blocked =
     report?.findings.filter((f) => f.severity === "high").length ?? 0;
   const incomplete =
@@ -109,45 +123,12 @@ export default function Home() {
       <BrandHeader />
       <MobileNavigation view={view} onNavigate={navigate} />
       <div className="shell">
-        <aside>
-          <div className="workspace">
-            <span className="avatar">H</span>
-            <div>
-              HeySalad<span>Development workspace</span>
-            </div>
-          </div>
-          <div className="nav-label">WORKSPACE</div>
-          <nav aria-label="Main navigation">
-            {nav.map((n) => (
-              <button
-                key={n.id}
-                aria-current={view === n.id ? "page" : undefined}
-                onClick={() => navigate(n.id)}
-              >
-                <n.icon size={17} />
-                {n.label}
-              </button>
-            ))}
-            <a className="nav-link" href="/repairs"><ListChecks size={17} /> Repairs &amp; audit trail</a>
-          </nav>
-          <div className="sidebar-footer">
-            <span className="tiny-mark">
-              <CheckCheck size={19} />
-            </span>
-            <p>
-              Code security,
-              <br />
-              backed by evidence.
-            </p>
-            <small>Built by HeySalad</small>
-          </div>
-        </aside>
+        <WorkspaceSidebar view={view} onNavigate={navigate}/>
         <main>
           <MemberControls
             refresh={report?.id || ""}
             onReport={(saved) => {
-              setReport(saved);
-              navigate("overview");
+              navigate("overview",saved);
             }}
           />
           <div className="breadcrumb">
@@ -182,7 +163,7 @@ export default function Home() {
             </section>
           ) : selected ? (
             <>
-              <button className="back" onClick={() => setSelected(null)}>
+              <button className="back" onClick={() => window.history.state?.shipcheckView ? window.history.back() : navigate(view,report)}>
                 <ArrowLeft size={15} />
                 Back to report
               </button>
@@ -383,8 +364,8 @@ export default function Home() {
               </section>
               <section className="workflow-cards" aria-label="Security workflow">
                 <button className="workflow-card" onClick={() => navigate("scan")}><span className="workflow-icon"><ScanLine size={25}/></span><small>01 / SCAN</small><h2>Start with the evidence.</h2><p>Inspect dependencies and verified staging hosts. See exactly what was checked.</p><strong>Configure a scan →</strong></button>
-                <a className="workflow-card" href="/repairs"><span className="workflow-icon"><FlaskConical size={25}/></span><small>02 / CHECK</small><h2>A fix you can inspect.</h2><p>Review a supported dependency patch and test it in isolated compute.</p><strong>Open repair workspace →</strong></a>
-                <a className="workflow-card" href="/repairs#repair-audit"><span className="workflow-icon"><ListChecks size={25}/></span><small>03 / REVIEW</small><h2>Keep the decision yours.</h2><p>Open a saved repair to review its audit trail, tests and draft PR evidence.</p><strong>Review saved repairs →</strong></a>
+                <Link className="workflow-card" href="/repairs"><span className="workflow-icon"><FlaskConical size={25}/></span><small>02 / CHECK</small><h2>A fix you can inspect.</h2><p>Review a supported dependency patch and test it in isolated compute.</p><strong>Open repair workspace →</strong></Link>
+                <Link className="workflow-card" href="/repairs#repair-audit"><span className="workflow-icon"><ListChecks size={25}/></span><small>03 / REVIEW</small><h2>Keep the decision yours.</h2><p>Open a saved repair to review its audit trail, tests and draft PR evidence.</p><strong>Review saved repairs →</strong></Link>
               </section>
               <div className="intro-features">
                 <div>
@@ -477,7 +458,7 @@ export default function Home() {
                         <p>{f.action}</p>
                         <button
                           className="text-button"
-                          onClick={() => setSelected(f)}
+                          onClick={() => navigate(view,report,f)}
                         >
                           Review evidence <ArrowUpRight size={14} />
                         </button>
@@ -502,7 +483,7 @@ export default function Home() {
                       <button
                         className="finding-row"
                         key={f.id}
-                        onClick={() => setSelected(f)}
+                        onClick={() => navigate(view,report,f)}
                       >
                         <span className={"severity " + f.severity}>
                           {f.severity === "review" ? "Review" : f.severity}
