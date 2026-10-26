@@ -845,3 +845,4 @@
   :global(.partner-strip .partner-logo-nebius) { height: 28px; }
   :global(.partner-strip .partner-logo-tavily) { height: 32px; }
 }
+:global(.provider-icons){display:flex;gap:16px;flex-wrap:wrap}:global(.provider-icons span){display:inline-flex;gap:6px;align-items:center}
