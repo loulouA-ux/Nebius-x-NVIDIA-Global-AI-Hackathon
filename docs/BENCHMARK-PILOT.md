@@ -57,3 +57,11 @@ Run each arm three times, retaining failed attempts and cold/warm distinction. I
 - No push, deployment, access change or paid cloud run.
 
 Verification recorded 26 October 2026: typecheck passed, 215 unit tests across 25 files passed (including seven new benchmark tests), production build passed. Both smoke and report CLIs exited 0. The generated summary correctly records three incomplete fixture runs, zero complete runs, null repeatability and null accuracy. No browser tests were rerun because this milestone changes no UI or HTTP route.
+
+## Large-manifest follow-up
+
+The first organisation collector processed 200 repositories, but only 49 of 387 attempted manifests reached dependency queries (39 with partial coverage). The follow-up introduces administrator-only parser options capped at 5 MB and 5,000 unique dependencies. Default application limits remain 200 KB and 50; byte length is now enforced for Unicode input too. OSV queries run in ten-dependency batches, preserving successful batches, and subdivide only the known advisory-count cap failure. Other provider failures remain explicit and are not automatically retried.
+
+`scripts/rescan-manifests.ts <prior-result-directory>` retries the first 20 incomplete manifests in original inventory order using the original Git blob IDs and verifies blob hashes. It never follows a moving branch. Results include fetch/size-and-integrity/parse/OSV stages, resolved-versus-queried counts and failed batch offsets. Prior artifacts remain unchanged. No cloud compute or repository code execution occurs. This improves dependency inventory only; no CodeQL, Trivy, secret-history or C# coverage is claimed.
+
+Follow-up validation: 219 unit tests across 26 files, typecheck and production build passed. A regression initially caught changed error wording; compatibility was restored before the passing full run. The live 20-manifest trial was launched on 26 October at 17:56 London; results are in ignored `test-results/manifest-rescan-2026-10-26T17-56-56-323Z`. Do not infer a completed trial from this launch record.
