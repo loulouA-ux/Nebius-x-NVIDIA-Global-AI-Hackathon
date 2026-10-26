@@ -49,7 +49,7 @@ export default function MemberControls({
         }
         if (!r.ok) throw Error("Member access temporarily unavailable.");
         const d = await r.json();
-        if (active) setMember(d.actor.id);
+        if (active) setMember(d.login || d.actor.id);
         if (accountOnly) return;
         const history = await fetch("/api/scans", { cache: "no-store" });
         if (history.status === 401) {
@@ -63,7 +63,7 @@ export default function MemberControls({
         if (!history.ok) throw Error("Saved scans could not be loaded.");
         const h = await history.json();
         if (active) {
-          setMember(d.actor.id);
+          setMember(d.login || d.actor.id);
           setScans(h.scans);
           setError("");
         }
