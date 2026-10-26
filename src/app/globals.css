@@ -40,7 +40,7 @@ button {
   cursor: pointer;
 }
 button:disabled {
-  cursor: wait;
+  cursor: not-allowed;
   opacity: 0.65;
 }
 a {
@@ -51,7 +51,8 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+summary:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 4px;
 }
@@ -1004,3 +1005,16 @@ time,code {font-variant-numeric:tabular-nums;}
 .evidence-pane .evidence pre {font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
 .evidence-pane .evidence small {display:block;margin-top:10px;}
 @media(max-width:1050px){.finding-workspace{grid-template-columns:1fr;gap:20px;}}
+
+/* Shared reading and keyboard surface refinements. */
+::selection { background:#bfdbfe; color:#142b45; }
+input, textarea { caret-color:var(--accent); }
+html { scrollbar-color:#94a3b8 #f1f5f9; }
+main h1:focus { outline:none; }
+summary { touch-action:manipulation; }
+time, .count { font-variant-numeric:tabular-nums; }
+@media(max-width:700px) {
+ main { font-size:16px; }
+ .intro, .finding-summary .intro, .repair-panel p { font-size:16px; }
+ .fineprint, .quiet-note { font-size:14px; }
+}

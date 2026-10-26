@@ -1,5 +1,7 @@
 "use client";
 import {clearReportMemory} from "./report-memory";
+import Link from "next/link";
+import styles from "./account-ux.module.css";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
 import { notifySessionExpired, sessionExpiredEvent } from "./session-expired";
@@ -43,6 +45,8 @@ export default function MemberControls({
         }
         if (!r.ok) throw Error("Member access temporarily unavailable.");
         const d = await r.json();
+        if (active) setMember(d.actor.id);
+        if (accountOnly) return;
         const history = await fetch("/api/scans", { cache: "no-store" });
         if (history.status === 401) {
           if (active) {
@@ -72,7 +76,7 @@ export default function MemberControls({
     return () => {
       active = false;
     };
-  }, [refresh]);
+  }, [refresh, accountOnly]);
   async function open(id: string) {
     if (!id) return;
     setBusy(true);
@@ -93,21 +97,12 @@ export default function MemberControls({
     }
   }
   return (
-    <section aria-label="Member access" className="member-access">
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
+    <section aria-label="Member access" className={`member-access ${styles.account}`}>
+      <div className={styles.row}>
         {member ? (
           <>
-            <span>
-              Signed in as <strong>{member}</strong>
-            </span>
-            {!accountOnly&&<><label htmlFor="saved-scan">Saved scans</label>
+            <span className={styles.identity}><strong>{member.startsWith("github:") ? "GitHub account" : "Team member"}</strong><small>Signed in as {member}</small></span>
+            {!accountOnly&&<div className={styles.history}><label htmlFor="saved-scan">Saved scans</label>
             <select
               id="saved-scan"
               aria-label="Saved scans"
@@ -122,7 +117,7 @@ export default function MemberControls({
                   {new Date(s.created_at).toLocaleString("en-GB")} · {s.status}
                 </option>
               ))}
-            </select></>}
+            </select></div>}
             <button
               className="button"
               disabled={busy}
@@ -143,7 +138,7 @@ export default function MemberControls({
             </button>
           </>
         ) : loaded ? (
-          <a className="button" href="/sign-in">Member sign in</a>
+          <><span className={styles.hint}>Demo mode · Sign in to save scans and connect repositories.</span><Link className="button" href="/sign-in">Member sign in</Link></>
         ) : (
           <span>Checking member session…</span>
         )}

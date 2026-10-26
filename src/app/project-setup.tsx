@@ -127,12 +127,12 @@ export default function ProjectSetup() {
     <>
       <h1>Set up a project.</h1>
       <p className="intro">
-        Name the release candidate and prove control of the exact staging host.
+        Optional staging checks: name the release candidate and prove control of its exact host. You can scan a dependency manifest without creating a project.
       </p>
       {needsSignIn && (
         <p className="quiet-note">
           Project setup requires a member session.{" "}
-          <a href="/sign-in">Sign in with your individual access key</a>.
+          <a href="/sign-in">Sign in to manage staging checks</a>.
         </p>
       )}
       {error && (

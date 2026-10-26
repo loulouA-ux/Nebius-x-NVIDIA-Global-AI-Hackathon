@@ -1,21 +1,22 @@
 "use client";
+import Link from "next/link";
+import styles from "../account-ux.module.css";
 import { useState } from "react";
 import BrandHeader from "../brand-header";
 export default function SignIn() {
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
-    <><BrandHeader /><main className="auth-layout">
+    <><BrandHeader /><main id="main-content" tabIndex={-1} className="auth-layout">
       <section className="auth-story"><h2>Scan. Check.<br/>Ship.</h2><p>One workspace for findings, supported repairs and the evidence behind your next decision.</p><img src="/brand/symbol.svg" width={160} height={136} alt=""/><p className="auth-assurance">Repository access stays separate. You choose what to connect.</p></section>
       <section className="auth-panel">
       <h1>Sign in to ShipCheck</h1>
       <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
       <p>GitHub sign-in is available to invited preview members. Repository permissions are requested separately.</p>
       <p>
-        Use your individual team access key for live scans. The offline demo is
-        available without signing in.
+        Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
       </p>
-      <form className="auth-key-form"
+      <details className={styles.key} open><summary>Use a team access key instead</summary><p id="access-key-hint" className={styles.hint}>Ask your workspace owner for your individual key. This is not your GitHub password.</p><form className="auth-key-form"
         onSubmit={async (event) => {
           event.preventDefault();
           setBusy(true);
@@ -47,6 +48,8 @@ export default function SignIn() {
           name="key"
           type="password"
           autoComplete="off"
+          aria-describedby="access-key-hint"
+          aria-invalid={Boolean(error)}
           required
           maxLength={100}
           style={{
@@ -59,9 +62,9 @@ export default function SignIn() {
         <button className="button primary" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
-      </form>
+      </form></details>
       <p role="alert" className={error ? "error" : undefined}>{error}</p>
-      <a href="/">Return to demo</a> · <a href="/repairs">Dependency repairs</a>
+      <Link href="/">Return to demo</Link> · <Link href="/repairs">Dependency repairs</Link>
     </section></main></>
   );
 }

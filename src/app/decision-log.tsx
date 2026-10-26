@@ -20,10 +20,15 @@ export default function DecisionLog({
     [reason, setReason] = useState(""),
     [error, setError] = useState(""),
     [expired, setExpired] = useState(false),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [loading, setLoading] = useState(report.mode !== "demo"),
+    [historyError, setHistoryError] = useState(""),
+    [reload, setReload] = useState(0);
   useEffect(() => {
     let active = true;
-    if (report.mode === "demo") return;
+    setEvents([]); setExpired(false); setError(""); setHistoryError("");
+    if (report.mode === "demo") { setLoading(false); return; }
+    setLoading(true);
     fetch(`/api/scans/${report.id}`, { cache: "no-store" })
       .then(async (r) => {
         if (r.status === 401) {
@@ -36,12 +41,12 @@ export default function DecisionLog({
         if (active) setEvents(d.decisions);
       })
       .catch((cause) => {
-        if (active) setError(cause instanceof Error ? cause.message : "Decision history unavailable.");
-      });
+        if (active) setHistoryError(cause instanceof Error ? cause.message : "Decision history unavailable.");
+      }).finally(() => { if(active) setLoading(false); });
     return () => {
       active = false;
     };
-  }, [report.id, report.mode]);
+  }, [report.id, report.mode, reload]);
   async function record(action: "acknowledge" | "dismiss") {
     setBusy(true);
     setError("");
@@ -60,6 +65,7 @@ export default function DecisionLog({
       if (!r.ok) throw Error(d.error || "Decision could not be saved.");
       setEvents((current) => [...current, d]);
       setReason("");
+      window.dispatchEvent(new CustomEvent("shipcheck:decision-recorded", { detail: { reportId: report.id } }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Decision could not be saved.");
     } finally {
@@ -119,6 +125,9 @@ export default function DecisionLog({
               {error}
             </p>
           )}
+          {loading && <p role="status">Loading decision history…</p>}
+          {historyError && <p role="alert">{historyError} <button className="button" onClick={() => setReload(n => n + 1)}>Reload history</button></p>}
+          {!loading && !historyError && !events.some(d => d.finding_id === findingId) && <p className="quiet-note">No decisions recorded for this finding.</p>}
           <ol aria-label="Decision history">
             {events
               .filter((d) => d.finding_id === findingId)

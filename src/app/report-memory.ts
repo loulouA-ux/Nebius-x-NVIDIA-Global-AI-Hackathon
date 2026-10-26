@@ -1,6 +1,14 @@
 import type {ScanReport} from '@/lib/types';
-// In-memory only. Never write report contents to URLs or browser storage.
+// Bounded session memory only. Never persist report contents, searches or credentials.
 const reports=new Map<string,ScanReport>();
-export function rememberReport(report:ScanReport){reports.set(report.id,report);if(reports.size>10)reports.delete(reports.keys().next().value!);}
+const locations=new Map<string,string>();
+export type FindingFilters={search:string;severity:string;source:string;package:string;decision:string};
+const filters=new Map<string,FindingFilters>();
+export function rememberReport(report:ScanReport){reports.delete(report.id);reports.set(report.id,report);if(reports.size>10){const oldest=reports.keys().next().value!;reports.delete(oldest);filters.delete(oldest);}}
 export function recalledReport(id:string){return reports.get(id);}
-export function clearReportMemory(){reports.clear();}
+export function latestReport(){return Array.from(reports.values()).at(-1);}
+export function setDashboardLocation(view:string,url:string){if(["overview","project","scan","findings","actions"].includes(view))locations.set(view,url);}
+export function dashboardHref(view:string){const report=latestReport();const saved=locations.get(view);return saved && new URLSearchParams(saved.split('?')[1]).get('report')===report?.id ? saved : `/?view=${view}${report?`&report=${encodeURIComponent(report.id)}`:''}`;}
+export function recalledFilters(id:string):FindingFilters{return filters.get(id)||{search:'',severity:'all',source:'all',package:'all',decision:'all'};}
+export function rememberFilters(id:string,value:FindingFilters){filters.set(id,value);}
+export function clearReportMemory(){reports.clear();locations.clear();filters.clear();}

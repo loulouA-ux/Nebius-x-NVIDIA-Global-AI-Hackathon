@@ -73,10 +73,11 @@ export function snapshotFindings(dependencies: Dependency[]): Finding[] {
       severity: "high",
       description: `${d.name}@${d.version} matches the affected range in this single-advisory OSV snapshot. Application-level exploitability has not been established.`,
       action:
-        "Review an upgrade to lodash 4.17.21 or later, update the lockfile and run application tests. This app does not install packages or apply changes.",
+        "Review an upgrade to lodash 4.17.21 or later, update the lockfile and run application tests. This scan does not install packages or apply changes.",
       evidence: [
         {
           kind: "advisory",
+          dependency: d,
           location: `${d.path} · ${d.name}@${d.version}`,
           excerpt: advisory.details,
           url: `https://osv.dev/vulnerability/${advisory.id}`,

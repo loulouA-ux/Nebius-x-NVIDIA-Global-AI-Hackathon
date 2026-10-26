@@ -124,6 +124,7 @@ describe("findings and policy", () => {
     ).toBe("review"));
   it("matches the demo advisory on affected versions only", () => {
     expect(snapshotFindings([dependency])).toHaveLength(1);
+    expect(snapshotFindings([dependency])[0].evidence[0].dependency).toEqual(dependency);
     expect(snapshotFindings([{ ...dependency, version: "4.17.21" }])).toEqual(
       [],
     );

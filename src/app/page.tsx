@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import styles from "./findings.module.css";
 import WorkspaceSidebar from "./workspace-sidebar";
-import {rememberReport,recalledReport,clearReportMemory} from "./report-memory";
+import {rememberReport,recalledReport,clearReportMemory,latestReport,setDashboardLocation,recalledFilters,rememberFilters, type FindingFilters} from "./report-memory";
 import {sessionExpiredEvent} from "./session-expired";
 import BrandHeader from "./brand-header";
 import MobileNavigation from "./mobile-navigation";
@@ -54,19 +55,54 @@ export default function Home() {
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
   const [projectId, setProjectId] = useState("");
+  const mainRef = useRef<HTMLElement>(null);
+  const focusPending = useRef(false);
+  const [filters,setFilters] = useState<FindingFilters>({search:'',severity:'all',source:'all',package:'all',decision:'all'});
+  const [decisionRevision,setDecisionRevision]=useState(0);
+  const [decisions,setDecisions]=useState<Record<string,string>>({});
+  const [decisionState,setDecisionState]=useState<'loading'|'ready'|'unavailable'|'demo'>('demo');
+  useEffect(()=>{
+    function refresh(event:Event){if((event as CustomEvent).detail?.reportId===report?.id)setDecisionRevision(n=>n+1);}
+    window.addEventListener('shipcheck:decision-recorded',refresh);return()=>window.removeEventListener('shipcheck:decision-recorded',refresh);
+  },[report?.id]);
+  useEffect(()=>{
+    let active=true;setDecisions({});
+    if(!report || report.mode==='demo'){setDecisionState('demo');return;}
+    setDecisionState('loading');
+    fetch(`/api/scans/${encodeURIComponent(report.id)}`,{cache:'no-store'}).then(async r=>{
+      if(!r.ok)throw Error('Decision history unavailable');
+      const data=await r.json();if(!Array.isArray(data.decisions))throw Error('Decision history unavailable');
+      const latest:Record<string,string>={};
+      [...data.decisions].sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at)).forEach(d=>{if(d.action==='acknowledge'||d.action==='dismiss')latest[d.finding_id]=d.action;});
+      if(active){setDecisions(latest);setDecisionState('ready');}
+    }).catch(()=>{if(active)setDecisionState('unavailable');});
+    return()=>{active=false;};
+  },[report?.id,report?.mode,decisionRevision]);
+  useEffect(() => {
+    if(focusPending.current && !busy){
+      const heading=mainRef.current?.querySelector('h1');
+      if(heading){heading.tabIndex=-1;heading.focus();focusPending.current=false;}
+    }
+  },[view,selected,report,busy]);
   useEffect(() => {
     let active=true;
-    async function restore() {
+    let generation=0;
+    async function restore(event?:Event) {
+      const ticket=++generation;
+      if(event)focusPending.current=true;
       const query=new URLSearchParams(window.location.search);
       const requested=query.get("view") || "overview";
       setView((["overview","project","scan","findings","actions"].includes(requested)?requested:"overview") as View);
       setError("");
-      const id=query.get("report"), finding=query.get("finding");
+      const id=query.get("report") || latestReport()?.id, finding=query.get("finding");
       if(!id){setReport(null);setSelected(null);return;}
       let loaded=recalledReport(id);
       if(!loaded){try{const r=await fetch(`/api/scans/${encodeURIComponent(id)}`);if(r.ok)loaded=(await r.json()).report;}catch{/* Offer recovery below. */}}
-      if(!active)return;
-      if(loaded){rememberReport(loaded);setReport(loaded);setSelected(loaded.findings.find(f=>f.id===finding)||null);}
+      if(!active || ticket!==generation)return;
+      if(loaded){rememberReport(loaded);setReport(loaded);setFilters(recalledFilters(loaded.id));setSelected(loaded.findings.find(f=>f.id===finding)||null);
+        query.set('report',loaded.id);window.history.replaceState(window.history.state,'',`/?${query}`);
+        const listQuery=new URLSearchParams(query);listQuery.delete('finding');setDashboardLocation(requested,`/?${listQuery}`);
+      }
       else {setReport(null);setSelected(null);setError("This report is unavailable. Sign in and reopen a saved report, or run the offline demo again.");}
     }
     function expire(){clearReportMemory();}
@@ -74,9 +110,11 @@ export default function Home() {
     return ()=>{active=false;window.removeEventListener("popstate",restore);window.removeEventListener(sessionExpiredEvent,expire);};
   }, []);
   function navigate(v: View, current=report, finding:Finding|null=null) {
-    if(current)rememberReport(current);
+    focusPending.current=true;
+    if(current){rememberReport(current);setFilters(recalledFilters(current.id));}
     const query=new URLSearchParams({view:v});
     if(current)query.set("report",current.id);
+    setDashboardLocation(v,`/?${query}`);
     if(finding)query.set("finding",finding.id);
     window.history.pushState({...window.history.state,shipcheckView:true},"",`/?${query}`);
     setView(v);setReport(current);setSelected(finding);setError("");
@@ -112,6 +150,15 @@ export default function Home() {
       setBusy(false);
     }
   }
+  function updateFilters(update:Partial<FindingFilters>){
+    const next={...filters,...update};setFilters(next);if(report)rememberFilters(report.id,next);
+  }
+  const packageOptions=Array.from(new Set(report?.findings.flatMap(f=>f.evidence.flatMap(e=>e.dependency?[e.dependency.name]:[]))||[])).sort();
+  const filteredFindings=report?.findings.filter(f=>{
+    const search=[f.title,f.description,...f.evidence.flatMap(e=>[e.location,e.dependency?.name||''])].join(' ').toLowerCase();
+    return (!filters.search.trim()||search.includes(filters.search.trim().toLowerCase())) && (filters.severity==='all'||f.severity===filters.severity) && (filters.source==='all'||f.evidence.some(e=>e.kind===filters.source)) && (filters.package==='all'||f.evidence.some(e=>e.dependency?.name===filters.package)) && (filters.decision==='all'||decisionState!=='ready'||(decisions[f.id]||'unreviewed')===filters.decision);
+  })||[];
+  const repairDependency=selected?.evidence.find(e=>e.dependency?.ecosystem==='npm')?.dependency;
   const blocked =
     report?.findings.filter((f) => f.severity === "high").length ?? 0;
   const incomplete =
@@ -124,7 +171,7 @@ export default function Home() {
       <MobileNavigation view={view} onNavigate={navigate} />
       <div className="shell">
         <WorkspaceSidebar view={view} onNavigate={navigate}/>
-        <main>
+        <main ref={mainRef} id="main-content" tabIndex={-1}>
           <MemberControls
             refresh={report?.id || ""}
             onReport={(saved) => {
@@ -177,6 +224,7 @@ export default function Home() {
               <section className="panel">
                 <h2>Recommended action</h2>
                 <p>{selected.action}</p>
+                {repairDependency && <div className={styles.handoff}><Link className="button" href={`/repairs?package=${encodeURIComponent(repairDependency.name)}`}>Prepare dependency repair <ArrowUpRight size={15}/></Link><p>Choose the repository, then review the proposed target version before verification. This manifest scan does not establish repository ownership or confirm that the same dependency is present there.</p></div>}
                 <div className="quiet-note">
                   <Info size={16} />
                   No code has been changed. Resolution requires independent
@@ -429,7 +477,7 @@ export default function Home() {
                 </span>
                 <span>{report.id.slice(0, 8)}</span>
               </div>
-              <section data-status={report.status} className={"verdict " + (blocked ? "blocked" : "")}>
+              {view === "findings" ? <p className={styles.compactVerdict}><strong>{report.status}</strong> · {blocked} high-severity findings · {incomplete} limited or incomplete checks. This assessment does not enforce a deployment gate. <button className="text-button" onClick={()=>navigate("overview")}>Review coverage</button></p> : <section data-status={report.status} className={"verdict " + (blocked ? "blocked" : "")}>
                 <div className="verdict-icon">
                   <ShieldAlert size={24} />
                 </div>
@@ -449,10 +497,10 @@ export default function Home() {
                       ? `${incomplete} checks use limited evidence or are incomplete. `
                       : ""}
                     This assessment is not a guarantee that the application is
-                    secure.
+                    secure and does not enforce a deployment gate.
                   </p>
                 </div>
-              </section>
+              </section>}
               {view === "actions" ? (
                 <section className="section">
                   <h2>Work through the findings</h2>
@@ -481,11 +529,20 @@ export default function Home() {
               ) : (
                 <section className="section">
                   <div className="section-heading">
-                    <h2>Needs your attention</h2>
+                    <h2>{view === "findings" ? "Triage findings" : "Highest priority findings"}</h2>
                     <span>{report.findings.length} findings</span>
                   </div>
+                  {view === 'findings' && <div className={styles.filters} aria-label="Filter findings">
+                    <label className={styles.search}>Search findings<input type="search" value={filters.search} placeholder="Title, package or evidence location" onChange={e=>updateFilters({search:e.target.value})}/></label>
+                    <label>Severity<select aria-label="Severity" value={filters.severity} onChange={e=>updateFilters({severity:e.target.value})}><option value="all">All severities</option><option value="high">High</option><option value="medium">Medium</option><option value="review">Review</option></select></label>
+                    <label>Evidence type<select aria-label="Evidence type" value={filters.source} onChange={e=>updateFilters({source:e.target.value})}><option value="all">All evidence</option><option value="advisory">Advisory</option><option value="code">Code</option><option value="http">HTTP observation</option></select></label>
+                    <label>Package<select aria-label="Package" value={filters.package} onChange={e=>updateFilters({package:e.target.value})}><option value="all">All packages</option>{packageOptions.map(p=><option key={p}>{p}</option>)}</select></label>
+                    <label>Review decision<select aria-label="Review decision" disabled={decisionState!=='ready'} value={decisionState==='ready'?filters.decision:'all'} onChange={e=>updateFilters({decision:e.target.value})}><option value="all">All decisions</option><option value="unreviewed">No decision</option><option value="acknowledge">Acknowledged</option><option value="dismiss">Dismissed</option></select></label>
+                    <p className={styles.decisionNote}>{decisionState==='demo'?'Demo decisions are not saved.':decisionState==='loading'?'Loading review decisions…':decisionState==='unavailable'?'Decision history unavailable. Findings are still shown.':'Review decisions do not resolve findings or change the scan verdict.'}{decisionState==='unavailable'&&<button className="text-button" onClick={()=>setDecisionRevision(n=>n+1)}>Retry decision history</button>}</p>
+                    <div className={styles.filterSummary}><span role="status">{filteredFindings.length} of {report.findings.length} findings</span><button className="text-button" onClick={()=>updateFilters({search:'',severity:'all',source:'all',package:'all',decision:'all'})}>Clear filters</button></div>
+                  </div>}
                   <div className="finding-list">
-                    {report.findings.map((f) => (
+                    {(view === 'findings' ? filteredFindings : [...report.findings].sort((a,b)=>({high:0,medium:1,review:2}[a.severity]-{high:0,medium:1,review:2}[b.severity])).slice(0,3)).map((f) => (
                       <button
                         className="finding-row"
                         key={f.id}
@@ -496,19 +553,22 @@ export default function Home() {
                         </span>
                         <span className="finding-copy">
                           <strong>{f.title}</strong>
-                          <small>{f.evidence[0]?.location}</small>
+                          <small>{f.evidence[0]?.location}{view==='findings' && decisionState==='ready' ? ` · ${decisions[f.id]==='acknowledge'?'Acknowledged':decisions[f.id]==='dismiss'?'Dismissed':'No decision recorded'}` : ''}</small>
                         </span>
                         <ArrowUpRight size={17} />
                       </button>
                     ))}
+                    {view === 'findings' && report.findings.length>0 && !filteredFindings.length && <p className="empty">No findings match these filters. Clear filters or try a different search.</p>}
                     {!report.findings.length && (
                       <p className="empty">
                         No findings returned. Check the coverage below.
                       </p>
                     )}
                   </div>
+                  {view === 'overview' && <button className="button" onClick={()=>navigate('findings')}>Review all {report.findings.length} findings <ArrowUpRight size={16}/></button>}
                 </section>
               )}
+              {view === 'overview' && <>
               <section className="section">
                 <div className="section-heading">
                   <h2>Coverage & confidence</h2>
@@ -572,6 +632,7 @@ export default function Home() {
                   ))}
                 </section>
               )}
+              </>}
             </>
           )}
           <footer>
