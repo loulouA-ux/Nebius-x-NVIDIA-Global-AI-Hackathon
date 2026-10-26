@@ -167,16 +167,30 @@ export default function Home() {
                 <ArrowLeft size={15} />
                 Back to report
               </button>
+              <div className="finding-workspace">
+                <section className="finding-summary" aria-label="Finding and recommended action">
               <span className={"severity " + selected.severity}>
                 {selected.severity === "review" ? "Review" : selected.severity}
               </span>
               <h1 className="detail-title">{selected.title}</h1>
               <p className="intro">{selected.description}</p>
               <section className="panel">
-                <h2>Evidence</h2>
+                <h2>Recommended action</h2>
+                <p>{selected.action}</p>
+                <div className="quiet-note">
+                  <Info size={16} />
+                  No code has been changed. Resolution requires independent
+                  verification.
+                </div>
+              </section>
+                </section>
+              <section className="panel evidence-pane" aria-label="Source evidence">
+                <div className="evidence-heading"><h2>Evidence</h2><span>{selected.evidence.length} source{selected.evidence.length === 1 ? "" : "s"}</span></div><p className="muted">Evidence recorded for this finding. Open the original source to check its context.</p>
                 {selected.evidence.map((e, i) => (
                   <div className="evidence" key={i}>
+                    <span className="evidence-kind">{e.kind === "advisory" ? "Advisory" : e.kind === "http" ? "HTTP observation" : "Code evidence"}</span>
                     <div className="code-label">{e.location}</div>
+                    {e.dependency && <p className="evidence-dependency">{e.dependency.name}@{e.dependency.version}<br/><code>{e.dependency.path}</code></p>}
                     <pre>{e.excerpt}</pre>
                     {e.url && (
                       <a href={e.url} target="_blank" rel="noreferrer">
@@ -192,15 +206,7 @@ export default function Home() {
                   </div>
                 ))}
               </section>
-              <section className="panel">
-                <h2>Recommended action</h2>
-                <p>{selected.action}</p>
-                <div className="quiet-note">
-                  <Info size={16} />
-                  No code has been changed. Resolution requires independent
-                  verification.
-                </div>
-              </section>
+              </div>
               {report && (
                 <DecisionLog
                   key={selected.id}

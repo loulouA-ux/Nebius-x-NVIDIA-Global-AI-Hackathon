@@ -991,3 +991,16 @@ time,code {font-variant-numeric:tabular-nums;}
 .nav-link[aria-current] {color:var(--accent);background:var(--soft);font-weight:600;}
 .with-mobile-navigation>.shell>.repair-workspace {margin:0 auto;}
 @media(max-width:700px){.with-mobile-navigation>.shell>aside{display:none;}.member-access{padding:14px;}.member-access strong{overflow-wrap:anywhere;}}
+
+.finding-workspace {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start;margin-top:20px;}
+.finding-summary {min-width:0;}
+.finding-summary .detail-title {font-size:clamp(25px,2.2vw,34px);line-height:1.2;}
+.finding-summary .intro {font-size:15px;line-height:1.6;}
+.finding-workspace .evidence-pane {margin:0;background:#fff;min-width:0;}
+.evidence-heading {display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:12px;}
+.evidence-heading>span {font-size:12px;color:var(--muted);white-space:nowrap;}
+.evidence-kind {display:inline-block;margin-bottom:10px;font-size:12px;color:var(--accent);font-weight:600;}
+.evidence-dependency {margin:10px 0;font-size:13px;}
+.evidence-pane .evidence pre {font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
+.evidence-pane .evidence small {display:block;margin-top:10px;}
+@media(max-width:1050px){.finding-workspace{grid-template-columns:1fr;gap:20px;}}
