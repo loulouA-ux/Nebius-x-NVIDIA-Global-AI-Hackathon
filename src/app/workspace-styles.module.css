@@ -823,27 +823,7 @@
 :global(.source-excerpt){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:13px;margin:8px 0}
 :global(.research-sources .panel>p:not(.source-excerpt)){font:12px var(--mono);margin:8px 0}
 /* Powered by: preserve original logo colours on white, non-shrinking tiles. */
-:global(.partner-strip) { max-width: 1200px; margin: 0 auto; padding: 28px 24px 48px; }
-:global(.partner-strip-eyebrow),:global(.partner-strip-label),:global(.partner-strip-source) {
-  color: #9AA6B6; font: 13px var(--mono); text-align: center;
-}
-:global(.partner-strip-eyebrow) { letter-spacing: .08em; }
-:global(.partner-strip-grid) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 18px; }
-:global(.partner-strip-item) { min-width: 0; }
-:global(.partner-strip-tile) { display: grid; place-items: center; height: 88px; padding: 0 24px; border-radius: 10px; background: #FFFFFF; }
-:global(.partner-strip img) { display: block; width: auto; max-width: 100%; object-fit: contain; }
-:global(.partner-strip .partner-logo-nvidia) { height: 76px; }
-:global(.partner-strip .partner-logo-nebius) { height: 32px; }
-:global(.partner-strip .partner-logo-tavily) { height: 38px; }
-:global(.partner-strip-label) { margin-top: 12px; }
-:global(.partner-strip-source) { margin-top: 24px; }
 @media (max-width: 767px) {
-  :global(.partner-strip) { padding: 28px 16px 40px; }
-  :global(.partner-strip-grid) { grid-template-columns: 1fr; gap: 24px; }
-  :global(.partner-strip-tile) { height: 72px; padding: 0 12px; }
-  :global(.partner-strip .partner-logo-nvidia) { height: 62px; }
-  :global(.partner-strip .partner-logo-nebius) { height: 28px; }
-  :global(.partner-strip .partner-logo-tavily) { height: 32px; }
 }
 :global(.provider-icons){display:flex;gap:16px;flex-wrap:wrap}:global(.provider-icons span){display:inline-flex;gap:6px;align-items:center}
 

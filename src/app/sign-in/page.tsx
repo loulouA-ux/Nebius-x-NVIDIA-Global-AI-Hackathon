@@ -11,7 +11,7 @@ export default function SignIn() {
       <section className="auth-panel">
       <h1>Sign in to ShipCheck</h1>
       <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
-      <p>GitHub sign-in is available to invited preview members. Repository permissions are requested separately.</p>
+      <p>Save reports, record review decisions and verify staging hosts. Sign-in is limited to invited preview members.</p><h2>What ShipCheck can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
       <p>
         Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
       </p>
@@ -63,7 +63,7 @@ export default function SignIn() {
         </button>
       </form></details>
       <p role="alert" className={error ? "error" : undefined}>{error}</p>
-      <Link href="/reports">Browse demo reports</Link> · <Link href="/repairs">Dependency repairs</Link>
+      <Link href="/reports/demo-recorded">Run the demo</Link> · <Link href="/repairs">Dependency repairs</Link>
     </section></main></>
   );
 }

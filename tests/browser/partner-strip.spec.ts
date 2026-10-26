@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 
 for (const width of [1440, 1024, 390, 360]) {
-  test(`Powered by tiles preserve logo colours and fit ${width}px`, async ({page}) => {
+  test(`Powered by dark marks preserve logo colours and fit ${width}px`, async ({page}) => {
     await page.setViewportSize({width, height: 1000});
     await page.goto('/');
     const strip = page.getByRole('region', {name: 'AI providers'});
@@ -14,18 +14,19 @@ for (const width of [1440, 1024, 390, 360]) {
       await expect(strip.getByText(label, {exact: true})).toHaveCSS('color', 'rgb(154, 166, 182)');
     }
     await page.evaluate(() => document.fonts.ready);
+    if(width===1440)expect(await strip.evaluate(el=>el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(900);
     const geometry = await strip.evaluate(el => {
       const rect = (e: Element) => {const r=e.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
       return [...el.querySelectorAll('.partner-strip-item')].map(item => ({
-        item: rect(item), tile: rect(item.querySelector('.partner-strip-tile')!),
+        item: rect(item), tile: rect(item.querySelector('.partner-logo-space')!),
         logo: rect(item.querySelector('img')!), label: rect(item.querySelector('.partner-strip-label')!),
-        background: getComputedStyle(item.querySelector('.partner-strip-tile')!).backgroundColor,
+        background: getComputedStyle(item.querySelector('.partner-logo-space')!).backgroundColor,
       }));
     });
     expect(geometry).toHaveLength(3);
     for (const {item,tile,logo,label,background} of geometry) {
-      expect(background).toBe('rgb(255, 255, 255)');
-      expect(tile.height).toBe(width < 768 ? 72 : 88);
+      expect(background).toBe('rgba(0, 0, 0, 0)');
+      expect(tile.height).toBe(72);
       expect(logo.x).toBeGreaterThanOrEqual(tile.x);
       expect(logo.right).toBeLessThanOrEqual(tile.right);
       expect(logo.y).toBeGreaterThanOrEqual(tile.y);
