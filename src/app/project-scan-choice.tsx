@@ -41,7 +41,7 @@ export default function ProjectScanChoice({
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Manifest only — no host requests</option>
-        {projects.map((p) => (
+        {projects.filter(p=>p.verification.status==="verified" && Date.parse(p.verification.challenge.expiresAt)>Date.now()).map((p) => (
           <option
             key={p.projectId}
             value={p.projectId}

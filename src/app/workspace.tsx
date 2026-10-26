@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import useReportNavigation from "./use-report-navigation";
 import NewScan from "./views/new-scan";
@@ -62,13 +62,16 @@ export default function Home() {
     }).catch(()=>{if(active)setDecisionState('unavailable');});
     return()=>{active=false;};
   },[report?.id,report?.mode,decisionRevision]);
+  const scanController=useRef<AbortController|null>(null);
   async function scan(mode: "demo" | "live", replay=false) {
+    scanController.current=new AbortController();
     setBusy(true);
     setError("");
     setSelected(null);
     try {
-      const response = replay ? await fetch("/api/demos?mode=recorded") : await fetch("/api/scans", {
+      const response = replay ? await fetch("/api/demos?mode=recorded",{signal:scanController.current.signal}) : await fetch("/api/scans", {
         method: "POST",
+        signal:scanController.current.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           mode === "demo"
@@ -88,7 +91,7 @@ export default function Home() {
         throw new Error(data.error || "The scan could not finish.");
       navigate("overview",data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to run scan.");
+      setError(e instanceof Error && e.name==="AbortError"?"Stopped waiting. Check saved reports before starting another scan.":e instanceof Error ? e.message : "Unable to run scan.");
     } finally {
       setBusy(false);
     }
@@ -126,7 +129,7 @@ export default function Home() {
             </div>
           )}
           {busy ? (
-            <ScanProgress/>
+            <ScanProgress cancel={()=>scanController.current?.abort()}/>
           ) : selected ? (
             <>
               {desktop&&report&&<ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>}

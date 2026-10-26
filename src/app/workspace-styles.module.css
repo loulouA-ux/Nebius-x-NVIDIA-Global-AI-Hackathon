@@ -833,3 +833,5 @@
 :global(.report-tools){display:flex;gap:10px}:global(.report-row),:global(.table-heading){grid-template-columns:85px minmax(0,2fr) minmax(0,1fr) 45px minmax(0,1fr) 80px 16px;gap:12px}@media(max-width:1023px){:global(.row-package),:global(.row-cvss){display:none}:global(.report-row){grid-template-columns:75px minmax(0,1fr) 16px;min-height:64px;padding:10px 12px}}
 
 :global(.finding-pager){display:flex;gap:8px;margin-left:auto}:global(.external-source){display:inline-flex;min-height:44px;align-items:center;margin-right:12px}@media(max-width:767px){:global(.finding-repair-action){position:sticky;bottom:86px;z-index:2;background:var(--surface);padding:12px 0}:global(.finding-repair-action .button){width:100%}}
+
+:global(.manifest-paste summary){min-height:44px;cursor:pointer;padding:12px 0;color:var(--accent)}:global(.file-confirmation){padding:12px;border:1px solid var(--line);border-radius:8px;font:12px var(--mono)}:global(.proof-methods){display:flex;gap:8px;margin:16px 0}:global(.scan-progress progress){width:100%;height:8px;accent-color:var(--accent);margin:16px 0}
