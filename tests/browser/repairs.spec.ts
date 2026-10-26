@@ -37,7 +37,7 @@ test("reopens saved evidence after reload without repeating mutations",async({pa
  await page.route("**/api/repairs",r=>r.fulfill({json:{repairs:[{id:base.id,state:"published",package_name:"lodash",repository_name:"team/demo",created_at:"2026-10-25T21:00:00Z"}]}}));
  await page.route(`**/api/repairs/${base.id}`,r=>{if(r.request().method()!=="GET")writes++;return r.fulfill({json:{...base,state:"published",url:"https://github.com/team/demo/pull/1"}});});
  await page.goto("/repairs");await page.reload();
- await page.getByRole("button",{name:"team/demo · lodash · published"}).click();
+ await page.getByRole("button",{name:"team/demo · lodash · Draft PR created"}).click();
  await expect(page.getByRole("link",{name:"Open draft pull request"})).toHaveAttribute("href","https://github.com/team/demo/pull/1");
  expect(writes).toBe(0);
 });
@@ -51,7 +51,7 @@ test("uncertain publication offers reconciliation rather than repeating approval
   if(r.request().method()==="POST"){actions.push(r.request().postDataJSON().action);state={...state,state:"published",url:"https://github.com/team/demo/pull/2"};}
   return r.fulfill({json:state});
  });
- await page.goto("/repairs");await page.getByRole("button",{name:"team/demo · lodash · publishing"}).click();
+ await page.goto("/repairs");await page.getByRole("button",{name:"team/demo · lodash · Publication needs reconciliation"}).click();
  await expect(page.getByRole("button",{name:"Approve and create draft PR"})).toHaveCount(0);
  await page.getByRole("button",{name:"Check existing draft PR"}).click();
  await expect(page.getByRole("link",{name:"Open draft pull request"})).toHaveAttribute("href","https://github.com/team/demo/pull/2");
@@ -64,7 +64,7 @@ test("audit history shows actor and evidence and exports without a mutation",asy
  await page.route("**/api/repositories",r=>r.fulfill({json:{repositories:[base.repository]}}));
  await page.route("**/api/repairs",r=>r.fulfill({json:{repairs:[{id:base.id,state:"published",package_name:"lodash",repository_name:"team/demo",created_at:"2026-10-25T21:00:00Z"}]}}));
  await page.route(`**/api/repairs/${base.id}`,r=>{if(r.request().method()!=="GET")writes++;return r.fulfill({json:{...base,state:"published",auditTrail:events}});});
- await page.goto("/repairs");await page.getByRole("button",{name:"team/demo · lodash · published"}).click();
+ await page.goto("/repairs");await page.getByRole("button",{name:"team/demo · lodash · Draft PR created"}).click();
  const audit=page.getByRole("region",{name:"Repair audit trail"});await expect(audit.getByText("Exact patch approved",{exact:true})).toBeVisible();await expect(audit.getByText("github:123",{exact:true})).toBeVisible();
  await audit.getByText("Evidence references",{exact:true}).click();await expect(audit.getByText(/approvalHash/)).toBeVisible();
  const download=page.waitForEvent("download");await audit.getByRole("button",{name:"Export audit trail"}).click();const file=await download;
