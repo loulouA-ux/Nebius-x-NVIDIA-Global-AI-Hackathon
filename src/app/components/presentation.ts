@@ -4,3 +4,5 @@ export const verdictLabel=(status:ScanReport['status'])=>({'Blocked':'Blocked','
 // Scanner 'review' represents uncertainty, not a documented low severity.
 export const severityLabel=(level:Finding['severity'])=>level==='review'?'Unrated':level==='high'?'High':'Medium';
 export const stateLabel=(state:Check['state'])=>state==='snapshot'?'Limited':state==='not-in-scope'?'Not in scope':state==='complete'?'Complete':'Incomplete';
+
+export const actionParts=(action:string)=>action.split(/(?<=[.!?])\s+(?=[A-Z])/);

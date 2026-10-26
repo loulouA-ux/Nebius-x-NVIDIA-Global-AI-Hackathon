@@ -16,7 +16,7 @@ test("repair flow requires evidence review and explicit approval before PR reque
  await expect(page.getByText("4.17.20 → 4.17.21",{exact:false})).toBeVisible();
  await page.getByRole("button",{name:"Run isolated verification"}).click();
  await expect(page.getByText("OSV reports lodash@4.17.20 as affected.")).toBeVisible();
- await expect(page.getByText("1 resolved dependencies checked · 0 advisory findings",{exact:false})).toBeVisible();
+ await expect(page.getByText("1 resolved dependency checked · 0 advisory findings",{exact:false})).toBeVisible();
  const approve=page.getByRole("button",{name:"Approve and create draft PR"});await expect(approve).toBeDisabled();expect(writes).toBe(0);
  await page.getByLabel("I reviewed the files and evidence",{exact:false}).check();await expect(approve).toBeEnabled();
  await page.screenshot({path:"test-results/repair-review-desktop.png",fullPage:true});

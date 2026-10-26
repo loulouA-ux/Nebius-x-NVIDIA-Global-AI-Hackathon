@@ -178,7 +178,7 @@ export default function ProjectSetup() {
           </p>
         )}
         <button
-          className="button primary"
+          className={selected ? "button" : "button primary"}
           type="button"
           disabled={busy || !projectName.trim() || !host}
           onClick={() =>

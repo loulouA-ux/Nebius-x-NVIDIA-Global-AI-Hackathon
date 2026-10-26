@@ -3,7 +3,7 @@ import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {ExternalLink} from 'lucide-react';
 import type {ScanReport} from '@/lib/types';
 import styles from './report-insights.module.css';
-import {severityLabel} from './components/presentation';
+import {severityLabel,plural} from './components/presentation';
 
 export function Preview({label,title,children}:{label:string;title:string;children:ReactNode}){
  const ref=useRef<HTMLDialogElement>(null);
@@ -18,12 +18,11 @@ export function SourcePreview({title,excerpt,url,retrievedAt}:{title:string;exce
  return <Preview label="Preview source" title={title}><p className={styles.note}>Recorded excerpt · this preview does not fetch or embed the external page.</p><pre className={styles.excerpt}>{excerpt}</pre>{retrievedAt&&<p>Retrieved {new Date(retrievedAt).toLocaleString('en-GB')}</p>}{safeUrl&&<a href={safeUrl} target="_blank" rel="noreferrer">Open original source in a new tab <ExternalLink size={14}/></a>}</Preview>;
 }
 export default function ReportInsights({report}:{report:ScanReport}){
- const counts=(['high','medium','review'] as const).map(level=>({level,count:report.findings.filter(f=>f.severity===level).length}));
  const total=report.findings.length;
  function download(){
   const cell=(v:string)=>'"'+(/^[=+@\-\t\r]/.test(v)?"'":"")+v.replaceAll('"','""')+'"';
   const rows=[['Title','Severity','Evidence location','Recommended action'],...report.findings.map(f=>[f.title,severityLabel(f.severity)+(f.severity==='review'?' · needs human review':''),f.evidence.map(e=>e.location).join('; '),f.action])];
   const url=URL.createObjectURL(new Blob(['\uFEFF'+rows.map(r=>r.map(cell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`shipcheck-${report.id}-findings.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
- return <Preview label="Export CSV" title="Findings CSV"><p>{total} findings in this report. Export includes recorded evidence locations and recommended actions.</p><button className="button" onClick={download}>Download CSV</button><div className={styles.table}><table><thead><tr><th>Finding</th><th>Severity</th><th>Evidence</th><th>Action</th></tr></thead><tbody>{report.findings.map(f=><tr key={f.id}><td>{f.title}</td><td>{severityLabel(f.severity)}{f.severity==='review'?' · needs human review':''}</td><td>{f.evidence.map(e=>e.location).join('; ')}</td><td>{f.action}</td></tr>)}</tbody></table>{!total&&<p>No findings returned. Review coverage before making a decision.</p>}</div></Preview>;
+ return <Preview label="Export CSV" title="Findings CSV"><p>{plural(total,"finding")} in this report. Export includes recorded evidence locations and recommended actions.</p><button className="button" onClick={download}>Download CSV</button><div className={styles.table}><table><thead><tr><th>Finding</th><th>Severity</th><th>Evidence</th><th>Action</th></tr></thead><tbody>{report.findings.map(f=><tr key={f.id}><td>{f.title}</td><td>{severityLabel(f.severity)}{f.severity==='review'?' · needs human review':''}</td><td>{f.evidence.map(e=>e.location).join('; ')}</td><td>{f.action}</td></tr>)}</tbody></table>{!total&&<p>No findings returned. Review coverage before making a decision.</p>}</div></Preview>;
 }

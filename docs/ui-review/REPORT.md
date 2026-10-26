@@ -28,3 +28,6 @@ Four-step stateful progress, real line diff, execution table with expandable out
 
 ## Phase 9 — tokens and visual cleanup
 Consolidated duplicate selector blocks by cascade context and grouped responsive conditions. Removed abandoned chart CSS and old hero/demo decorations. Brand has one teal definition; blue remains interactive. Review is neutral outline, with distinct verdict colours. Raised sub-12px metadata and sub-14px body styling. Added light/dark surface, canvas and text tokens. Initial computed contrast inspection found dark sidebar surfaces still light; those now use canvas tokens. Typecheck, 203 unit tests, build and 35 browser tests pass. Final viewport/contrast inventory follows below.
+
+## Phase 10 — components and final browser review
+Extracted all requested views, verdict/table components and the 66-line routing hook. Recent scans reuse member history. Drawer Escape restores row focus. Screenshot review corrected mobile label overlap and an action hidden by bottom navigation; regression tests now enforce ≤80px rows and a real hit-test on Scan. Shared pluralisation covers report/CSV/evidence and repairs. Final typecheck, 203 unit tests, build and 38 browser tests pass.

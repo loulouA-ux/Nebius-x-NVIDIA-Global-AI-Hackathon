@@ -1,17 +1,20 @@
 "use client";
+import {verdictLabel} from "./components/presentation";
 import {clearReportMemory} from "./report-memory";
 import Link from "next/link";
 import styles from "./account-ux.module.css";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
 import { notifySessionExpired, sessionExpiredEvent } from "./session-expired";
-type Saved = { id: string; created_at: string; status: string };
+export type Saved = { id: string; created_at: string; status: string };
 export default function MemberControls({
   refresh,
   onReport,
   accountOnly=false,
+  onHistory,
 }: {
   accountOnly?: boolean;
+  onHistory?:(value:{signedIn:boolean;scans:Saved[];error:string})=>void;
   refresh: string;
   onReport: (report: ScanReport) => void;
 }) {
@@ -20,6 +23,7 @@ export default function MemberControls({
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [loaded, setLoaded] = useState(false);
+  useEffect(()=>{onHistory?.({signedIn:!!member,scans,error});},[member,scans,error,onHistory]);
   useEffect(() => {
     function expire() {
       if (!member) return;
@@ -114,7 +118,7 @@ export default function MemberControls({
               <option value="">Choose a report ({scans.length})</option>
               {scans.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {new Date(s.created_at).toLocaleString("en-GB")} · {s.status}
+                  {new Date(s.created_at).toLocaleString("en-GB")} · {verdictLabel(s.status as ScanReport["status"])||s.status}
                 </option>
               ))}
             </select></div>}

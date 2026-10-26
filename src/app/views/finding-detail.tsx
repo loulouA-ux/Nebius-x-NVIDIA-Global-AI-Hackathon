@@ -2,7 +2,7 @@ import Link from 'next/link';
 import {ArrowLeft,ChevronRight,Info} from 'lucide-react';
 import type {Finding,ScanReport,Evidence} from '@/lib/types';
 import advisory from '../../../fixtures/lodash-advisory.json';
-import {severityLabel} from '../components/presentation';
+import {severityLabel,actionParts,plural} from '../components/presentation';
 import styles from '../findings.module.css';
 import DecisionLog from '../decision-log';
 import {SourcePreview} from '../report-insights';
@@ -21,7 +21,7 @@ export default function FindingDetail({finding,report,close}:{finding:Finding;re
               <p className="intro">{finding.description}</p>
               <section className="panel">
                 <h2>Recommended action</h2>
-                {fixed&&repairDependency&&<p className="change-chip">{repairDependency.name} {repairDependency.version} → {fixed} <span>Fixed in {fixed}</span></p>}<p>{finding.action}</p>
+                {fixed&&repairDependency&&<p className="change-chip">{repairDependency.name} {repairDependency.version} → {fixed} <span>Fixed in {fixed}</span></p>}<p>{actionParts(finding.action)[0]}</p>{actionParts(finding.action).length>1&&<details><summary>Action context</summary><p>{actionParts(finding.action).slice(1).join(" ")}</p></details>}
                 {repairDependency && <div className={styles.handoff}><Link className="button primary" href={`/repairs?package=${encodeURIComponent(repairDependency.name)}`}>Prepare repair <ChevronRight size={15}/></Link><p>Choose the repository and confirm the dependency before verification.</p></div>}
                 <div className="quiet-note">
                   <Info size={16} />
@@ -30,7 +30,7 @@ export default function FindingDetail({finding,report,close}:{finding:Finding;re
               </section>
                 </section>
               <section className="panel evidence-pane" aria-label="Source evidence">
-                <div className="evidence-heading"><h2>Evidence</h2><span>{finding.evidence.length} source{finding.evidence.length === 1 ? "" : "s"}</span></div><p className="muted">Evidence recorded for this finding. Open the original source to check its context.</p>
+                <div className="evidence-heading"><h2>Evidence</h2><span>{plural(finding.evidence.length,"source")}</span></div><p className="muted">Evidence recorded for this finding. Open the original source to check its context.</p>
                 {finding.evidence.map((e, i) => (
                   <div className="evidence" key={i}>
                     <span className="evidence-kind">{e.kind === "advisory" ? "Advisory" : e.kind === "http" ? "HTTP observation" : "Code evidence"}</span>

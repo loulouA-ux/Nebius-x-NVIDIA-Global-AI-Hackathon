@@ -1,46 +1,24 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import useReportNavigation from "./use-report-navigation";
 import NewScan from "./views/new-scan";
 import ScanProgress from "./components/scan-progress";
 import FindingDetail from "./views/finding-detail";
 import FindingSurface from "./components/finding-surface";
 import ReportView from "./views/report";
 import HomeEmpty from "./views/home-empty";
-import AiTriage from "./components/ai-triage";
-import styles from "./findings.module.css";
-import ReportInsights, {SourcePreview, Preview} from "./report-insights";
 import WorkspaceSidebar from "./workspace-sidebar";
-import {rememberReport,recalledReport,clearReportMemory,latestReport,setDashboardLocation,recalledFilters,rememberFilters, type FindingFilters} from "./report-memory";
-import {sessionExpiredEvent} from "./session-expired";
+import {rememberFilters, type FindingFilters} from "./report-memory";
 import BrandHeader from "./brand-header";
 import MobileNavigation from "./mobile-navigation";
-import {
-  CheckCheck,
-  LayoutDashboard,
-  ShieldAlert,
-  ArrowUpRight,
-  ArrowLeft,
-  FileSearch,
-  ScanLine,
-  ListChecks,
-  CircleCheck,
-  CircleDashed,
-  ExternalLink,
-  ChevronRight,
-  LoaderCircle,
-  Package,
-  FlaskConical,
-  Info,
-} from "lucide-react";
-import type { Finding, ScanReport } from "@/lib/types";
-import MemberControls from "./member-controls";
-import DecisionLog from "./decision-log";
-import ProjectScanChoice from "./project-scan-choice";
+import {CheckCheck,ShieldAlert} from "lucide-react";
+import type { ScanReport } from "@/lib/types";
+import MemberControls, {type Saved} from "./member-controls";
 import ProjectSetup from "./project-setup";
 import { notifySessionExpired } from "./session-expired";
 
-type View = "overview" | "project" | "scan" | "findings" | "actions";
+
 const defaultManifest = JSON.stringify(
   {
     name: "my-app",
@@ -54,24 +32,16 @@ const defaultManifest = JSON.stringify(
   2,
 );
 export default function Home() {
-  const [view, setView] = useState<View>("overview");
-  const [report, setReport] = useState<ScanReport | null>(null);
-  const [selected, setSelected] = useState<Finding | null>(null);
   const [busy, setBusy] = useState(false);
-  const [desktop,setDesktop]=useState(false);
-  useEffect(()=>{const m=matchMedia("(min-width:1024px)");const update=()=>setDesktop(m.matches);update();m.addEventListener("change",update);return()=>m.removeEventListener("change",update);},[]);
+  const [recent,setRecent]=useState<{signedIn:boolean;scans:Saved[];error:string}>({signedIn:false,scans:[],error:""});
   const [recorded,setRecorded]=useState<boolean|null>(null);
   useEffect(()=>{fetch("/api/demos?mode=availability").then(r=>r.json()).then(d=>setRecorded(d.recorded)).catch(()=>setRecorded(false));},[]);
   const [error, setError] = useState("");
-  const [unavailable,setUnavailable]=useState(false);
+  const {view,report,selected,setSelected,desktop,unavailable,mainRef,focusPending,filters,setFilters,navigate}=useReportNavigation(busy,setError);
   const [filename, setFilename] = useState("package-lock.json");
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
   const [projectId, setProjectId] = useState("");
-  const mainRef = useRef<HTMLElement>(null);
-  const focusPending = useRef(false);
-  const [navigationRevision,setNavigationRevision]=useState(0);
-  const [filters,setFilters] = useState<FindingFilters>({search:'',severity:'all',source:'all',package:'all',decision:'all'});
   const [decisionRevision,setDecisionRevision]=useState(0);
   const [decisions,setDecisions]=useState<Record<string,string>>({});
   const [decisionState,setDecisionState]=useState<'loading'|'ready'|'unavailable'|'demo'>('demo');
@@ -92,49 +62,6 @@ export default function Home() {
     }).catch(()=>{if(active)setDecisionState('unavailable');});
     return()=>{active=false;};
   },[report?.id,report?.mode,decisionRevision]);
-  useEffect(() => {
-    if(focusPending.current && !busy){
-      const heading=mainRef.current?.querySelector<HTMLElement>(selected&&desktop?'dialog h1':'h1');
-      if(heading){heading.tabIndex=-1;heading.focus();focusPending.current=false;}
-    }
-  },[view,selected,report,busy,navigationRevision]);
-  useEffect(() => {
-    let active=true;
-    let generation=0;
-    async function restore(event?:Event) {
-      const ticket=++generation;
-      if(event)focusPending.current=true;
-      const query=new URLSearchParams(window.location.search);
-      let requested=query.get("view") || "overview";
-      if(requested==='actions'||requested==='findings'){requested='overview';query.set('view',requested);window.history.replaceState(window.history.state,'',`/?${query}`);}
-      setView((["overview","project","scan","findings","actions"].includes(requested)?requested:"overview") as View);
-      setError("");setUnavailable(false);
-      const id=query.get("report") || latestReport()?.id, finding=query.get("finding");
-      if(!id){setReport(null);setSelected(null);return;}
-      let loaded=recalledReport(id);
-      if(!loaded){try{const r=await fetch(id==='demo-offline'||id==='demo-recorded'?`/api/demos?mode=${id==='demo-offline'?'offline':'recorded'}`:`/api/scans/${encodeURIComponent(id)}`);if(r.ok){const data=await r.json();loaded=data.report||data;}}catch{/* Offer recovery below. */}}
-      if(!active || ticket!==generation)return;
-      if(loaded){rememberReport(loaded);setReport(loaded);setFilters(recalledFilters(loaded.id));setSelected(loaded.findings.find(f=>f.id===finding)||null);
-        query.set('report',loaded.id);window.history.replaceState(window.history.state,'',`/?${query}`);
-        const listQuery=new URLSearchParams(query);listQuery.delete('finding');setDashboardLocation(requested,`/?${listQuery}`);
-      }
-      else {setReport(null);setSelected(null);setUnavailable(true);}
-    }
-    function expire(){clearReportMemory();}
-    void restore();window.addEventListener("popstate",restore);window.addEventListener(sessionExpiredEvent,expire);
-    return ()=>{active=false;window.removeEventListener("popstate",restore);window.removeEventListener(sessionExpiredEvent,expire);};
-  }, []);
-  function navigate(v: View, current=report, finding:Finding|null=null) {
-    if(v==='actions'||v==='findings')v='overview';
-    focusPending.current=true;setNavigationRevision(n=>n+1);
-    if(current){rememberReport(current);setFilters(recalledFilters(current.id));}
-    const query=new URLSearchParams({view:v});
-    if(current)query.set("report",current.id);
-    setDashboardLocation(v,`/?${query}`);
-    if(finding)query.set("finding",finding.id);
-    window.history.pushState({...window.history.state,shipcheckView:true},"",`/?${query}`);
-    setView(v);setReport(current);setSelected(finding);setError("");setUnavailable(false);
-  }
   async function scan(mode: "demo" | "live", replay=false) {
     setBusy(true);
     setError("");
@@ -169,12 +96,10 @@ export default function Home() {
   function updateFilters(update:Partial<FindingFilters>){
     const next={...filters,...update};setFilters(next);if(report)rememberFilters(report.id,next);
   }
-  const packageOptions=Array.from(new Set(report?.findings.flatMap(f=>f.evidence.flatMap(e=>e.dependency?[e.dependency.name]:[]))||[])).sort();
   const filteredFindings=report?.findings.filter(f=>{
     const search=[f.title,f.description,...f.evidence.flatMap(e=>[e.location,e.dependency?.name||''])].join(' ').toLowerCase();
     return (!filters.search.trim()||search.includes(filters.search.trim().toLowerCase())) && (filters.severity==='all'||f.severity===filters.severity) && (filters.source==='all'||f.evidence.some(e=>e.kind===filters.source)) && (filters.package==='all'||f.evidence.some(e=>e.dependency?.name===filters.package)) && (filters.decision==='all'||decisionState!=='ready'||(decisions[f.id]||'unreviewed')===filters.decision);
   })||[];
-  const repairDependency=selected?.evidence.find(e=>e.dependency?.ecosystem==='npm')?.dependency;
   const blocked =
     report?.findings.filter((f) => f.severity === "high").length ?? 0;
   const incomplete =
@@ -188,7 +113,7 @@ export default function Home() {
       <div className="shell">
         <WorkspaceSidebar view={view} onNavigate={navigate}/>
         <main ref={mainRef} id="main-content" tabIndex={-1}>
-          <MemberControls
+          <MemberControls onHistory={setRecent}
             refresh={report?.id || ""}
             onReport={(saved) => {
               navigate("overview",saved);
@@ -216,7 +141,7 @@ export default function Home() {
           ) : unavailable ? (
             <section className="home-empty"><h1>Report unavailable</h1><p>This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.</p><Link className="button primary" href="/sign-in">Sign in</Link> <button className="button" onClick={()=>scan('demo')}>Run offline demo</button></section>
           ) : !report ? (
-            <HomeEmpty demo={offline=>scan("demo",!offline&&recorded===true)} scan={()=>navigate("scan")} recorded={recorded}/>
+            <HomeEmpty recent={recent} open={async id=>{try{const r=await fetch(`/api/scans/${encodeURIComponent(id)}`);if(!r.ok)throw Error("Saved report unavailable. Sign in again or retry.");navigate("overview",(await r.json()).report);}catch(e){setError((e as Error).message);}}} demo={offline=>scan("demo",!offline&&recorded===true)} scan={()=>navigate("scan")} recorded={recorded}/>
           ) : (
             <ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>
           )}
