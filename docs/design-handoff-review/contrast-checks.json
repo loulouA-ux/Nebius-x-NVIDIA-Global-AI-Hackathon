@@ -1,0 +1,51 @@
+[
+  {
+    "name": "body",
+    "fg": "#E8ECF2",
+    "bg": "#0A0D12",
+    "ratio": 16.41,
+    "pass": true
+  },
+  {
+    "name": "muted",
+    "fg": "#9AA6B6",
+    "bg": "#11161D",
+    "ratio": 7.35,
+    "pass": true
+  },
+  {
+    "name": "link",
+    "fg": "#5EEAD4",
+    "bg": "#0D1117",
+    "ratio": 12.79,
+    "pass": true
+  },
+  {
+    "name": "primary",
+    "fg": "#0A0D12",
+    "bg": "#F2F5F9",
+    "ratio": 17.79,
+    "pass": true
+  },
+  {
+    "name": "high",
+    "fg": "#FF8A8A",
+    "bg": "#2A1416",
+    "ratio": 7.65,
+    "pass": true
+  },
+  {
+    "name": "medium",
+    "fg": "#F5C063",
+    "bg": "#2A2010",
+    "ratio": 9.6,
+    "pass": true
+  },
+  {
+    "name": "unrated",
+    "fg": "#AEB8C6",
+    "bg": "#0D1117",
+    "ratio": 9.44,
+    "pass": true
+  }
+]

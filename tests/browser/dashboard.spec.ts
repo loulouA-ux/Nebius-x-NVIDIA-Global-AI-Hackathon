@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 test("demo runs real findings, exposes evidence and manual actions", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?view=overview");
   await expect(
     page.getByRole("heading", { name: "Check before you ship." }),
   ).toBeVisible();
@@ -42,7 +42,7 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
 test("anonymous live scan is blocked before manifest processing", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/?view=overview");
   await page
     .getByRole("button", { name: "New scan", exact: true })
     .first()
@@ -61,7 +61,7 @@ test("anonymous live scan is blocked before manifest processing", async ({
 });
 test("mobile flow has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/?view=overview");
   await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
     page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
@@ -80,7 +80,7 @@ test("desktop overview renders without client errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/");
+  await page.goto("/?view=overview");
   await page.screenshot({
     path: "test-results/welcome-desktop.png",
     fullPage: true,
@@ -160,7 +160,7 @@ test("member can reopen a saved report and record a decision without changing it
     decisions.push(item);
     await route.fulfill({ status: 201, json: item });
   });
-  await page.goto("/");
+  await page.goto("/?view=overview");
   await expect(page.getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await expect(
@@ -218,7 +218,7 @@ test("expired decision session clears stale member state and offers sign-in", as
   await page.route(`**/api/scans/${report.id}/decisions`, (route) =>
     route.fulfill({ status: 401, json: { error: "Session expired." } }),
   );
-  await page.goto("/");
+  await page.goto("/?view=overview");
   await expect(page.getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await page

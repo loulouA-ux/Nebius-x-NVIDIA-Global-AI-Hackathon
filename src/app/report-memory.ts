@@ -8,7 +8,7 @@ export function rememberReport(report:ScanReport){reports.delete(report.id);repo
 export function recalledReport(id:string){return reports.get(id);}
 export function latestReport(){return Array.from(reports.values()).at(-1);}
 export function setDashboardLocation(view:string,url:string){if(["overview","project","scan","findings","actions"].includes(view))locations.set(view,url);}
-export function dashboardHref(view:string){const report=latestReport();const saved=locations.get(view);return saved && new URLSearchParams(saved.split('?')[1]).get('report')===report?.id ? saved : `/?view=${view}${report?`&report=${encodeURIComponent(report.id)}`:''}`;}
+export function dashboardHref(view:string){const report=latestReport();return view==='scan'?'/scan':view==='project'?'/hosts':report?`/reports/${encodeURIComponent(report.id)}`:'/reports';}
 export function recalledFilters(id:string):FindingFilters{return filters.get(id)||{search:'',severity:'all',source:'all',package:'all',decision:'all'};}
 export function rememberFilters(id:string,value:FindingFilters){filters.set(id,value);}
 export function clearReportMemory(){reports.clear();locations.clear();filters.clear();}

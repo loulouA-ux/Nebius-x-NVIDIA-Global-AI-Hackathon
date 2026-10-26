@@ -131,7 +131,7 @@ export default function MemberControls({
                   const r = await fetch("/api/session", { method: "DELETE" });
                   if (!r.ok) throw Error("Sign-out failed.");
                   clearReportMemory();
-                  location.assign("/");
+                  location.assign("/reports");
                 } catch {
                   setError("Sign-out failed. Please try again.");
                   setBusy(false);

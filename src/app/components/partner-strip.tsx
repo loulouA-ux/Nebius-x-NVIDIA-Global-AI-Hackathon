@@ -1,0 +1,1 @@
+export default function PartnerStrip(){return <div className="partner-strip" aria-label="AI providers"><span><img src="/partners/nvidia-logo-horz.svg" alt="NVIDIA"/>Nemotron</span><span><img src="/partners/nebius-color.svg" alt="Nebius"/>Token Factory</span><span><img src="/partners/tavily-full.svg" alt="Tavily"/>Search</span></div>}

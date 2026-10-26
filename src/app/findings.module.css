@@ -1,7 +1,7 @@
 .filters { display:grid;grid-template-columns:minmax(220px,2fr) repeat(4,minmax(120px,1fr));gap:12px;margin-block:12px; }
 .filters label {display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--ink);min-width:0;}
-.filters input,.filters select {width:100%;min-height:44px;min-width:0;padding:10px 12px;border:1px solid #b7c5d6;border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;}
-.filters input:focus-visible,.filters select:focus-visible {outline:3px solid #2563eb;outline-offset:2px;}
+.filters input,.filters select {width:100%;min-height:44px;min-width:0;padding:10px 12px;border:1px solid #3A4452;border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:16px;}
+.filters input:focus-visible,.filters select:focus-visible {outline:3px solid var(--accent);outline-offset:2px;}
 .filterSummary {grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font-size:14px;color:var(--muted);}
 .handoff {margin-block:20px;}
 .handoff p {font-size:14px;color:var(--muted);line-height:1.6;margin-top:10px;}

@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 for(const [width,height] of [[390,844],[1280,720],[1440,900]])test(`scan data and previews fit ${width}x${height}`,async({page})=>{
  await page.setViewportSize({width,height});
  await page.route('**/api/session',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
- await page.goto('/');await page.getByRole('button',{name:'Offline fixture'}).click();
+ await page.goto('/?view=overview');await page.getByRole('button',{name:'Offline fixture'}).click();
  await expect(page.getByRole('heading',{name:'Check coverage'})).toBeVisible();
  await expect(page.getByRole('status').filter({hasText:'3 of 3 findings'})).toBeVisible();
  await page.getByRole('heading',{name:'Check coverage'}).scrollIntoViewIfNeeded();await page.screenshot({path:`../outputs/shipcheck-data-previews/${width}-charts.png`});

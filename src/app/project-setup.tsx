@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {usePathname} from "next/navigation";
 import { notifySessionExpired } from "./session-expired";
 
 type ProjectData = {
@@ -57,6 +58,7 @@ function stagingHostname(input: string): string | null {
 }
 
 export default function ProjectSetup() {
+  const pathname=usePathname();
   const [projectName, setProjectName] = useState("");
   const [stagingUrl, setStagingUrl] = useState("");
   const [method, setMethod] = useState<"dns" | "file">("dns");
@@ -125,7 +127,7 @@ export default function ProjectSetup() {
 
   return (
     <>
-      <h1>Set up a project.</h1>
+      <h1>{pathname==='/hosts'?'Staging hosts':'Set up a project.'}</h1>
       <p className="intro">
         Optional staging checks: name the release candidate and prove control of its exact host. You can scan a dependency manifest without creating a project.
       </p>
