@@ -1,0 +1,152 @@
+{
+  "journey": [
+    {
+      "step": "demo",
+      "url": "http://127.0.0.1:3162/reports/demo-recorded",
+      "focus": "H1"
+    },
+    {
+      "step": "finding",
+      "url": "http://127.0.0.1:3162/reports/demo-recorded/findings/GHSA-29mw-wpgm-hmr9%3Alodash%404.17.20",
+      "focus": "H1"
+    },
+    {
+      "step": "Back",
+      "url": "http://127.0.0.1:3162/reports/demo-recorded"
+    },
+    {
+      "step": "finding again",
+      "url": "http://127.0.0.1:3162/reports/demo-recorded/findings/GHSA-29mw-wpgm-hmr9%3Alodash%404.17.20",
+      "focus": "H1"
+    },
+    {
+      "step": "repair",
+      "url": "http://127.0.0.1:3162/repairs?package=lodash",
+      "focus": "H1"
+    },
+    {
+      "step": "reports home",
+      "url": "http://127.0.0.1:3162/reports",
+      "focus": "H1"
+    }
+  ],
+  "colors": {
+    "--ink": "#e8ecf2",
+    "--strong": "#f7f9fc",
+    "--secondary": "#c7cfda",
+    "--muted": "#9aa6b6",
+    "--accent": "#5eead4",
+    "--warning": "#f5c063",
+    "--danger": "#ff8a8a",
+    "--canvas": "#0a0d12",
+    "--surface": "#0d1117",
+    "--raised": "#11161d"
+  },
+  "contrast": [
+    {
+      "fg": "--ink",
+      "bg": "--canvas",
+      "ratio": 16.41
+    },
+    {
+      "fg": "--ink",
+      "bg": "--surface",
+      "ratio": 15.96
+    },
+    {
+      "fg": "--ink",
+      "bg": "--raised",
+      "ratio": 15.32
+    },
+    {
+      "fg": "--strong",
+      "bg": "--canvas",
+      "ratio": 18.45
+    },
+    {
+      "fg": "--strong",
+      "bg": "--surface",
+      "ratio": 17.94
+    },
+    {
+      "fg": "--strong",
+      "bg": "--raised",
+      "ratio": 17.22
+    },
+    {
+      "fg": "--secondary",
+      "bg": "--canvas",
+      "ratio": 12.38
+    },
+    {
+      "fg": "--secondary",
+      "bg": "--surface",
+      "ratio": 12.05
+    },
+    {
+      "fg": "--secondary",
+      "bg": "--raised",
+      "ratio": 11.56
+    },
+    {
+      "fg": "--muted",
+      "bg": "--canvas",
+      "ratio": 7.88
+    },
+    {
+      "fg": "--muted",
+      "bg": "--surface",
+      "ratio": 7.66
+    },
+    {
+      "fg": "--muted",
+      "bg": "--raised",
+      "ratio": 7.35
+    },
+    {
+      "fg": "--accent",
+      "bg": "--canvas",
+      "ratio": 13.15
+    },
+    {
+      "fg": "--accent",
+      "bg": "--surface",
+      "ratio": 12.79
+    },
+    {
+      "fg": "--accent",
+      "bg": "--raised",
+      "ratio": 12.28
+    },
+    {
+      "fg": "--warning",
+      "bg": "--canvas",
+      "ratio": 11.68
+    },
+    {
+      "fg": "--warning",
+      "bg": "--surface",
+      "ratio": 11.36
+    },
+    {
+      "fg": "--warning",
+      "bg": "--raised",
+      "ratio": 10.9
+    },
+    {
+      "fg": "--danger",
+      "bg": "--canvas",
+      "ratio": 8.58
+    },
+    {
+      "fg": "--danger",
+      "bg": "--surface",
+      "ratio": 8.34
+    },
+    {
+      "fg": "--danger",
+      "bg": "--raised",
+      "ratio": 8
+    }
+  ]
+}

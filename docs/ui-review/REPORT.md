@@ -1,301 +1,151 @@
-# ShipCheck UI/UX overhaul review
+# ShipCheck dark-design rebuild review
 
-26 October 2026 · Europe/London. Worktree: `shipcheck-integration`; branch: `codex/branded-dashboard`; baseline: `5a24d0c`.
+26 October 2026 · Europe/London · `codex/branded-dashboard`.
 
-The overhaul is implemented locally. Security verdict rules, evidence validation, repository access and explicit draft-PR approval are preserved. No push, PR, merge, deployment or access change was performed.
+Implemented and tested locally against the final master prompt. The actual starting commit was `1edc9f5`, newer than the prompt's `5a24d0c`; existing work was preserved. The new approved dark-logo instruction supersedes the earlier white-tile instruction. Nothing was pushed or deployed. This is not a claim of pixel-perfect approval or new hosted acceptance.
 
-## Verification
+## Commits, in order
 
-| Check | Before | After |
+1. `1b05e72` Phase 1: consolidate dark styles and self-host Geist fonts
+2. `b72dfed` Phase 2: expose captured Nemotron model and provider configuration
+3. `e5ee1e8` Phase 3: canonical redirects, full-page findings and direct mobile tabs
+4. `7f2c2f0` Phase 4: approved dark hero marks and accurate sign-in disclosure
+5. `b9544ea` Phase 5: evidence-backed report summary cards and saved counts
+6. `411c2a4` Phase 6: finding pagination and before-after repair evidence
+7. `712ac67` Phase 7: manifest confirmation, honest progress cancellation and host proof controls
+8. `6a566a4` Phase 8: enforce replay-only demo mode and verify responsive navigation
+
+The following documentation commit contains this report, screenshots and audit JSON.
+
+## Test results
+
+| Check | Before | Final |
 |---|---:|---:|
-| TypeScript | Passed | Passed |
-| Unit tests | 203 / 22 files | 203 / 22 files |
-| Production build | Passed | Passed |
-| Playwright | 32 | 38 |
+| Typecheck | Pass | Pass |
+| Unit tests | 203, 22 files | 206, 23 files |
+| Production build | Pass | Pass |
+| Main Playwright suite | 44 | 47 |
+| Public-demo running-server suite | Not present | 1 |
 | Skipped tests | 0 | 0 |
 
-Every phase ran typecheck, unit tests, build and the browser suite. Intermediate failures were corrected before committing. No safety assertions were removed. Phase 10 includes the final screenshot-driven fixes.
+Three new unit tests cover 19 direct API handlers, replay-only proxy routing and flag-off behavior. Browser additions cover canonical routes/new tabs, direct mobile tabs and hidden desktop table headings on phones. Existing browser tests were updated from old query navigation, desktop drawers and More menus to real routes, full-page findings and four direct tabs. Fixture entry now starts at `/scan`; saved-history checks use the visible phone account controls. No repair approval, authorization, evidence, quota, SSRF or reconciliation assertion was weakened. The mobile row-height bound remains 80px; common rows are approximately 64px. All changed tests ran successfully.
 
-Screenshots: all nine requested views at 1440×900 and 375×812, plus the same set at 1024×768 and a dark report at each width: 30 PNGs. “Findings” is a scrolled position in the unified report, not a duplicate route. `viewport-checks.json` records no horizontal overflow across all 30 captures. Home demo and Scan actions are above the fold. A browser hit-test verifies the mobile Scan button is not covered by navigation. Mobile finding rows are tested at ≤80 px with no tag/title overlap.
+Screenshot review exposed a phone table-header cascade bug; fixed before final capture. All 50 route/width checks pass at 1440, 1024, 768, 390 and 360px. See `final-viewport-checks.json`. Eleven views are captured at 1440×900 and 390×844, with full-page output where content extends below the viewport, plus four logo-strip captures. `final-*.png` are current; older screenshots remain historical.
 
-Browser checks cover keyboard skip/focus, source/CSV dialogs and Escape, nested-dialog isolation, drawer focus return, report/finding Back/Forward and reload, stable demo URLs, unavailable reports, responsive repairs, authentication expiry, upload limits and explicit repair approval. Desktop/mobile screenshots were visually inspected. These are local browser checks, not a claim of new hosted acceptance or production deployment.
+Keyboard activation verified landing → recorded report → finding → Back → finding → Prepare tested repair → reports. Navigation focuses H1. This targeted keyboard check uses focused links and Enter; existing browser tests separately cover Tab/skip link, dialog Escape, focus return, reload and Back/Forward. It is not a full assistive-technology certification.
 
-## Real recorded run
+## Item outcomes
 
-Captured **2026-10-26T09:08:16.729Z**, using the existing synthetic demo manifest, the real pipeline, Tavily and Nebius Token Factory. Model: **nvidia/nemotron-3-super-120b-a12b**; endpoint region: **us-central1**; capture commit: **a7a49c7a0d4f035ba5d8661f99d6bb300702f0ff**. The stored report contains five findings and five sources, retaining pipeline-produced notes and retrieval provenance.
+Fixed means implemented and locally checked. Partly fixed identifies an explicit remaining difference.
 
-`fixtures/recorded-live-run.json` is the default demo when present. The recorded report has seven actual coverage checks; the offline fixture has six. The meter counts the report's actual checks instead of truncating the live report to six. Replay makes no new provider requests. Capture script and README instructions support honest absent/failed capture states.
+### Phase 1 — identity, tokens and shell
 
-## Item-by-item outcomes
+- **Fixed:** ShipCheck UI/title/metadata/README name; former Agent Shielda name retained once in README only.
+- **Fixed:** Demo workspace when signed out; authenticated GitHub login when available, otherwise actual actor ID rather than a fabricated identity.
+- **Fixed:** Protected-preview badge and sidebar marketing footer removed; actual deployment protection unchanged. Landing footer carries ShipCheck/by HeySalad/MIT.
+- **Fixed:** Accurate GitHub sign-in wording, preserving individual-key fallback.
+- **Fixed:** Central dark tokens, one `--brand` definition, Geist and Geist Mono through `next/font/google`; old light root theme removed.
+- **Partly fixed:** globals.css is reduced to tokens/base; component modules exist, but workspace-styles.module.css still uses compatibility `:global` selectors and responsive overrides. Fully isolated per-component styles are not complete.
+- **Fixed:** White primary action treatment; teal navigation/focus, semantic severity tags and provider stand-in icons.
+- **Fixed:** Desktop sidebar order/account placement and phone top bar/four direct bottom tabs; matching Lucide icons.
+- **Partly fixed:** Shell matches the major hierarchy, but this is not a pixel-level reproduction of every mockup spacing value or the exact requested flex declaration.
 
-“Fixed” describes implemented and locally checked behaviour, not external review approval. Partial items and deliberate omissions are explicit.
+### Phase 2 — actual sponsor evidence
 
-### Phase 1 — identity
+- **Fixed:** Existing genuine recorded live fixture is reused unchanged; no duplicate paid capture or invented replacement.
+- **Fixed:** Model, capture time, endpoint region, commit and existing source evidence are retained; replay makes no fresh provider calls.
+- **Fixed:** Availability endpoint, missing-capture state, documented capture script, recorded default and offline fallback.
+- **Fixed:** Banner identifies captured run, actual model and replay/no-live-requests status.
+- **Fixed:** AI triage displays configuration booleans with in-app icons; default enabled when both providers are configured. Presence is explicitly not a health check.
 
-| Item | Outcome |
-|---|---|
-| Single ShipCheck name, metadata, README, alt text | Fixed. Agent Shielda remains only as the single README historical note. |
-| Real workspace identity | Fixed. Signed out is Demo workspace; sidebar uses GitHub login from the authenticated session when available. |
-| Sidebar marketing footer | Fixed. Removed; a small Built by HeySalad remains in the page footer. |
-| Protected preview badge | Fixed. Removed without changing actual deployment protection. |
-| Sign-in wording | Fixed. Sign in with GitHub links to the existing page; individual access-key fallback remains. |
-| Tagline once | Fixed. One shared header instance; hidden on narrow mobile layouts. |
+### Phase 3 — routes and state
 
-### Phase 2 — sponsor evidence
+- **Fixed:** Landing `/`, reports `/reports`, canonical report/finding, scan, host, repair and sign-in routes; old view URLs redirect.
+- **Fixed:** Stable `demo-recorded` and `demo-offline` fixture reconstruction; legacy offline POST also returns stable offline identity/time.
+- **Fixed:** Saved member reports load server-side; no report contents persisted in browser storage.
+- **Fixed:** Route-specific unavailable states explain unsaved/no-access possibilities honestly.
+- **Fixed:** Real whole-row anchors support new tabs, reload and Back/Forward; full-page findings replace desktop drawer routing.
+- **Fixed:** Breadcrumbs on report/finding/repair; active navigation, H1 focus and root-page split into components/routes.
 
-| Item | Outcome |
-|---|---|
-| Recorded live demo | Fixed. Real captured report, not invented AI text. |
-| Capture only synthetic input | Fixed. Existing demo manifest; no private repository code sent. |
-| Scrubbed fixture and provenance | Fixed. Masked pipeline report, dates, source snippets/URLs, model, region and commit; no raw provider request bodies or auth headers. |
-| Missing-provider/capture fallback and script | Fixed. Availability endpoint, honest absent state and documented capture script. |
-| Replay banner and original coverage | Fixed. Captured timestamp and replay/no-live-requests wording; stored states retained. |
-| Recorded default, offline secondary | Fixed. Availability drives default; stable IDs for both. |
-| Visible AI triage with configuration booleans | Fixed. Existing safe health endpoint; presence is explicitly not a provider health check. Defaults on when both configured. |
+### Phase 4 — landing and sign-in
 
-### Phase 3 — home
+- **Fixed:** Header anchors, requested hero heading, CTA pair, browser-frame preview, three steps, AI/rules explanation, agent section, final CTA and footer.
+- **Fixed:** Real fixture counts in preview; no invented security scores or outcomes.
+- **Fixed:** Official dark marks only in Powered by hero, unfiltered and without tiles; original colors/clear space/alt text. SHA-256 comparisons all match handoff files in `final-logo-hashes.json`.
+- **Fixed:** Powered by row fits above 900px at 1440px width; phone marks stack without horizontal overflow.
+- **Fixed:** IN DEVELOPMENT badge remains; no claim that packages ship.
+- **Fixed:** GitHub OAuth disclosure reflects `read:user`; repository App installation is separate. Demo fallback follows availability.
+- **Partly fixed:** Intentional copy differences: replay wording replaces an unsupported “~10s” promise; only hero CTA is primary to satisfy the one-primary rule. The access-key fallback remains visible for existing members.
 
-| Item | Outcome |
-|---|---|
-| One compact empty state | Fixed. One sentence, Run the demo, duration guidance, Scan your lockfile and compact flow line. |
-| Recent scans for signed-in users | Fixed. Reuses MemberControls history data with empty/error states and saved-report opening. |
-| Remove hero, decorative diagram/cards and CSS | Fixed. Removed. |
-| One primary action per screen | Fixed for actionable views. Deliberately omitted during loading and findings without a supported repair action; no artificial action is invented. Background report is inert while a finding drawer is open. |
-| Compact sign-in banner | Fixed. Signed-out account row stays compact on mobile; real signed-in controls retain identity and saved history. |
-| Demo button above mobile fold | Fixed and captured at 375×812. |
+### Phase 5 — reports and vocabulary
 
-### Phase 4 — unified report
+- **Fixed:** Reports search/verdict filtering, mobile chips, demo labels, member saved scans and no-saved-scan state.
+- **Fixed:** Saved finding/coverage counts now come from stored report JSON; missing values are not invented.
+- **Partly fixed:** Saved report identity/source uses available saved fields; richer project labels require additional stored metadata.
+- **Fixed:** Blocked/Needs review/Incomplete/Clear presentation without policy changes. Stored review severity displays Unrated with human-review guidance; no new Low classification invented. CSV shares vocabulary.
+- **Fixed:** Replay banner, breadcrumb/tools, three summary cards and coverage totals based on actual checks.
+- **Fixed:** Whole finding-row links, advisory IDs, package/file, fix and decision columns; no Quick view or bounded inner findings scroll.
+- **Partly fixed:** Numeric CVSS is shown as unavailable when not captured; no fake score. Phone hides desktop columns and truncates long summaries; full text is on the finding page.
+- **Fixed:** Tavily sources remain unconfirmed with supplied dates; missing publication dates are not manufactured.
+- **Fixed:** Removed separate overview/findings/actions navigation and severity chart; shared plural helper retained.
+- **Partly fixed:** General report caveats are consolidated, but authentication, proof, repair approval and verbatim evidence limitations remain in their relevant contexts for safety.
 
-| Item | Outcome |
-|---|---|
-| Verdict vocabulary | Fixed. Presentation maps to Blocked / Needs review / Incomplete / Clear without changing stored policy values. |
-| Review severity | Fixed. No documented low-severity rule exists, so it is Unrated plus Needs human review. CSV uses the same mapping. |
-| High-severity count wording and deployment disclaimer | Fixed. Count matches findings; one advisory-verdict line. |
-| Coverage meter and arithmetic | Fixed. Buttons expose each real state; complete + limited + incomplete + not-in-scope equals actual total. |
-| Collapsed coverage and scope | Fixed. What this scan covers contains full check details and consolidated report limitations. |
-| Remove severity chart; retain CSV | Fixed. Chart and abandoned bar styles removed; CSV preview/download is in findings header. |
-| Merge Overview, Findings, Actions | Fixed. One report, severity-sorted rows, package/location, next step and signed-in decision state. Legacy views normalize to overview. |
-| Filters | Fixed. Severity chips always; search/advanced filters only above eight findings; demo decision filter hidden. |
-| Pluralisation | Fixed across changed report, evidence, CSV and repair counts using the shared helper. |
-| Disclaimer inventory and diet | Partly fixed. Repeated report warnings are consolidated and action context collapses. Authentic source/model text and contextual authentication, host-proof and repair safety warnings remain; they are not silently rewritten or removed. Full copy inventory follows. |
-| One row target, drawer/full page | Fixed. No Quick view. Desktop native dialog traps focus; mobile full view; finding URL, Escape, Back/Forward and row focus restoration are tested. |
-| Internal/external icons | Fixed in changed finding/report navigation; external source links retain an external icon and noreferrer. |
-| Remove inner findings scroll | Fixed. No bounded-findings class or tabIndex scroll container; the document scrolls. Dialogs retain their necessary bounded scrolling. |
-| Mobile row sizing/touch | Fixed. Compact rows ≤80 px tested; full title remains in the accessible button name and detail view. |
+### Phase 6 — findings and repairs
 
-### Phase 5 — finding detail
+- **Fixed:** Finding count, previous/next links, real severity/advisory identity; available matching OSV metadata only, no synthetic scores or CVEs.
+- **Fixed:** Recommended action and supported repair handoff; evidence/path/source link; scanner-quoted model note hidden if absent; exploitability Not assessed.
+- **Partly fixed:** Some captured live findings have no structured affected-range/fixed-version/CVSS fields. Those fields remain absent rather than guessed. Exact matching bundled OSV metadata is displayed where available.
+- **Fixed:** Members retain decision workflow; demos disable decisions with sign-in explanation.
+- **Fixed:** Four repair steps; real diff and collapsed lockfile; before/after command output; actual OSV count comparison and point-in-time caveat.
+- **Fixed:** Explicit approval, recovery, reconciliation and no automatic repeat behavior retained; audit UTC/actors/evidence/export unchanged.
+- **Fixed:** No inline style attributes in repairs/page.tsx; phone action treatment retained.
+- **Partly fixed:** Busy controls use shared adjacent progress/recovery text rather than one repeated reason per button. Screenshots show honest signed-out/unavailable repair states; successful repair rendering is covered by existing clearly synthetic browser tests, not a newly executed cloud repair.
 
-| Item | Outcome |
-|---|---|
-| Advisory ID, aliases, vector, CWE, range, fixed version | Fixed for the exact matching bundled OSV record. Fields absent from stored evidence are omitted. Other live advisories are not enriched or guessed; snapshot metadata must not be mistaken for a fresh OSV lookup. |
-| Dependency duplication | Fixed in the evidence card: one dependency line and one path. Original advisory excerpts remain verbatim. |
-| Concrete change and Prepare repair | Fixed where a fixed version is known; supported npm findings get the primary repair handoff. Caveat shortened and additional action context collapsed. |
-| Demo review controls | Fixed. Disabled Acknowledge/Dismiss with Sign in to record decisions; no fake saved decisions. Member behaviour unchanged. |
-| Nemotron note basis | Fixed. Validated selections explicitly say verbatim from scanner evidence; existing scanner-fallback rules remain. No note means no empty note panel. |
-| Source preview | Fixed. Keyboard-accessible preview and visibly external original-source link. |
+### Phase 7 — scan and hosts
 
-### Phase 6 — navigation
+- **Fixed:** Drop/pick/paste supported filenames, preflight 200KB/50-package checks, inline errors and filename/version/count/size confirmation.
+- **Fixed:** AI card, verified/unexpired-host selector, hosts link and single Run scan primary action.
+- **Fixed:** Real elapsed timer and indeterminate progress with six queued checks. No stage completion is simulated.
+- **Fixed:** Cancel waiting aborts the client wait and explicitly warns that server/provider work may continue and save a report. It does not falsely claim server cancellation.
+- **Fixed:** Existing host state/proof/expiry validation retained; proof-method choices, server-provided values, copy feedback and challenge/verify controls.
+- **Partly fixed:** Proof methods use accessible choice buttons rather than a full ARIA tab implementation; hosted DNS/file verification was not repeated during this presentation change.
 
-| Item | Outcome |
-| Stable demo reload/share | Fixed. Fixture reconstruction for demo-offline and demo-recorded, including finding URLs. |
-| Live report privacy | Fixed. Member reports load from the server; no report contents added to browser persistent storage. |
-| Missing report state | Fixed. Dedicated recovery view, with honest not-saved/no-access wording rather than claiming to know which cause applies. |
-| Useful navigation without report | Fixed. Overview empty state and independent Scan/Project/Repairs flows; redundant report tabs removed. |
-| Breadcrumb depth | Fixed. Top-level repetition removed; finding Back to report and repair Report › Repair retained. |
-| Footer/demo messaging | Fixed. Demo banner explains unsaved decisions; footer simplified. |
+### Phase 8 — public demo and polish
 
-### Phase 7 — new scan
+- **Fixed:** `SHIPCHECK_PUBLIC_DEMO=1` server/proxy enforcement; only landing, demo index/replays and required assets/health work. Live/auth/host/repository/repair handlers reject before sensitive work.
+- **Fixed:** 19 handler tests and running production-server browser test demonstrate refusal; normal flag-off behavior retained.
+- **Fixed:** No horizontal document overflow in 50 route/width checks; desktop/mobile screenshots saved.
+- **Fixed:** Targeted keyboard journey, canonical new tabs/reload/history and existing modal accessibility tests pass.
+- **Partly fixed:** Contrast audit covers 21 principal foreground/background pairs, all ≥4.5:1, not every possible dynamic or disabled state. No handoff token color change was needed. See `final-keyboard-contrast.json`.
+- **Partly fixed:** Visual hierarchy is implemented, but exact mockup equivalence and all signed-in state screenshots are not certified. Public blocked-page response is a plain accessible recovery page, not a full branded screen.
 
-| Item | Outcome |
-| One visible Scan action | Fixed. Sticky action bar; visible at 1440×900 and above mobile navigation. |
-| Upload/drop, detection, override and limits | Fixed. Three supported filenames, format override, 200 KB UTF-8 byte limit and parser's 50-package limit before request; inline errors. Server checks unchanged. |
-| Staging badge and compact secondary column | Fixed. Own line, no wrap; one demo action and project setup guidance. |
-| Honest progress | Fixed using the permitted queued approach: one running request, elapsed time and queued check list. No simulated stage completion or new streaming endpoint. |
+### Phase 9 — optional packages
 
-### Phase 8 — repairs
+- **Skipped:** Library/CLI extraction, app package migration, CLI exit-code tests, stdio MCP tools and integration setup docs. Required visual review still has explicit partial items; optional extraction must not obscure these. Nothing published; IN DEVELOPMENT stays visible.
 
-| Item | Outcome |
-| Four-step progress | Fixed. Current/completed/failed states derive from saved repair state; failures retain recovery/no-repeat behaviour. |
-| Real diff | Fixed. Added/removed lines derived from before/after manifests; no fabricated patch. |
-| Execution evidence | Fixed. Baseline/patched command table, exit/result and expandable actual output. |
-| Before/after scan comparison | Fixed. Counts and singular/plural; hashes collapsed; absent evidence stays absent. |
-| Disabled-button explanations | Partly fixed. Proposal and approval gates have adjacent reasons; buttons temporarily disabled by busy/loading share the existing visible status, rather than each duplicating it. |
-| Sign-in copy, shared styling and breadcrumb | Fixed. Repair-specific sign-in error; no repair-page inline style attributes. |
-| Audit trail | Fixed. UTC timeline, collapsed evidence, unchanged read-only/export semantics. |
-| Signed-out walkthrough | Fixed using the explicitly permitted empty-stepper option. No real completed repair fixture was available, so no fake sample was added. |
+## Recorded run provenance
 
-### Phase 9 — visual system
+Existing fixture: `fixtures/recorded-live-run.json`. Recorded **2026-10-26T09:08:16.729Z**, model **nvidia/nemotron-3-super-120b-a12b**, region **us-central1**, source commit **a7a49c7a0d4f035ba5d8661f99d6bb300702f0ff**. Five findings, five sources, seven checks (six complete, one not in scope). The offline fixture has six checks. Showing seven actual checks instead of forcing six mockup segments is intentional. No fresh capture was performed for this rebuild; the prior real capture already satisfies the replay requirement.
 
-| Item | Outcome |
-| Interactive, severity and verdict colours | Fixed. Blue interaction, red/amber severity, neutral Unrated; separate verdict tokens. |
-| Single brand token | Fixed. Teal #0f766e defined once for brand. |
-| CSS consolidation | Fixed for duplicate selectors within the same cascade context and identical breakpoint conditions; grouped selectors still share declarations normally. Dead hero/chart styles removed. |
-| Typography | Fixed in changed styles. Sub-12 px metadata raised, body rules raised to 14 px; compact code/metadata retains 12–13 px. |
-| Text contrast | Fixed in audited states: no computed text pair below 4.5:1 on six primary routes in light/dark mode. See scope and colours below; this is not certification of every possible provider/error string or native control state. |
-| Dark mode | Fixed through prefers-color-scheme and shared tokens; dark report screenshots supplied. |
+## Disclaimers before and after
 
-### Phase 10 — structure
+The complete earlier verbatim inventory is preserved in `PREVIOUS-REVIEW.md`, sections “Disclaimer inventory”, “Before” and “After”; it is historical, not a second current completion report. The final rebuild retains these safety meanings:
 
-| Item | Outcome |
-| Per-view components | Fixed. home-empty, new-scan, report and finding-detail extracted. |
-| Focused components | Fixed. verdict-card, coverage-meter, findings-table, finding-surface, AI triage and scan-progress; repair evidence components extracted. |
-| Routing module | Fixed. URL/state, popstate, breakpoint and focus logic in use-report-navigation.ts (66 lines); main page reduced from 646 to about 160 lines. |
-| Behaviour regression | Fixed locally: complete suite green, no test deleted/skipped and no runtime dependency added. |
+- Under verdict: “Advisory verdict. ShipCheck does not block deployments.”
+- Finding: no code has been changed; review decisions do not resolve the finding or change its verdict.
+- In “What this scan covers”: findings do not establish exploitability or guarantee security; no target is changed; repairs require separate verification/approval; research is unconfirmed; absent notes do not imply safety; recorded/snapshot evidence is point-in-time.
+- Source previews retain recorded-excerpt/no-external-fetch wording; model notes retain quoted-scanner/fallback basis.
+- Replay retains captured/replayed/no-live-request and unsaved-demo-decision labels.
+- Authentication, host proof, budget, cleanup, PR approval, reconciliation and audit-integrity notices remain contextual. Removing these would change the safety meaning.
+- Added: public-demo refusal message and explicit limitation of Cancel waiting.
 
-## Colour / contrast evidence
+The former repeated coverage and deployment caveats were consolidated in the preceding overhaul; this rebuild preserves that work rather than claiming it was newly removed here.
 
-Light: ink #142b45 and muted #475569 on #ffffff / #f8fafc; interactive #2563eb. Dark: ink #e5edf7, muted #b6c4d6, links #93c5fd on #182231 / #101722. Filled dark primary buttons use #1d4ed8 with white text. High/medium use dedicated red/amber light and dark palettes; Unrated is a neutral outline. Changed formerly fixed pale sidebar/panel surfaces to shared surface/canvas tokens. Metadata/placeholder colours use muted tokens.
+## Remaining risks and review boundaries
 
-`contrast-checks.json` records computed foreground/background pairs for home, scan, project, offline report, repairs and sign-in in both schemes. Transparent backgrounds were resolved to opaque ancestors. Disabled controls were excluded. This check does not measure rendered antialiasing, image text, every nested dialog/state or every OS-native widget; those limits are explicit rather than a universal accessibility claim.
-
-## Test changes
-
-- dashboard: unified labels and explicit Offline fixture selection; anonymous API rejection also asserted directly with malformed input before client-side valid-form submission.
-- findings-usability: a nine-finding test fixture exercises the >8 advanced-filter threshold; real decision/history and navigation assertions retained.
-- responsive: obsolete Actions/Findings navigation replaced with unified report, drawer closed before background navigation; mobile resize waits for full-page transition.
-- report-previews: removed Quick view expectations; retained CSV download, focus restoration, source links, nested Escape and bounds.
-- repairs: repair CTA wording and singular dependency copy updated; approval, no-repeat, reconciliation and audit safety assertions retained.
-- storage: assigns an explicit UUID to the synthetic storage test report, because stable demo replay IDs are not stored as member reports. Ownership/redaction/verdict assertions retained.
-- six new browser tests: stable/legacy reload, unavailable recovery, drawer focus plus replay provenance, upload/limits, mobile Scan hit-test, and mobile row separation/height.
-
-## Known limits / reviewer attention
-
-1. Real fixture capture succeeded, but replay is point-in-time evidence, not a new security scan.
-2. Rich advisory metadata is displayed from the matching existing snapshot; unsupported metadata is omitted. No extra live metadata lookup was added.
-3. Some contextual safety copy remains outside the report scope disclosure, and temporary busy buttons share status copy. These are the two partial items above.
-4. Loading intentionally has no primary action; findings without a supported repair have no invented repair button. The “one primary” rule is applied to actionable screens.
-5. No fresh live repair run, sandbox spend, GitHub mutation, sign-in change or hosted deployment was performed in this UI task. Existing repair semantics are verified by regression tests.
-6. Source inspection did not open .env.local or .private as text. The authorised one-time capture process privately loaded provider credentials at runtime; no secret values were displayed, copied into reports, or committed. It would be inaccurate to say the runtime never used credentials.
-7. .impeccable/ and docs/PHASE-4-BROWSER-CHECK.md remain untouched/untracked. No runtime dependencies added. No fabricated model output, dates or findings in the product fixture. Browser test doubles remain clearly test-only.
-
-## Local commits
-
-- `a7a49c7` Phase 1: unify ShipCheck identity and show authenticated workspace
-- `aa93f0a` Phase 2: capture real provider evidence and add labelled replay
-- `d370c6f` Phase 3: replace marketing home with one actionable empty state
-- `d49466d` Phase 4: unify verdict, coverage and findings with accessible detail drawer
-- `bc708e7` Phase 5: clarify advisory evidence and repair handoff
-- `2892cdc` Phase 6: restore stable demo links and provide report recovery
-- `dd02d0e` Phase 7: add validated manifest upload and honest scan progress
-- `524a1fc` Phase 8: organize repair verification, diff and audit evidence
-- `11c4d2e` Phase 9: consolidate visual tokens, responsive styles and dark surfaces
-- `cc06f61` Phase 10: extract report navigation and complete responsive workflow checks
-
-The final documentation-only commit contains this report and is identified by HEAD after completion; its own hash cannot be embedded recursively.
-
-## Disclaimer inventory — before and after
-
-The following inventory preserves full static paragraph/metadata copy (whitespace normalised); `[runtime evidence]` marks expressions populated by the report. Source excerpts, model selections and server error messages remain verbatim at runtime. The inventory includes contextual safeguards in authentication, project verification and repairs, not just report scope warnings. Additional non-paragraph warning lines are listed explicitly.
-
-### Before
-
-- Record your assessment. This does not resolve the finding or change the scan verdict.
-- Decision history is available for saved member scans. This offline demo is temporary.
-- No decisions recorded for this finding.
-- Live requests are bounded. Findings appear when the scan finishes.
-- Choose the repository, then review the proposed target version before verification. This manifest scan does not establish repository ownership or confirm that the same dependency is present there.
-- Exact pins only · up to 50 resolved packages · 200 KB maximum
-- Package names and versions go to OSV. Optional research uses server-side provider keys; missing keys appear as incomplete coverage. Do not paste credentials.
-- Uses a single OSV advisory snapshot from 23 Oct 2026. No external requests.
-- Prove ownership of your staging host, then select it for bounded passive checks.
-- Offline fixture · no account or API keys needed
-- Open a saved repair to review its audit trail, tests and draft PR evidence.
-- [runtime evidence] · [runtime evidence] high-severity findings · [runtime evidence] limited or incomplete checks. This assessment does not enforce a deployment gate. [runtime evidence] Review coverage
-- [runtime evidence] This assessment is not a guarantee that the application is secure and does not enforce a deployment gate.
-- No actions generated. Review incomplete coverage before relying on this result.
-- No findings match these filters. Clear filters or try a different search.
-- No findings returned. Check the coverage below.
-- Search results do not establish that a version is affected and never change the verdict.
-- Optional staging checks: name the release candidate and prove control of its exact host. You can scan a dependency manifest without creating a project.
-- Use the HTTPS origin of a public staging host. Paths, ports, query strings and credentials are not accepted.
-- Exact host to verify: [runtime evidence]
-- Publish the current value at the exact hostname. The challenge expires at [runtime evidence] .
-- Exact content: [runtime evidence]
-- After verification, choose this project under New scan to include bounded passive staging checks.
-- Review a patch, verify it in isolated compute, and approve an exact change for a draft pull request.
-- Your saved evidence is preserved. No action will be automatically repeated.
-- Verification was started. Refresh this saved repair to read its latest status; this does not start another sandbox. [runtime evidence] [runtime evidence] Refresh verification status
-- The server recorded a failed verification but no detailed reason is available. Ask your workspace administrator to inspect the execution logs using this repair ID.
-- Sandbox cleanup was not confirmed. Ask your administrator to check and stop remaining compute before starting another verification.
-- Runs baseline and patched tests. Compute is enabled only within the configured preview budget.
-- Not completed. No after-scan success is implied.
-- Point-in-time OSV matches for resolved dependencies; this does not establish application exploitability or prove the application secure.
-- Dependency scan evidence is unavailable. Run a fresh verification before approval.
-- Creates a new branch and draft PR containing only package.json and package-lock.json. Nothing is merged or deployed.
-- This saved result lacks current approval evidence. Create and verify a fresh proposal.
-- Recorded actors, actions and evidence fingerprints. Times are shown in UTC. Events have no edit or delete action in ShipCheck; this is not an independently tamper-proof archive.
-- No recorded audit events. This repair may predate event logging; earlier actions have not been reconstructed.
-- Confirm the repository and inspect the resolved version in the proposal before testing. A package passed from a finding does not identify its repository. Small npm projects only: a direct dependency, supported semver range, committed package-lock.json and real test script are required.
-- Repository access is separate from sign-in. Ask your workspace administrator to connect your GitHub App installation to your ShipCheck account, then refresh.
-- No connected repositories. Ask your workspace administrator to connect a repository, then [runtime evidence] refresh repository access .
-- Your latest 25 repairs. Opening a repair only reads its saved evidence.
-- Loading saved repairs…
-- Saved repairs could not be loaded: [runtime evidence]
-- Refresh to try again. Existing repairs have not been changed.
-- No saved repairs yet. Select a repository and dependency to prepare your first proposal.
-- Recorded excerpt · this preview does not fetch or embed the external page.
-- Incomplete, snapshot and out-of-scope checks are not counted as complete. These counts are not a security score.
-- No findings returned. Review coverage before making a decision.
-- Repository access stays separate. You choose what to connect.
-- Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
-- Ask your workspace owner for your individual key. This is not your GitHub password.
-- No code has been changed. Resolution requires independent verification.
-- Offline demo is temporary · Member scans are saved
-
-### After
-
-- [runtime evidence] · configuration presence, not a provider health check.
-- Missing provider keys produce incomplete coverage.
-- The pipeline does not stream progress. Checks below remain queued until the report arrives.
-- Advisory verdict — ShipCheck does not block deployments.
-- Record your assessment. This does not resolve the finding or change the scan verdict.
-- Sign in to record decisions. Demo decisions are not saved.
-- No decisions recorded for this finding.
-- This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.
-- Optional staging checks: name the release candidate and prove control of its exact host. You can scan a dependency manifest without creating a project.
-- Use the HTTPS origin of a public staging host. Paths, ports, query strings and credentials are not accepted.
-- Exact host to verify: [runtime evidence]
-- Publish the current value at the exact hostname. The challenge expires at [runtime evidence] .
-- Exact content: [runtime evidence]
-- After verification, choose this project under New scan to include bounded passive staging checks.
-- Review a patch, verify it in isolated compute, and approve an exact change for a draft pull request.
-- Your saved evidence is preserved. No action will be automatically repeated.
-- Sign in to start. A connected repository is required; no recorded repair walkthrough is available.
-- Verification was started. Refresh this saved repair to read its latest status; this does not start another sandbox. [runtime evidence] [runtime evidence] Refresh verification status
-- The server recorded a failed verification but no detailed reason is available. Ask your workspace administrator to inspect the execution logs using this repair ID.
-- Sandbox cleanup was not confirmed. Ask your administrator to check and stop remaining compute before starting another verification.
-- Runs baseline and patched tests. Compute is enabled only within the configured preview budget.
-- Not completed. No after-scan success is implied.
-- Point-in-time OSV matches for resolved dependencies; this does not establish application exploitability or prove the application secure.
-- Dependency scan evidence is unavailable. Run a fresh verification before approval.
-- Creates a new branch and draft PR containing only package.json and package-lock.json. Nothing is merged or deployed.
-- This saved result lacks current approval evidence. Create and verify a fresh proposal.
-- Recorded actors, actions and evidence fingerprints. Times are shown in UTC. Events have no edit or delete action in ShipCheck; this is not an independently tamper-proof archive.
-- No recorded audit events. This repair may predate event logging; earlier actions have not been reconstructed.
-- Confirm the repository and inspect the resolved version in the proposal before testing. A package passed from a finding does not identify its repository. Small npm projects only: a direct dependency, supported semver range, committed package-lock.json and real test script are required.
-- Repository access is separate from sign-in. Ask your workspace administrator to connect your GitHub App installation to your ShipCheck account, then refresh.
-- No connected repositories. Ask your workspace administrator to connect a repository, then [runtime evidence] refresh repository access .
-- Your latest 25 repairs. Opening a repair only reads its saved evidence.
-- Loading saved repairs…
-- Saved repairs could not be loaded: [runtime evidence]
-- Refresh to try again. Existing repairs have not been changed.
-- No saved repairs yet. Select a repository and dependency to prepare your first proposal.
-- Recorded excerpt · this preview does not fetch or embed the external page.
-- No findings returned. Review coverage before making a decision.
-- Repository access stays separate. You choose what to connect.
-- Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
-- Ask your workspace owner for your individual key. This is not your GitHub password.
-- Choose the repository and confirm the dependency before verification.
-- ≈10 seconds · no account needed
-- No saved scans yet. Scan your lockfile to create your first report.
-- Exact pins · up to 50 resolved packages · 200 KB maximum
-- Package names and versions go to OSV. AI triage uses server-side keys; missing keys mean incomplete coverage. Do not paste credentials.
-- Prove staging-host ownership to enable bounded passive checks.
-- Verified members only
-- Findings do not establish application exploitability or guarantee security. Review decisions do not resolve findings or change the verdict. No target system is changed by a scan. Dependency repairs require separate verification and explicit approval.
-- Research is unconfirmed context, not an affected-package assertion. Missing model notes are not evidence that a finding is safe. Recorded and snapshot evidence is point-in-time, not current coverage.
-- No code has been changed.
-- Advisory verdict — ShipCheck does not block deployments.
-- Demo decisions are not saved.
-- Selected verbatim from scanner-authored notes; no generated claims.
-- Scanner fallback. Unvalidated model wording is not displayed.
+- Compatibility CSS still needs a separate maintainability pass for fully isolated modules; mockup fidelity should receive independent review.
+- New hosted member/session/database/provider and sandbox runs were not performed. Tests use real stored replay and existing synthetic browser fixtures as labeled; screenshots do not pretend to be authenticated evidence.
+- Public mode is built/tested locally, not enabled on any remote deployment. Existing protected-preview decision is unchanged.
+- Missing live metadata stays missing; additional capture/schema enrichment is separate work.
+- No new runtime dependency was added. Geist is built through the permitted Next font integration.
+- No push, PR, merge, publish, deployment or account/access change. No secret file contents were read, printed, copied or committed. Next loaded its normal environment during build/runtime without exposing values. No fabricated model output, scan result, advisory, score or execution evidence. `.impeccable/` and `docs/PHASE-4-BROWSER-CHECK.md` remain untouched/untracked.
