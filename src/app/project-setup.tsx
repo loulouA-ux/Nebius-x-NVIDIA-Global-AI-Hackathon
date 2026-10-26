@@ -145,7 +145,7 @@ export default function ProjectSetup() {
           {message}
         </p>
       )}
-      <section className="panel scan-form">
+      <section className="panel scan-form project-form">
         <h2>Project details</h2>
         <label htmlFor="project-name">Project name</label>
         <input
@@ -200,7 +200,7 @@ export default function ProjectSetup() {
         </button>
       </section>
       {projects.length > 0 && (
-        <section className="panel scan-form">
+        <section className="panel scan-form project-form">
           <h2>Your projects</h2>
           <label htmlFor="saved-project">Choose a project</label>
           <select
@@ -221,7 +221,7 @@ export default function ProjectSetup() {
         </section>
       )}
       {selected && (
-        <section className="panel scan-form">
+        <section className="panel scan-form project-form">
           <h2>Prove control of {selected.hostname}</h2>
           <p>
             Publish the current value at the exact hostname. The challenge

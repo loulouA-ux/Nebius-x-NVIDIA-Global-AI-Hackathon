@@ -1,5 +1,5 @@
-.account { padding: 12px 16px !important; margin-bottom: 20px !important; }
-.row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.account { padding: 0 0 12px !important; margin-bottom: 16px !important; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; }
+.row { justify-content:space-between; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .identity { display:flex; gap:6px; align-items:center; flex-wrap:wrap; min-width:0; }
 .identity small { color:#475569; overflow-wrap:anywhere; }
 .history { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-inline-start:auto; }
