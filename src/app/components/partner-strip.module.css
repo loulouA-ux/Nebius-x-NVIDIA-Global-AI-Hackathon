@@ -1,7 +1,7 @@
 .strip{max-width:820px;margin:40px auto 0;padding-top:24px;border-top:1px solid var(--line)}
 .strip :global(.partner-strip-eyebrow),.strip :global(.partner-strip-label),.strip :global(.partner-strip-source){font:12px var(--mono);color:var(--muted);text-align:center}
 .strip :global(.partner-strip-eyebrow){letter-spacing:.08em}
-.strip :global(.partner-strip-grid){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:18px}
+.strip :global(.partner-strip-grid){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px}
 .strip :global(.partner-strip-item){min-width:0}
 .strip :global(.partner-logo-space){height:72px;display:grid;place-items:center}
 .strip img{display:block;width:auto;max-width:100%;object-fit:contain}

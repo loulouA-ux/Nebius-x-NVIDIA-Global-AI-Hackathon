@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 for(const width of [390,1440])test(`handoff pages and deep links at ${width}px`,async({page})=>{
  await page.setViewportSize({width,height:900});
- await page.goto('/');await expect(page.getByRole('heading',{level:1})).toContainText('Ship without');
+ await page.goto('/');await expect(page.getByRole('heading',{level:1})).toContainText('Check before you ship.');
  await expect(page.getByRole('link',{name:'Run the demo',exact:true}).nth(1)).toHaveAttribute('href','/reports/demo-recorded');await page.getByRole('link',{name:'Run the demo',exact:true}).nth(1).click();
  await expect(page).toHaveURL(/\/reports\/demo-recorded$/);await expect(page.locator('.report-row')).toHaveCount(5);
  await page.locator('.report-row').first().click();await expect(page).toHaveURL(/\/findings\//);

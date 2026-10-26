@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
       <body className={`${styles.root} ${geist.variable} ${mono.variable}`}><SkipLink /><RouteFocus/>{children}</body>
     </html>
   );

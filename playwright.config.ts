@@ -4,6 +4,7 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:3148",
     headless: true,
+    colorScheme: "dark",
     trace: "retain-on-failure",
   },
   webServer: {

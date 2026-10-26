@@ -8,7 +8,7 @@ for (const width of [1440, 1024, 390, 360]) {
     await expect(strip.getByText('POWERED BY', {exact: true})).toBeVisible();
     await expect(strip.getByText('Advisory data from OSV.dev', {exact: true})).toBeVisible();
     for (const [name, label] of [['NVIDIA', 'Nemotron 3 Super'], ['Nebius', 'Token Factory'], ['Tavily', 'Search API']]) {
-      const logo = strip.getByRole('img', {name, exact: true});
+      const logo = strip.getByRole('img', {name, exact: true}).filter({visible:true});
       await expect(logo).toHaveCSS('filter', 'none');
       await expect.poll(() => logo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
       await expect(strip.getByText(label, {exact: true})).toHaveCSS('color', 'rgb(154, 166, 182)');
