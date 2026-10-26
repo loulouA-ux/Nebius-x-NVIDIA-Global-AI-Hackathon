@@ -80,10 +80,7 @@ export default function DecisionLog({
         scan verdict.
       </p>
       {report.mode === "demo" ? (
-        <p>
-          Decision history is available for saved member scans. This offline
-          demo is temporary.
-        </p>
+        <div><p>Sign in to record decisions. Demo decisions are not saved.</p><button className="button" disabled>Acknowledge</button> <button className="button" disabled>Dismiss with reason</button> <a href="/sign-in">Sign in</a></div>
       ) : expired ? (
         <p role="alert" className="error">
           Session expired. <a href="/sign-in">Sign in again</a> to review or save decisions.
@@ -106,7 +103,7 @@ export default function DecisionLog({
           />
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <button
-              className="button primary"
+              className="button"
               disabled={busy}
               onClick={() => void record("acknowledge")}
             >

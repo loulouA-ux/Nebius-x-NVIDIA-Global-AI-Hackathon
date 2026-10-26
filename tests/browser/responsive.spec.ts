@@ -37,7 +37,7 @@ test('Back restores report and finding context without repeating a scan',async({
  await page.getByRole('button',{name:'Back to report'}).click();
  await expect(page.getByRole('heading',{name:'Blocked · 2 high-severity findings'})).toBeVisible();
  await page.goForward();await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
- await page.getByRole('link',{name:'Prepare dependency repair'}).click();
+ await page.getByRole('link',{name:'Prepare repair'}).click();
  await expect(page.getByRole('heading',{name:'Verify a dependency repair'})).toBeVisible();
  await page.goBack();await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
  expect(scans).toBe(1);

@@ -1,5 +1,6 @@
 "use client";
 import {useEffect,useRef,useState,type ReactNode} from 'react';
+import {ExternalLink} from 'lucide-react';
 import type {ScanReport} from '@/lib/types';
 import styles from './report-insights.module.css';
 import {severityLabel} from './components/presentation';
@@ -14,7 +15,7 @@ export function Preview({label,title,children}:{label:string;title:string;childr
 }
 export function SourcePreview({title,excerpt,url,retrievedAt}:{title:string;excerpt:string;url?:string;retrievedAt?:string}){
  const safeUrl=url&&/^https?:\/\//i.test(url)?url:undefined;
- return <Preview label="Preview source" title={title}><p className={styles.note}>Recorded excerpt · this preview does not fetch or embed the external page.</p><pre className={styles.excerpt}>{excerpt}</pre>{retrievedAt&&<p>Retrieved {new Date(retrievedAt).toLocaleString('en-GB')}</p>}{safeUrl&&<a href={safeUrl} target="_blank" rel="noreferrer">Open original source in a new tab</a>}</Preview>;
+ return <Preview label="Preview source" title={title}><p className={styles.note}>Recorded excerpt · this preview does not fetch or embed the external page.</p><pre className={styles.excerpt}>{excerpt}</pre>{retrievedAt&&<p>Retrieved {new Date(retrievedAt).toLocaleString('en-GB')}</p>}{safeUrl&&<a href={safeUrl} target="_blank" rel="noreferrer">Open original source in a new tab <ExternalLink size={14}/></a>}</Preview>;
 }
 export default function ReportInsights({report}:{report:ScanReport}){
  const counts=(['high','medium','review'] as const).map(level=>({level,count:report.findings.filter(f=>f.severity===level).length}));

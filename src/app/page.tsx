@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import FindingDetail from "./views/finding-detail";
 import FindingSurface from "./components/finding-surface";
 import ReportView from "./views/report";
 import HomeEmpty from "./views/home-empty";
@@ -224,67 +225,7 @@ export default function Home() {
             <>
               {desktop&&report&&<ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>}
               <FindingSurface desktop={desktop} close={()=>window.history.state?.shipcheckView ? window.history.back() : navigate('overview',report)}>
-              <button className="back" onClick={() => window.history.state?.shipcheckView ? window.history.back() : navigate(view,report)}>
-                <ArrowLeft size={15} />
-                Back to report
-              </button>
-              <div className="finding-workspace">
-                <section className="finding-summary" aria-label="Finding and recommended action">
-              <span className={"severity " + selected.severity}>
-                {selected.severity === "review" ? "Review" : selected.severity}
-              </span>
-              <h1 tabIndex={-1} className="detail-title">{selected.title}</h1>
-              <p className="intro">{selected.description}</p>
-              <section className="panel">
-                <h2>Recommended action</h2>
-                <p>{selected.action}</p>
-                {repairDependency && <div className={styles.handoff}><Link className="button" href={`/repairs?package=${encodeURIComponent(repairDependency.name)}`}>Prepare dependency repair <ArrowUpRight size={15}/></Link><p>Choose the repository, then review the proposed target version before verification. This manifest scan does not establish repository ownership or confirm that the same dependency is present there.</p></div>}
-                <div className="quiet-note">
-                  <Info size={16} />
-                  No code has been changed. Resolution requires independent
-                  verification.
-                </div>
-              </section>
-                </section>
-              <section className="panel evidence-pane" aria-label="Source evidence">
-                <div className="evidence-heading"><h2>Evidence</h2><span>{selected.evidence.length} source{selected.evidence.length === 1 ? "" : "s"}</span></div><p className="muted">Evidence recorded for this finding. Open the original source to check its context.</p>
-                {selected.evidence.map((e, i) => (
-                  <div className="evidence" key={i}>
-                    <span className="evidence-kind">{e.kind === "advisory" ? "Advisory" : e.kind === "http" ? "HTTP observation" : "Code evidence"}</span>
-                    <div className="code-label">{e.location}</div>
-                    {e.dependency && <p className="evidence-dependency">{e.dependency.name}@{e.dependency.version}<br/><code>{e.dependency.path}</code></p>}
-                    <pre>{e.excerpt}</pre>
-                    {e.url && (
-                      <SourcePreview title={e.location} excerpt={e.excerpt} url={e.url} retrievedAt={e.retrievedAt}/>
-                    )}
-                    {e.retrievedAt && (
-                      <small>
-                        Retrieved{" "}
-                        {new Date(e.retrievedAt).toLocaleDateString("en-GB")}
-                      </small>
-                    )}
-                  </div>
-                ))}
-              </section>
-              </div>
-              {report && (
-                <DecisionLog
-                  key={selected.id}
-                  report={report}
-                  findingId={selected.id}
-                />
-              )}
-              {report?.explanations
-                .filter((e) => e.findingId === selected.id)
-                .map((e, i) => (
-                  <section className="panel" key={i}>
-                    <h2>{e.basis === "validated-selection" ? "Nemotron-selected scanner note" : "Scanner evidence note"}</h2>
-                    <p>{e.basis ? e.explanation : selected.description}</p>
-                    <small>
-                      {e.basis === "validated-selection" ? "Selected verbatim from scanner-authored notes; no generated claims." : "Scanner fallback. Unvalidated model wording is not displayed."}
-                    </small>
-                  </section>
-                ))}
+              {report&&<FindingDetail finding={selected} report={report} close={()=>window.history.state?.shipcheckView ? window.history.back() : navigate('overview',report)}/>}
               </FindingSurface>
             </>
           ) : view === "project" ? (

@@ -23,7 +23,7 @@ for(const width of [390,1440])test(`filter findings and retain report through re
  await page.getByLabel('Package',{exact:true}).selectOption('lodash');
  await page.getByRole('button',{name:/Affected lodash dependency/}).click();
  await expect(page.getByRole('heading',{name:'Affected lodash dependency'})).toBeFocused();
- await expect(page.getByRole('link',{name:'Prepare dependency repair'})).toHaveAttribute('href','/repairs?package=lodash');
+ await expect(page.getByRole('link',{name:'Prepare repair'})).toHaveAttribute('href','/repairs?package=lodash');
  await page.getByRole('button',{name:'Back to report'}).click();
  await expect(page.getByLabel('Evidence type')).toHaveValue('advisory');
  await expect(page.getByLabel('Package',{exact:true})).toHaveValue('lodash');

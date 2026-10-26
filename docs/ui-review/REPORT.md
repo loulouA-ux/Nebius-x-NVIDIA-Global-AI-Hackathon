@@ -13,3 +13,6 @@ Single empty-state card and default recorded demo; explicit offline alternative.
 
 ## Phase 4 — unified report
 Verdict presentation maps policy without altering it; review severity is Unrated with a human-review flag. Coverage counts every actual check state (live runs may have more than six checks). One report replaces three views, with severity chips and advanced filters only above eight findings. CSV and evidence previews remain keyboard accessible. Desktop findings use a modal side drawer; mobile uses a full view. Removed chart, Quick view and bounded findings scroll. Typecheck, 203 unit tests, build and all 32 browser tests pass. Nested source-dialog Escape now closes only that dialog. Responsive geometry checks wait for the drawer-to-page transition.
+
+## Phase 5 — finding detail
+Extracted reusable finding detail. The exact matching OSV snapshot supplies advisory ID, CVE aliases, CVSS vector, CWE, affected ranges and fixed-version change chip. No metadata is inferred for other live advisories; those fields remain absent when not stored. Prepare repair is primary; demo decision controls are disabled with sign-in guidance. Validated Nemotron selection is explicitly labelled verbatim. External source links carry an external icon. All 203 unit and 32 browser tests, typecheck and build pass.
