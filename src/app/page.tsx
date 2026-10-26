@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import NewScan from "./views/new-scan";
+import ScanProgress from "./components/scan-progress";
 import FindingDetail from "./views/finding-detail";
 import FindingSurface from "./components/finding-surface";
 import ReportView from "./views/report";
@@ -199,15 +201,7 @@ export default function Home() {
             </div>
           )}
           {busy ? (
-            <section className="loading" role="status">
-              <LoaderCircle className="spin" size={30} />
-              <h1>Checking your next release.</h1>
-              <p>Reading inputs and collecting evidence.</p><div className="loading-cards" aria-hidden="true"><div/><div/><div/></div>
-              <p className="muted">
-                Live requests are bounded. Findings appear when the scan
-                finishes.
-              </p>
-            </section>
+            <ScanProgress/>
           ) : selected ? (
             <>
               {desktop&&report&&<ReportView report={report} filtered={filteredFindings} filters={filters} update={updateFilters} open={f=>navigate('overview',report,f)} scan={()=>navigate('scan')} decisions={decisions} decisionState={decisionState}/>}
@@ -218,86 +212,7 @@ export default function Home() {
           ) : view === "project" ? (
             <ProjectSetup />
           ) : view === "scan" ? (
-            <>
-              <h1>Check a project.</h1>
-              <p className="intro">
-                Start with dependency evidence. Keep the next step clear.
-              </p>
-              <div className="scan-grid">
-                <section className="panel scan-form">
-                  <h2>Paste a dependency manifest</h2>
-                  <p className="muted">
-                    Exact pins only · up to 50 resolved packages · 200 KB
-                    maximum
-                  </p>
-                  <label htmlFor="manifest-type">File format</label>
-                  <select
-                    id="manifest-type"
-                    value={filename}
-                    onChange={(e) => setFilename(e.target.value)}
-                  >
-                    <option>package-lock.json</option>
-                    <option>package.json</option>
-                    <option>requirements.txt</option>
-                  </select>
-                  <label htmlFor="manifest">Manifest content</label>
-                  <textarea
-                    id="manifest"
-                    spellCheck={false}
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={13}
-                  />
-                  <AiTriage enabled={research} onChange={setResearch}/>
-                  <p className="fineprint">
-                    Package names and versions go to OSV. Optional research uses
-                    server-side provider keys; missing keys appear as incomplete
-                    coverage. Do not paste credentials.
-                  </p>
-                  <ProjectScanChoice
-                    value={projectId}
-                    onChange={setProjectId}
-                  />
-                  <button
-                    className="button primary"
-                    onClick={() => scan("live")}
-                  >
-                    <ScanLine size={17} />
-                    Scan manifest
-                  </button>
-                </section>
-                <section className="panel demo-panel"><button className="button" onClick={()=>scan("demo",true)}>Recorded live run</button>
-                  <div className="illustration">
-                    <FlaskConical size={29} />
-                  </div>
-                  <h2>Try the demo first</h2>
-                  <p>
-                    Real rules, synthetic input. Inspect a vulnerable
-                    dependency, a fake credential and a configuration review.
-                  </p>
-                  <button className="button" onClick={() => scan("demo")}>
-                    Run offline demo <ArrowUpRight size={16} />
-                  </button>
-                  <small>
-                    Uses a single OSV advisory snapshot from 23 Oct 2026. No
-                    external requests.
-                  </small>
-                  <hr />
-                  <h2>Staging URL checks</h2>
-                  <p>
-                    Prove ownership of your staging host, then select it for
-                    bounded passive checks.
-                  </p>
-                  <button
-                    className="button"
-                    onClick={() => navigate("project")}
-                  >
-                    View project setup <ChevronRight size={16} />
-                  </button>
-                  <span className="neutral-badge">Verified members only</span>
-                </section>
-              </div>
-            </>
+            <NewScan filename={filename} setFilename={setFilename} content={content} setContent={setContent} research={research} setResearch={setResearch} projectId={projectId} setProjectId={setProjectId} scan={()=>scan('live')} demo={()=>scan('demo',recorded===true)} project={()=>navigate('project')}/>
           ) : unavailable ? (
             <section className="home-empty"><h1>Report unavailable</h1><p>This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.</p><Link className="button primary" href="/sign-in">Sign in</Link> <button className="button" onClick={()=>scan('demo')}>Run offline demo</button></section>
           ) : !report ? (

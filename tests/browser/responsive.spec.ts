@@ -2,6 +2,7 @@ import {test,expect} from '@playwright/test';
 for(const width of [360,768,1440]) {
  test(`brand and workflow surfaces fit ${width}px`,async({page})=>{
   await page.setViewportSize({width,height:900});
+  await page.route('**/api/demos?mode=availability',r=>r.fulfill({json:{recorded:false}}));
   await page.route('**/api/session',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
   await page.route('**/api/projects',r=>r.fulfill({json:{projects:[]}}));
   await page.route('**/api/repositories',r=>r.fulfill({json:{repositories:[]}}));
@@ -17,7 +18,7 @@ for(const width of [360,768,1440]) {
    if(width<=700 && name==='Project setup')await page.getByRole('button',{name:'More',exact:true}).click();
    await page.getByRole('navigation',{name:'Main navigation'}).getByRole('button',{name,exact:true}).click();await fits();
   }
-  await page.getByRole('button',{name:'Run offline demo',exact:false}).click();
+  await page.getByRole('button',{name:'Or try the demo',exact:false}).click();
   await expect(page.getByRole('heading',{name:'Blocked · 2 high-severity findings'})).toBeVisible();await fits();
   await page.getByRole('button',{name:/Command Injection in lodash/}).click();await fits();
   await page.getByRole('button',{name:'Back to report'}).click();await fits();

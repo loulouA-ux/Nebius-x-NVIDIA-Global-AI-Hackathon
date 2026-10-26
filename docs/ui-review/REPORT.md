@@ -19,3 +19,6 @@ Extracted reusable finding detail. The exact matching OSV snapshot supplies advi
 
 ## Phase 6 — restorable navigation
 Stable demo-offline and demo-recorded URLs reload through the fixture endpoint; legacy findings/actions links normalize to overview. Missing/inaccessible reports show a dedicated recovery state. Top-level breadcrumb removed and footer simplified. Added two browser tests for deep-link reload and unavailable recovery. Storage test now explicitly assigns a member-scan UUID to its synthetic storage fixture (demo IDs are not persisted). All 203 unit tests and 34 browser tests, typecheck and build pass.
+
+## Phase 7 — scan input and honest progress
+New scan extracted to its own view, with AI/staging choices above compact input, upload/drop and format override. UTF-8 byte size and parsed package limit are checked before sending. Scan action is sticky; staging badge is on its own line. Progress shows six queued checks and a real elapsed timer, not simulated completions. Added upload/limit test; anonymous safety assertion now also calls the API directly with malformed input, while the browser submits a valid manifest through new client validation. Typecheck, 203 unit tests, build and 35 browser tests pass.

@@ -47,9 +47,13 @@ test("anonymous live scan is blocked before manifest processing", async ({
     .getByRole("button", { name: "New scan", exact: true })
     .first()
     .click();
-  await page.getByLabel("Manifest content").fill("{bad json");
+  const blocked=await page.request.post("/api/scans",{data:{mode:"live",filename:"package.json",content:"{bad json"}});
+  expect(blocked.status()).toBe(401);
+  expect(await blocked.json()).toMatchObject({error:"Sign in to run live scans."});
+  await page.getByLabel("File format").selectOption("package.json");
+  await page.getByLabel("Manifest content").fill(JSON.stringify({dependencies:{lodash:"4.17.20"}}));
   await page
-    .getByRole("button", { name: "Scan manifest", exact: true })
+    .getByRole("button", { name: "Scan", exact: true })
     .click();
   await expect(
     page.getByRole("alert").filter({ hasText: "Sign in to run live scans." }),
