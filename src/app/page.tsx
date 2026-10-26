@@ -102,12 +102,10 @@ export default function Home() {
     <div className="app">
       <header className="topbar">
         <a className="brand" href="/" aria-label="ShipCheck home">
-          <span className="brand-mark">
-            <CheckCheck size={22} />
-          </span>
+          <img className="brand-symbol" src="/brand/symbol.svg" alt="" width={48} height={42} />
           ShipCheck
         </a>
-        <span className="tagline">Check before you ship.</span>
+        <span className="tagline">Scan. Check. Ship.</span>
         <span className="build-badge">
           Preview <span>0.2</span>
         </span>
@@ -132,15 +130,16 @@ export default function Home() {
                 {n.label}
               </button>
             ))}
+            <a className="nav-link" href="/repairs"><ListChecks size={17} /> Repairs &amp; audit trail</a>
           </nav>
           <div className="sidebar-footer">
             <span className="tiny-mark">
               <CheckCheck size={19} />
             </span>
             <p>
-              A little confidence.
+              Code security,
               <br />
-              Before every release.
+              backed by evidence.
             </p>
             <small>Built by HeySalad</small>
           </div>
@@ -353,13 +352,11 @@ export default function Home() {
                 <div className="welcome-copy">
                   <span className="eyebrow">YOUR FIRST CHECK</span>
                   <h2>
-                    Less guessing.
-                    <br />
-                    More evidence.
+                    Scan. Check. Ship.
                   </h2>
                   <p>
-                    Check your dependencies before deployment. Every finding
-                    comes with a source and a practical next step.
+                    Investigate findings, inspect supported fixes and review
+                    the evidence before your next release.
                   </p>
                   <button
                     className="button primary"
@@ -385,6 +382,11 @@ export default function Home() {
                     <span>Evidence</span>
                   </div>
                 </div>
+              </section>
+              <section className="workflow-cards" aria-label="Security workflow">
+                <button className="workflow-card" onClick={() => navigate("scan")}><span className="workflow-icon"><ScanLine size={25}/></span><small>01 / SCAN</small><h2>Start with the evidence.</h2><p>Inspect dependencies and verified staging hosts. See exactly what was checked.</p><strong>Configure a scan →</strong></button>
+                <a className="workflow-card" href="/repairs"><span className="workflow-icon"><FlaskConical size={25}/></span><small>02 / CHECK</small><h2>A fix you can inspect.</h2><p>Review a supported dependency patch and test it in isolated compute.</p><strong>Open repair workspace →</strong></a>
+                <a className="workflow-card" href="/repairs#repair-audit"><span className="workflow-icon"><ListChecks size={25}/></span><small>03 / REVIEW</small><h2>Keep the decision yours.</h2><p>Open a saved repair to review its audit trail, tests and draft PR evidence.</p><strong>Review saved repairs →</strong></a>
               </section>
               <div className="intro-features">
                 <div>

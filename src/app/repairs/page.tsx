@@ -21,11 +21,12 @@ export default function Repairs(){
   catch(e){setError(e instanceof Error?e.message:"Action failed.");try{setRepair(await api(`/api/repairs/${repair.id}`));}catch{ /* Keep the last known evidence; do not repeat writes. */ }}finally{setBusy("");void refreshSaved().catch(()=>{});}
  }
  const box={padding:24,border:"1px solid #cbd5e1",borderRadius:16,marginTop:20,background:"white"};
- return <main style={{maxWidth:1000,margin:"40px auto",padding:24}}>
+ return <main className="repair-workspace" style={{maxWidth:1100,margin:"32px auto",padding:24}}>
+  <div className="repair-brand"><a className="brand" href="/"><img src="/brand/symbol.svg" width={48} height={42} alt=""/>ShipCheck</a><span>Scan. Check. Ship.</span></div>
   <a href="/">← ShipCheck dashboard</a><h1>Verify a dependency repair</h1>
   <p>Choose an authorised repository, inspect the proposal, and test the change in isolated compute before approving a draft pull request.</p>
   <p><a href="/sign-in">Sign in with GitHub</a> · Repository access is separate from sign-in. This preview supports small npm projects with direct dependencies with supported semver ranges and a committed lockfile.</p>
-  <section style={box}><h2>Saved repairs</h2><p>Your latest 25 repairs. Reopening a repair does not repeat a test or create a PR.</p><button className="button" disabled={!!busy} onClick={()=>refreshSaved().catch(e=>setError(e.message))}>Refresh saved repairs</button>{saved.length?<ul>{saved.map(r=><li key={r.id}><button disabled={!!busy} onClick={()=>openSaved(r.id)}>{r.repository_name} · {r.package_name} · {r.state}</button> <time>{new Date(r.created_at).toLocaleString()}</time></li>)}</ul>:<p>No saved repairs.</p>}</section>
+  <section id="repair-audit" style={box}><h2>Saved repairs</h2><p>Your latest 25 repairs. Reopening a repair does not repeat a test or create a PR.</p><button className="button" disabled={!!busy} onClick={()=>refreshSaved().catch(e=>setError(e.message))}>Refresh saved repairs</button>{saved.length?<ul>{saved.map(r=><li key={r.id}><button disabled={!!busy} onClick={()=>openSaved(r.id)}>{r.repository_name} · {r.package_name} · {r.state}</button> <time>{new Date(r.created_at).toLocaleString()}</time></li>)}</ul>:<p>No saved repairs.</p>}</section>
   <form onSubmit={propose} style={box}><h2>1. Select a repository and dependency</h2>
    <label htmlFor="repository">GitHub repository</label><select id="repository" value={repo} required onChange={e=>setRepo(e.target.value)} style={{display:"block",padding:10,width:"100%"}}><option value="">Choose a connected repository</option>{repos.map(r=><option key={r.id} value={r.id}>{r.full_name}</option>)}</select>
    <label htmlFor="dependency">Dependency package name</label><input id="dependency" value={pkg} onChange={e=>setPkg(e.target.value)} placeholder="lodash" required maxLength={150} style={{display:"block",padding:10,width:"100%",marginBottom:16}}/>

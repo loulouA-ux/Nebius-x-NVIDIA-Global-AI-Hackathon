@@ -1,0 +1,113 @@
+SHIPCHECK / MESSAGE SYSTEM
+Scan. Check. Ship.
+Code security, backed by evidence.
+
+Voice: direct, calm, specific. State the observation, its scope and next action. Avoid false certainty, fear-based copy and vague AI claims.
+
+Landing headline: Find the issue. Inspect the fix. See the evidence.
+Landing description: Investigate code-security findings, test supported fixes in isolation and review the evidence before opening a pull request.
+Primary CTA: Connect repository
+Secondary CTA: See the workflow
+
+Social messages:
+1. Scan. Check. Ship. Code security, backed by evidence.
+2. A proposed fix is a starting point. The diff, tests and evidence make it reviewable.
+3. Human review stays in the loop. Inspect the patch before it becomes a draft pull request.
+
+Transactional email template:
+Subject: ShipCheck: results ready for {repository}
+Your scan of {branch} completed at {timestamp}. Review {findingCount} findings and the check coverage in ShipCheck.
+CTA: Review scan
+Send only after a verified completion event. Never include secrets or raw logs in email.
+
+In-product messages (render only when the corresponding backend event is confirmed):
+
+welcome
+Start with a repository.
+Connect a repository to choose what ShipCheck can inspect.
+CTA: Connect repository
+
+scope
+Your scope. Your control.
+Choose the repository and branch before starting a scan.
+CTA: Review scope
+
+queued
+Your scan is queued.
+We will show progress when the worker starts.
+CTA: View queue
+
+scanning
+Checking the selected scope.
+Collecting dependency and configuration evidence. Results will show what was checked.
+CTA: View scan
+
+findings
+Findings ready for review.
+Open each finding to see its source, affected component and available next step.
+CTA: Review findings
+
+no-findings
+No findings in this scan.
+This result covers the selected checks and scope. It is not a guarantee that the project is secure.
+CTA: View coverage
+
+proposal
+A fix to inspect.
+Review the proposed changes before running them in an isolated test environment.
+CTA: Review patch
+
+sandbox
+Testing in isolation.
+The selected test commands are running against the proposed patch.
+CTA: View test log
+
+passed
+Configured tests passed.
+Compare the before-and-after evidence, then decide whether to approve a draft pull request.
+CTA: Review evidence
+
+failed
+Verification needs attention.
+At least one configured check did not pass. Inspect the log before retrying or changing the patch.
+CTA: Inspect failure
+
+approval
+Ready for your review.
+Check the diff, test scope and evidence. Approval allows a draft PR; it does not merge or deploy.
+CTA: Review approval
+
+pr
+Draft pull request created.
+The patch and verification evidence are ready for repository review.
+CTA: Open draft PR
+
+session
+Sign in to continue.
+Your session has expired. Sign in again before requesting another action.
+CTA: Sign in
+
+permission
+Repository access is missing.
+Check the app installation and repository selection with an owner.
+CTA: Review access
+
+provider
+One check is unavailable.
+A provider did not return a usable result. Available evidence is shown separately; this scan is incomplete.
+CTA: Review partial results
+
+budget
+Testing paused at the spending limit.
+Review usage and remaining budget before authorising another run.
+CTA: Review usage
+
+saved
+Decision recorded.
+Your review decision has been added to the audit trail.
+CTA: View audit trail
+
+export
+Evidence export ready.
+Review the export for sensitive information before sharing it outside your team.
+CTA: Download evidence
