@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BrandHeader from "./brand-header";
+import MobileNavigation from "./mobile-navigation";
 import {
   CheckCheck,
   LayoutDashboard,
@@ -41,6 +42,10 @@ const defaultManifest = JSON.stringify(
 );
 export default function Home() {
   const [view, setView] = useState<View>("overview");
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("view");
+    if (["overview", "project", "scan", "findings", "actions"].includes(requested || "")) setView(requested as View);
+  }, []);
   const [report, setReport] = useState<ScanReport | null>(null);
   const [selected, setSelected] = useState<Finding | null>(null);
   const [busy, setBusy] = useState(false);
@@ -100,8 +105,9 @@ export default function Home() {
       (c) => c.state === "incomplete" || c.state === "snapshot",
     ).length ?? 0;
   return (
-    <div className="app">
+    <div className="app with-mobile-navigation">
       <BrandHeader />
+      <MobileNavigation view={view} onNavigate={navigate} />
       <div className="shell">
         <aside>
           <div className="workspace">
@@ -342,7 +348,7 @@ export default function Home() {
               </div>
               <section className="welcome">
                 <div className="welcome-copy">
-                  <span className="eyebrow">YOUR FIRST CHECK</span>
+
                   <h2>
                     Scan. Check. Ship.
                   </h2>

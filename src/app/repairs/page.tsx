@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import BrandHeader from "../brand-header";
+import MobileNavigation from "../mobile-navigation";
 import type {RepairPlan} from "@/lib/repair/plan";
 import type {RepairRun} from "@/lib/repair/runner";
 type Repo={id:number;full_name:string};
@@ -21,7 +22,7 @@ export default function Repairs(){
   try{await api(`/api/repairs/${repair.id}`,{action:kind,...(kind==="approve"?{approvalHash:repair.approvalHash}:{})});setRepair(await api(`/api/repairs/${repair.id}`));setApproved(false);}
   catch(e){setError(e instanceof Error?e.message:"Action failed.");try{setRepair(await api(`/api/repairs/${repair.id}`));}catch{ /* Keep the last known evidence; do not repeat writes. */ }}finally{setBusy("");void refreshSaved().catch(()=>{});}
  }
- return <><BrandHeader /><main className="repair-workspace">
+ return <div className="with-mobile-navigation"><BrandHeader /><MobileNavigation view="repairs"/><main className="repair-workspace">
   <a href="/">← ShipCheck dashboard</a><h1>Verify a dependency repair</h1>
   <p>Choose an authorised repository, inspect the proposal, and test the change in isolated compute before approving a draft pull request.</p>
   <p><a href="/sign-in">Sign in with GitHub</a> · Repository access is separate from sign-in. This preview supports small npm projects with direct dependencies with supported semver ranges and a committed lockfile.</p>
@@ -35,7 +36,7 @@ export default function Repairs(){
   {repair&&<>
    <section className="repair-panel"><h2>2. Review the proposal</h2><p><strong>{repair.plan.packageName}</strong>: {repair.plan.fromVersion} → {repair.plan.toVersion}</p><p>Status: {repair.state}</p><p>Source commit: <code>{repair.plan.baseCommit}</code></p>
     <ul>{repair.plan.sourceUrls.map(url=><li key={url}><a href={url} target="_blank" rel="noreferrer">{url}</a></li>)}</ul>
-    <details><summary>Compare package.json</summary><h3>Before</h3><pre style={{overflow:"auto"}}>{repair.plan.manifestBefore}</pre><h3>Proposed</h3><pre style={{overflow:"auto"}}>{repair.plan.manifestAfter}</pre></details>
+    <details><summary>Compare package.json</summary><div className="repair-diff"><div><h3>Before</h3><pre>{repair.plan.manifestBefore}</pre></div><div><h3>Proposed</h3><pre>{repair.plan.manifestAfter}</pre></div></div></details>
     <ul>{repair.plan.limitations.map(v=><li key={v}>{v}</li>)}</ul>
     <button className="button primary" disabled={!!busy||repair.state!=="proposed"} onClick={()=>action("verify")}>Run isolated verification</button><p>Runs baseline and patched tests. Compute is enabled only within the configured preview budget.</p>
    </section>
@@ -55,5 +56,5 @@ export default function Repairs(){
    </section>
    {repair.url&&<p><a href={repair.url} target="_blank" rel="noreferrer">Open draft pull request</a></p>}
   </>}
- </main></>;
+ </main></div>;
 }

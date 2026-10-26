@@ -6,8 +6,8 @@ export default function SignIn() {
     [busy, setBusy] = useState(false);
   return (
     <><BrandHeader /><main className="auth-layout">
-      <section className="auth-story"><span className="eyebrow">EVIDENCE BEFORE DEPLOYMENT</span><h2>Scan. Check.<br/>Ship.</h2><p>One workspace for findings, supported repairs and the evidence behind your next decision.</p><img src="/brand/symbol.svg" width={160} height={136} alt=""/><p className="auth-assurance">Repository access stays separate. You choose what to connect.</p></section>
-      <section className="auth-panel"><span className="eyebrow">MEMBER ACCESS</span>
+      <section className="auth-story"><h2>Scan. Check.<br/>Ship.</h2><p>One workspace for findings, supported repairs and the evidence behind your next decision.</p><img src="/brand/symbol.svg" width={160} height={136} alt=""/><p className="auth-assurance">Repository access stays separate. You choose what to connect.</p></section>
+      <section className="auth-panel">
       <h1>Sign in to ShipCheck</h1>
       <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
       <p>GitHub sign-in is available to invited preview members. Repository permissions are requested separately.</p>

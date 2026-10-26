@@ -14,11 +14,13 @@ for(const width of [360,768,1440]) {
   }
   await page.goto('/');
   for(const name of ['Project setup','New scan']){
+   if(width<=700 && name==='Project setup')await page.getByRole('button',{name:'More',exact:true}).click();
    await page.getByRole('navigation',{name:'Main navigation'}).getByRole('button',{name,exact:true}).click();await fits();
   }
   await page.getByRole('button',{name:'Run offline demo',exact:false}).click();
   await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();await fits();
   await page.getByRole('button',{name:/Command Injection in lodash/}).click();await fits();
+  if(width<=700)await page.getByRole('button',{name:'More',exact:true}).click();
   await page.getByRole('button',{name:'Recommended actions',exact:true}).click();await fits();
  });
 }
