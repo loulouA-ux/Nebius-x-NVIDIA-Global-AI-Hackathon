@@ -1,12 +1,12 @@
 .account { padding: 0 0 12px !important; margin-bottom: 16px !important; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; }
 .row { justify-content:space-between; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .identity { display:flex; gap:6px; align-items:center; flex-wrap:wrap; min-width:0; }
-.identity small { color:#475569; overflow-wrap:anywhere; }
+.identity small { color:var(--muted); overflow-wrap:anywhere; }
 .history { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-inline-start:auto; }
 .history select { max-width:100%; padding:8px; min-height:44px; }
 .skip { position:fixed; top:8px; left:8px; transform:translateY(-160%); z-index:1000; padding:12px 18px; background:#142b45; color:white; border-radius:8px; }
 .skip:focus { transform:translateY(0); outline:3px solid #5eead4; outline-offset:2px; }
 .key { margin-block:24px; border-top:1px solid #cbd5e1; padding-top:20px; }
 .key summary { cursor:pointer; font-weight:600; padding-block:8px; }
-.hint { color:#475569; font-size:14px; line-height:1.5; }
+.hint { color:var(--muted); font-size:14px; line-height:1.5; }
 @media(max-width:700px){ .history{margin-inline-start:0;width:100%;}.history select{width:100%;font-size:16px;} }

@@ -1,7 +1,7 @@
 .summary { scroll-margin-block-start: 1rem; }
 .summary h2 { overflow-wrap: anywhere; }
 .summary h2:focus { outline: 3px solid #2563eb; outline-offset: 6px; }
-.state { font-weight: 700; color: #142b45; }
+.state { font-weight: 700; color:var(--ink); }
 .failure { margin-block: 1.5rem; padding: 1.25rem; background: #fff7ed; color: #7c2d12; border-radius: 12px; overflow-wrap: anywhere; }
 .failure h3 { margin-block-start: 0; }
 .failure p { max-width: 72ch; }
