@@ -384,7 +384,7 @@ export default function Home() {
                 <div className="welcome-copy">
 
                   <h2>
-                    Scan. Check. Ship.
+                    Understand your release.
                   </h2>
                   <p>
                     Investigate findings, inspect supported fixes and review

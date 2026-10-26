@@ -15,7 +15,7 @@ test('mobile More restores focus on Escape and omits duplicate sign in',async({p
  await page.goto('/');
  await page.getByRole('button',{name:'More',exact:true}).click();
  await expect(page.getByRole('button',{name:'Close more navigation'})).toBeFocused();
- await expect(page.getByRole('link',{name:'Member sign in',exact:true})).toHaveCount(1);
+ await expect(page.getByRole('link',{name:'Sign in with GitHub',exact:true})).toHaveCount(1);
  await page.keyboard.press('Escape');
  await expect(page.getByRole('button',{name:'More',exact:true})).toBeFocused();
  await expect(page.getByRole('button',{name:'Project setup',exact:true})).not.toBeVisible();
@@ -28,7 +28,7 @@ test('identity survives history failure and can still sign out',async({page})=>{
  await expect(page.getByText('GitHub account',{exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
  await expect(page.getByText('Saved scans could not be loaded.',{exact:true})).toBeVisible();
- await expect(page.getByRole('link',{name:'Member sign in',exact:true})).toHaveCount(0);
+ await expect(page.getByRole('link',{name:'Sign in with GitHub',exact:true})).toHaveCount(0);
 });
 
 test('access-key sign in explains its purpose and retains error recovery',async({page})=>{

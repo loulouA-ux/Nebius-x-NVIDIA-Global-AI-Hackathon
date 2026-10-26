@@ -10,7 +10,10 @@ import { Store } from "@/lib/server/store";
 export const runtime = "nodejs";
 export async function GET(request: Request) {
   try {
-    return json({ actor: await requireActor(request, database()) });
+    const query=database();
+    const actor=await requireActor(request,query);
+    const account=actor.id.startsWith('github:') ? (await query('SELECT login FROM sc_github_accounts WHERE github_id=$1',[actor.id.slice(7)]))[0] : undefined;
+    return json({actor, ...(account?.login ? {login:account.login}: {})});
   } catch (e) {
     return failure(e);
   }

@@ -9,10 +9,10 @@ import type { Check, ScanInput, ScanReport } from "./types";
 export const demoFiles = {
   "package-lock.json": JSON.stringify(
     {
-      name: "salad-storefront",
+      name: "shipcheck-demo",
       lockfileVersion: 3,
       packages: {
-        "": { name: "salad-storefront" },
+        "": { name: "shipcheck-demo" },
         "node_modules/lodash": { version: "4.17.20" },
       },
     },

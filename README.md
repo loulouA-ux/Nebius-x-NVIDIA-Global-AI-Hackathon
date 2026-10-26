@@ -1,5 +1,7 @@
 # ShipCheck
 
+Earlier working name: Agent Shielda.
+
 **Check before you ship.** A pre-deployment security assessment for small teams, built around evidence and explicit coverage.
 
 ## Status: protected team preview

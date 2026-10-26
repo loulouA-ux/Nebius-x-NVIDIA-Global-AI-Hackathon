@@ -8,7 +8,7 @@ export default function SignIn() {
     [busy, setBusy] = useState(false);
   return (
     <><BrandHeader /><main id="main-content" tabIndex={-1} className="auth-layout">
-      <section className="auth-story"><h2>Scan. Check.<br/>Ship.</h2><p>One workspace for findings, supported repairs and the evidence behind your next decision.</p><img src="/brand/symbol.svg" width={160} height={136} alt=""/><p className="auth-assurance">Repository access stays separate. You choose what to connect.</p></section>
+      <section className="auth-story"><h2>Evidence before deployment.</h2><p>One workspace for findings, supported repairs and the evidence behind your next decision.</p><img src="/brand/symbol.svg" width={160} height={136} alt=""/><p className="auth-assurance">Repository access stays separate. You choose what to connect.</p></section>
       <section className="auth-panel">
       <h1>Sign in to ShipCheck</h1>
       <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>

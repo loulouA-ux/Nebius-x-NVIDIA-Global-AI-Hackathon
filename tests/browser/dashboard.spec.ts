@@ -184,7 +184,7 @@ test("member can reopen a saved report and record a decision without changing it
   ).toBeVisible();
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(
-    page.getByRole("link", { name: "Member sign in" }),
+    page.getByRole("link", { name: "Sign in with GitHub" }),
   ).toBeVisible();
 });
 
@@ -222,7 +222,7 @@ test("expired decision session clears stale member state and offers sign-in", as
     .getByRole("button", { name: /Potential credential in supplied content/ })
     .click();
   await page.getByRole("button", { name: "Acknowledge", exact: true }).click();
-  await expect(page.getByRole("link", { name: "Member sign in" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in with GitHub" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Sign in again" })).toBeVisible();
   await expect(page.getByText("Signed in as")).toHaveCount(0);
   await expect(page.getByRole("list", { name: "Decision history" })).toHaveCount(0);
