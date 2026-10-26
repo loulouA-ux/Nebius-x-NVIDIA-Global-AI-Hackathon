@@ -168,16 +168,16 @@ export async function runScan(
     (a, b) => severityOrder[a.severity] - severityOrder[b.severity],
   );
   const result: ScanReport = {
-    id: randomUUID(),
+    id: demo ? "demo-offline" : randomUUID(),
     mode: input.mode,
-    createdAt: new Date().toISOString(),
+    createdAt: demo ? "2026-10-23T00:00:00Z" : new Date().toISOString(),
     status: verdict(findings, checks),
     dependencies: parsed.dependencies,
     findings,
     checks,
     sources,
     explanations,
-    durationMs: Date.now() - start,
+    durationMs: demo ? 0 : Date.now() - start,
     policy:
       "shipcheck-v0.1: high findings block; incomplete coverage cannot pass; other findings require review.",
   };

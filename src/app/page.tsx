@@ -61,6 +61,7 @@ export default function Home() {
   const [recorded,setRecorded]=useState<boolean|null>(null);
   useEffect(()=>{fetch("/api/demos?mode=availability").then(r=>r.json()).then(d=>setRecorded(d.recorded)).catch(()=>setRecorded(false));},[]);
   const [error, setError] = useState("");
+  const [unavailable,setUnavailable]=useState(false);
   const [filename, setFilename] = useState("package-lock.json");
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
@@ -105,17 +106,17 @@ export default function Home() {
       let requested=query.get("view") || "overview";
       if(requested==='actions'||requested==='findings'){requested='overview';query.set('view',requested);window.history.replaceState(window.history.state,'',`/?${query}`);}
       setView((["overview","project","scan","findings","actions"].includes(requested)?requested:"overview") as View);
-      setError("");
+      setError("");setUnavailable(false);
       const id=query.get("report") || latestReport()?.id, finding=query.get("finding");
       if(!id){setReport(null);setSelected(null);return;}
       let loaded=recalledReport(id);
-      if(!loaded){try{const r=await fetch(`/api/scans/${encodeURIComponent(id)}`);if(r.ok)loaded=(await r.json()).report;}catch{/* Offer recovery below. */}}
+      if(!loaded){try{const r=await fetch(id==='demo-offline'||id==='demo-recorded'?`/api/demos?mode=${id==='demo-offline'?'offline':'recorded'}`:`/api/scans/${encodeURIComponent(id)}`);if(r.ok){const data=await r.json();loaded=data.report||data;}}catch{/* Offer recovery below. */}}
       if(!active || ticket!==generation)return;
       if(loaded){rememberReport(loaded);setReport(loaded);setFilters(recalledFilters(loaded.id));setSelected(loaded.findings.find(f=>f.id===finding)||null);
         query.set('report',loaded.id);window.history.replaceState(window.history.state,'',`/?${query}`);
         const listQuery=new URLSearchParams(query);listQuery.delete('finding');setDashboardLocation(requested,`/?${listQuery}`);
       }
-      else {setReport(null);setSelected(null);setError("This report is unavailable. Sign in and reopen a saved report, or run the offline demo again.");}
+      else {setReport(null);setSelected(null);setUnavailable(true);}
     }
     function expire(){clearReportMemory();}
     void restore();window.addEventListener("popstate",restore);window.addEventListener(sessionExpiredEvent,expire);
@@ -130,7 +131,7 @@ export default function Home() {
     setDashboardLocation(v,`/?${query}`);
     if(finding)query.set("finding",finding.id);
     window.history.pushState({...window.history.state,shipcheckView:true},"",`/?${query}`);
-    setView(v);setReport(current);setSelected(finding);setError("");
+    setView(v);setReport(current);setSelected(finding);setError("");setUnavailable(false);
   }
   async function scan(mode: "demo" | "live", replay=false) {
     setBusy(true);
@@ -191,20 +192,6 @@ export default function Home() {
               navigate("overview",saved);
             }}
           />
-          <div className="breadcrumb">
-            WORKSPACE <ChevronRight size={12} />{" "}
-            {selected
-              ? "FINDING DETAILS"
-              : view === "project"
-                ? "PROJECT SETUP"
-                : view === "scan"
-                  ? "NEW SCAN"
-                  : view === "actions"
-                    ? "RECOMMENDED ACTIONS"
-                    : view === "findings"
-                      ? "FINDINGS"
-                      : "OVERVIEW"}
-          </div>
           {error && (
             <div role="alert" className="error">
               <ShieldAlert size={18} />
@@ -311,6 +298,8 @@ export default function Home() {
                 </section>
               </div>
             </>
+          ) : unavailable ? (
+            <section className="home-empty"><h1>Report unavailable</h1><p>This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.</p><Link className="button primary" href="/sign-in">Sign in</Link> <button className="button" onClick={()=>scan('demo')}>Run offline demo</button></section>
           ) : !report ? (
             <HomeEmpty demo={offline=>scan("demo",!offline&&recorded===true)} scan={()=>navigate("scan")} recorded={recorded}/>
           ) : (
@@ -322,7 +311,7 @@ export default function Home() {
               <CheckCheck size={14} />
               ShipCheck · Evidence before deployment
             </span>
-            <span>Offline demo is temporary · Member scans are saved</span>
+            <span>Built by HeySalad</span>
           </footer>
         </main>
       </div>

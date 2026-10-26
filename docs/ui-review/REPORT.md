@@ -16,3 +16,6 @@ Verdict presentation maps policy without altering it; review severity is Unrated
 
 ## Phase 5 — finding detail
 Extracted reusable finding detail. The exact matching OSV snapshot supplies advisory ID, CVE aliases, CVSS vector, CWE, affected ranges and fixed-version change chip. No metadata is inferred for other live advisories; those fields remain absent when not stored. Prepare repair is primary; demo decision controls are disabled with sign-in guidance. Validated Nemotron selection is explicitly labelled verbatim. External source links carry an external icon. All 203 unit and 32 browser tests, typecheck and build pass.
+
+## Phase 6 — restorable navigation
+Stable demo-offline and demo-recorded URLs reload through the fixture endpoint; legacy findings/actions links normalize to overview. Missing/inaccessible reports show a dedicated recovery state. Top-level breadcrumb removed and footer simplified. Added two browser tests for deep-link reload and unavailable recovery. Storage test now explicitly assigns a member-scan UUID to its synthetic storage fixture (demo IDs are not persisted). All 203 unit tests and 34 browser tests, typecheck and build pass.

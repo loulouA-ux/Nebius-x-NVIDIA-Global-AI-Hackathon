@@ -88,6 +88,8 @@ describe("real Postgres storage boundary", () => {
   });
   it("masks stored evidence and preserves verdict across decision events", async () => {
     const report = await runScan({ mode: "demo" });
+    // Storage uses UUIDs for member scans; demo replay IDs are never persisted.
+    report.id = "df44ab44-2b67-4918-abf0-d588b0a2572d";
     report.findings[0].description = "sk_live_" + "B".repeat(24);
     await store.saveScan(peter, report);
     const original = await store.getScan(peter, report.id);
