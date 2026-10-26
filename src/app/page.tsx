@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import BrandHeader from "./brand-header";
 import {
   CheckCheck,
   LayoutDashboard,
@@ -100,16 +101,7 @@ export default function Home() {
     ).length ?? 0;
   return (
     <div className="app">
-      <header className="topbar">
-        <a className="brand" href="/" aria-label="ShipCheck home">
-          <img className="brand-symbol" src="/brand/symbol.svg" alt="" width={48} height={42} />
-          ShipCheck
-        </a>
-        <span className="tagline">Scan. Check. Ship.</span>
-        <span className="build-badge">
-          Preview <span>0.2</span>
-        </span>
-      </header>
+      <BrandHeader />
       <div className="shell">
         <aside>
           <div className="workspace">
