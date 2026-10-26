@@ -1,0 +1,347 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "home",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Run the demo",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "new-scan",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "demo-overview",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "findings",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "finding-detail",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Prepare repair",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "repairs",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Propose repair",
+        "aboveFold": false
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "project",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Create project and get challenge",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "unavailable",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Sign in",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "loading",
+    "horizontalOverflow": false,
+    "primaryButtons": []
+  },
+  {
+    "width": 1440,
+    "height": 900,
+    "name": "dark-report",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "home",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Run the demo",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "new-scan",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "demo-overview",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "findings",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "finding-detail",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Prepare repair",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "repairs",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Propose repair",
+        "aboveFold": false
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "project",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Create project and get challenge",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "unavailable",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Sign in",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "loading",
+    "horizontalOverflow": false,
+    "primaryButtons": []
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "name": "dark-report",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "home",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Run the demo",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "new-scan",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "demo-overview",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "findings",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "finding-detail",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Prepare repair",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "repairs",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Propose repair",
+        "aboveFold": false
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "project",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Create project and get challenge",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "unavailable",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "Sign in",
+        "aboveFold": true
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "loading",
+    "horizontalOverflow": false,
+    "primaryButtons": []
+  },
+  {
+    "width": 375,
+    "height": 812,
+    "name": "dark-report",
+    "horizontalOverflow": false,
+    "primaryButtons": [
+      {
+        "label": "New scan",
+        "aboveFold": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,674 @@
+[
+  {
+    "mode": "light",
+    "route": "/",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Recorded live run · Nemotron on Nebius · Tavily research",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "255,255,255",
+        "ratio": 14.37
+      },
+      {
+        "text": "Scan → Evidence → Verified repair",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "255,255,255",
+        "ratio": 7.58
+      },
+      {
+        "text": "Demo workspace",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "248,250,252",
+        "ratio": 13.74
+      },
+      {
+        "text": "Overview",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "239,246,255",
+        "ratio": 13.21
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "248,250,252",
+        "ratio": 7.24
+      },
+      {
+        "text": "Sign in with GitHub",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "248,250,252",
+        "ratio": 4.94
+      },
+      {
+        "text": "Run the demo",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "37,99,235",
+        "ratio": 5.17
+      },
+      {
+        "text": "Offline fixture",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "255,255,255",
+        "ratio": 5.17
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "light",
+    "route": "/?view=scan",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Or try the demo",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "255,255,255",
+        "ratio": 14.37
+      },
+      {
+        "text": "Package names and versions go to OSV. AI triage uses server-side ",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "255,255,255",
+        "ratio": 7.58
+      },
+      {
+        "text": "Verified members only",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "248,250,252",
+        "ratio": 13.74
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "248,250,252",
+        "ratio": 7.24
+      },
+      {
+        "text": "New scan",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "239,246,255",
+        "ratio": 13.21
+      },
+      {
+        "text": "View project setup",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "248,250,252",
+        "ratio": 4.94
+      },
+      {
+        "text": "Scan",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "37,99,235",
+        "ratio": 5.17
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "light",
+    "route": "/?view=project",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Staging URL",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "255,255,255",
+        "ratio": 14.37
+      },
+      {
+        "text": "Use the HTTPS origin of a public staging host. Paths, ports, quer",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "255,255,255",
+        "ratio": 7.58
+      },
+      {
+        "text": "Set up a project.",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "248,250,252",
+        "ratio": 13.74
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "248,250,252",
+        "ratio": 7.24
+      },
+      {
+        "text": "Project setup",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "239,246,255",
+        "ratio": 13.21
+      },
+      {
+        "text": "Sign in to manage staging checks",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "248,250,252",
+        "ratio": 4.94
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "light",
+    "route": "/?report=demo-offline",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Not in scope",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "255,255,255",
+        "ratio": 14.37
+      },
+      {
+        "text": "No verified staging project was selected. No target site was cont",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "255,255,255",
+        "ratio": 7.58
+      },
+      {
+        "text": "Decision",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "248,250,252",
+        "ratio": 13.74
+      },
+      {
+        "text": "Overview",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "239,246,255",
+        "ratio": 13.21
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "248,250,252",
+        "ratio": 7.24
+      },
+      {
+        "text": "Clear filters",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "248,250,252",
+        "ratio": 4.94
+      },
+      {
+        "text": "New scan",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "37,99,235",
+        "ratio": 5.17
+      },
+      {
+        "text": "Blocked · 2 high-severity findings",
+        "fg": "rgb(185, 28, 28)",
+        "bg": "255,255,255",
+        "ratio": 6.47
+      },
+      {
+        "text": "High",
+        "fg": "rgb(185, 28, 28)",
+        "bg": "254,242,242",
+        "ratio": 5.91
+      },
+      {
+        "text": "0 Medium",
+        "fg": "rgb(180, 83, 9)",
+        "bg": "255,251,235",
+        "ratio": 4.84
+      },
+      {
+        "text": "All",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "255,255,255",
+        "ratio": 5.17
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "light",
+    "route": "/repairs",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Refresh saved repairs",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "255,255,255",
+        "ratio": 14.37
+      },
+      {
+        "text": "Refresh to try again. Existing repairs have not been changed.",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "255,255,255",
+        "ratio": 7.58
+      },
+      {
+        "text": "Approve draft PR",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "248,250,252",
+        "ratio": 13.74
+      },
+      {
+        "text": "Sign in to start. A connected repository is required; no recorded",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "248,250,252",
+        "ratio": 7.24
+      },
+      {
+        "text": "Repairs & audit trail",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "239,246,255",
+        "ratio": 4.75
+      },
+      {
+        "text": "Report",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "248,250,252",
+        "ratio": 4.94
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "light",
+    "route": "/sign-in",
+    "pairs": [
+      {
+        "text": "Evidence before deployment.",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Sign in",
+        "fg": "rgb(20, 43, 69)",
+        "bg": "255,255,255",
+        "ratio": 14.37
+      },
+      {
+        "text": "Ask your workspace owner for your individual key. This is not you",
+        "fg": "rgb(71, 85, 105)",
+        "bg": "255,255,255",
+        "ratio": 7.58
+      },
+      {
+        "text": "Repository access stays separate. You choose what to connect.",
+        "fg": "rgb(203, 213, 225)",
+        "bg": "20,43,69",
+        "ratio": 9.68
+      },
+      {
+        "text": "Continue with GitHub",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "37,99,235",
+        "ratio": 5.17
+      },
+      {
+        "text": "Dependency repairs",
+        "fg": "rgb(37, 99, 235)",
+        "bg": "255,255,255",
+        "ratio": 5.17
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "dark",
+    "route": "/",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Recorded live run · Nemotron on Nebius · Tavily research",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "24,34,49",
+        "ratio": 13.56
+      },
+      {
+        "text": "Scan → Evidence → Verified repair",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "24,34,49",
+        "ratio": 9.04
+      },
+      {
+        "text": "Demo workspace",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "16,23,34",
+        "ratio": 15.23
+      },
+      {
+        "text": "Overview",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "32,52,77",
+        "ratio": 10.72
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "16,23,34",
+        "ratio": 10.15
+      },
+      {
+        "text": "Sign in with GitHub",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "16,23,34",
+        "ratio": 9.97
+      },
+      {
+        "text": "Run the demo",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "29,78,216",
+        "ratio": 6.7
+      },
+      {
+        "text": "Offline fixture",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "24,34,49",
+        "ratio": 8.88
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "dark",
+    "route": "/?view=scan",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Or try the demo",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "24,34,49",
+        "ratio": 13.56
+      },
+      {
+        "text": "Package names and versions go to OSV. AI triage uses server-side ",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "24,34,49",
+        "ratio": 9.04
+      },
+      {
+        "text": "Verified members only",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "16,23,34",
+        "ratio": 15.23
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "16,23,34",
+        "ratio": 10.15
+      },
+      {
+        "text": "New scan",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "32,52,77",
+        "ratio": 10.72
+      },
+      {
+        "text": "View project setup",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "16,23,34",
+        "ratio": 9.97
+      },
+      {
+        "text": "Scan",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "29,78,216",
+        "ratio": 6.7
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "dark",
+    "route": "/?view=project",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Staging URL",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "24,34,49",
+        "ratio": 13.56
+      },
+      {
+        "text": "Use the HTTPS origin of a public staging host. Paths, ports, quer",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "24,34,49",
+        "ratio": 9.04
+      },
+      {
+        "text": "Set up a project.",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "16,23,34",
+        "ratio": 15.23
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "16,23,34",
+        "ratio": 10.15
+      },
+      {
+        "text": "Project setup",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "32,52,77",
+        "ratio": 10.72
+      },
+      {
+        "text": "Sign in to manage staging checks",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "16,23,34",
+        "ratio": 9.97
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "dark",
+    "route": "/?report=demo-offline",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Not in scope",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "24,34,49",
+        "ratio": 13.56
+      },
+      {
+        "text": "No verified staging project was selected. No target site was cont",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "24,34,49",
+        "ratio": 9.04
+      },
+      {
+        "text": "Decision",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "16,23,34",
+        "ratio": 15.23
+      },
+      {
+        "text": "Overview",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "32,52,77",
+        "ratio": 10.72
+      },
+      {
+        "text": "Built by HeySalad",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "16,23,34",
+        "ratio": 10.15
+      },
+      {
+        "text": "Clear filters",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "16,23,34",
+        "ratio": 9.97
+      },
+      {
+        "text": "New scan",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "29,78,216",
+        "ratio": 6.7
+      },
+      {
+        "text": "Blocked · 2 high-severity findings",
+        "fg": "rgb(252, 165, 165)",
+        "bg": "24,34,49",
+        "ratio": 8.43
+      },
+      {
+        "text": "High",
+        "fg": "rgb(252, 165, 165)",
+        "bg": "72,30,38",
+        "ratio": 7.43
+      },
+      {
+        "text": "0 Medium",
+        "fg": "rgb(252, 211, 77)",
+        "bg": "66,51,23",
+        "ratio": 8.48
+      },
+      {
+        "text": "All",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "24,34,49",
+        "ratio": 8.88
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "dark",
+    "route": "/repairs",
+    "pairs": [
+      {
+        "text": "Skip to main content",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Refresh saved repairs",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "24,34,49",
+        "ratio": 13.56
+      },
+      {
+        "text": "Refresh to try again. Existing repairs have not been changed.",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "24,34,49",
+        "ratio": 9.04
+      },
+      {
+        "text": "Approve draft PR",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "16,23,34",
+        "ratio": 15.23
+      },
+      {
+        "text": "Sign in to start. A connected repository is required; no recorded",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "16,23,34",
+        "ratio": 10.15
+      },
+      {
+        "text": "Repairs & audit trail",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "32,52,77",
+        "ratio": 7.02
+      },
+      {
+        "text": "Report",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "16,23,34",
+        "ratio": 9.97
+      }
+    ],
+    "failures": []
+  },
+  {
+    "mode": "dark",
+    "route": "/sign-in",
+    "pairs": [
+      {
+        "text": "Evidence before deployment.",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "20,43,69",
+        "ratio": 14.37
+      },
+      {
+        "text": "Sign in",
+        "fg": "rgb(229, 237, 247)",
+        "bg": "24,34,49",
+        "ratio": 13.56
+      },
+      {
+        "text": "Ask your workspace owner for your individual key. This is not you",
+        "fg": "rgb(182, 196, 214)",
+        "bg": "24,34,49",
+        "ratio": 9.04
+      },
+      {
+        "text": "Repository access stays separate. You choose what to connect.",
+        "fg": "rgb(203, 213, 225)",
+        "bg": "20,43,69",
+        "ratio": 9.68
+      },
+      {
+        "text": "Continue with GitHub",
+        "fg": "rgb(255, 255, 255)",
+        "bg": "29,78,216",
+        "ratio": 6.7
+      },
+      {
+        "text": "Dependency repairs",
+        "fg": "rgb(147, 197, 253)",
+        "bg": "24,34,49",
+        "ratio": 8.88
+      }
+    ],
+    "failures": []
+  }
+]
