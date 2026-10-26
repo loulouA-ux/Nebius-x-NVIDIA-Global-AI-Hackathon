@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import HomeEmpty from "./views/home-empty";
 import AiTriage from "./components/ai-triage";
 import styles from "./findings.module.css";
 import ReportInsights, {SourcePreview, Preview} from "./report-insights";
@@ -52,6 +53,8 @@ export default function Home() {
   const [report, setReport] = useState<ScanReport | null>(null);
   const [selected, setSelected] = useState<Finding | null>(null);
   const [busy, setBusy] = useState(false);
+  const [recorded,setRecorded]=useState<boolean|null>(null);
+  useEffect(()=>{fetch("/api/demos?mode=availability").then(r=>r.json()).then(d=>setRecorded(d.recorded)).catch(()=>setRecorded(false));},[]);
   const [error, setError] = useState("");
   const [filename, setFilename] = useState("package-lock.json");
   const [content, setContent] = useState(defaultManifest);
@@ -358,83 +361,7 @@ export default function Home() {
               </div>
             </>
           ) : !report ? (
-            <>
-              <div className="page-heading">
-                <div>
-                  <h1>Ready for your next release?</h1>
-                  <p className="intro">
-                    Find the risks. Understand the evidence. Decide what ships.
-                  </p>
-                </div>
-                <button
-                  className="button primary"
-                  onClick={() => navigate("scan")}
-                >
-                  <ScanLine size={17} />
-                  New scan
-                </button>
-              </div>
-              <section className="welcome">
-                <div className="welcome-copy">
-
-                  <h2>
-                    Understand your release.
-                  </h2>
-                  <p>
-                    Investigate findings, inspect supported fixes and review
-                    the evidence before your next release.
-                  </p>
-                  <button
-                    className="button primary"
-                    onClick={() => scan("demo")}
-                  >
-                    Explore the demo <ArrowUpRight size={17} />
-                  </button>
-                  <small>Offline fixture · no account or API keys needed</small>
-                </div>
-                <div className="welcome-art" aria-hidden="true">
-                  <div className="art-node">
-                    <Package size={24} />
-                    <span>Dependency</span>
-                  </div>
-                  <div className="art-line" />
-                  <div className="art-node center-node">
-                    <CheckCheck size={30} />
-                    <span>ShipCheck</span>
-                  </div>
-                  <div className="art-line" />
-                  <div className="art-node">
-                    <FileSearch size={24} />
-                    <span>Evidence</span>
-                  </div>
-                </div>
-              </section>
-              <section className="workflow-cards" aria-label="Security workflow">
-                <button className="workflow-card" onClick={() => navigate("scan")}><span className="workflow-icon"><ScanLine size={25}/></span><small>01 / SCAN</small><h2>Start with the evidence.</h2><p>Inspect dependencies and verified staging hosts. See exactly what was checked.</p><strong>Configure a scan →</strong></button>
-                <Link className="workflow-card" href="/repairs"><span className="workflow-icon"><FlaskConical size={25}/></span><small>02 / CHECK</small><h2>A fix you can inspect.</h2><p>Review a supported dependency patch and test it in isolated compute.</p><strong>Open repair workspace →</strong></Link>
-                <Link className="workflow-card" href="/repairs#repair-audit"><span className="workflow-icon"><ListChecks size={25}/></span><small>03 / REVIEW</small><h2>Keep the decision yours.</h2><p>Open a saved repair to review its audit trail, tests and draft PR evidence.</p><strong>Review saved repairs →</strong></Link>
-              </section>
-              <div className="intro-features">
-                <div>
-                  <Package />
-                  <h3>Know what you ship</h3>
-                  <p>
-                    Inspect resolved versions, with unsupported inputs clearly
-                    called out.
-                  </p>
-                </div>
-                <div>
-                  <FileSearch />
-                  <h3>See the source</h3>
-                  <p>Follow each finding to code evidence or an advisory.</p>
-                </div>
-                <div>
-                  <ListChecks />
-                  <h3>Choose your next step</h3>
-                  <p>Review practical actions. Nothing changes without you.</p>
-                </div>
-              </div>
-            </>
+            <HomeEmpty demo={offline=>scan("demo",!offline&&recorded===true)} scan={()=>navigate("scan")} recorded={recorded}/>
           ) : (
             <>
               <div className="page-heading">

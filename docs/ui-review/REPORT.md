@@ -7,3 +7,6 @@ ShipCheck identity; neutral signed-out workspace; actual GitHub login fetched fr
 
 ## Phase 2
 Captured real synthetic-manifest run at 2026-10-26 09:08 London on a7a49c7, model nvidia/nemotron-3-super-120b-a12b, us-central1. Five findings and five sources; exact recorded notes, dates and excerpts retained. Capture refuses incomplete inference evidence and credential values. Configuration endpoint exposes booleans only. Phase checks: typecheck/build, 203 unit and 32 browser tests passed.
+
+## Phase 3
+Single empty-state card and default recorded demo; explicit offline alternative. Compact demo identity strip. Removed hero, decorative diagram, workflow cards and repeated feature blurbs. Typecheck/build, 203 unit and 32 browser tests passed. Recent-scan presentation will be completed with state extraction.

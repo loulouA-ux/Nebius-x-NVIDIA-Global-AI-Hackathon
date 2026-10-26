@@ -31,7 +31,7 @@ test('Back restores report and finding context without repeating a scan',async({
  await page.route('**/api/session',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
  await page.route('**/api/repositories',r=>r.fulfill({json:{repositories:[]}}));
  await page.route('**/api/repairs',r=>r.fulfill({json:{repairs:[]}}));
- await page.goto('/');await page.getByRole('button',{name:'Explore the demo'}).click();
+ await page.goto('/');await page.getByRole('button',{name:'Offline fixture'}).click();
  await expect(page.getByRole('heading',{name:'2 blockers need attention'})).toBeVisible();
  await page.getByRole('button',{name:/Command Injection in lodash/}).click();
  await expect(page.getByRole('heading',{name:'Evidence',exact:true})).toBeVisible();
@@ -46,7 +46,7 @@ test('Back restores report and finding context without repeating a scan',async({
 
 test('finding and its evidence are adjacent on desktop and stacked on mobile',async({page})=>{
  await page.setViewportSize({width:1440,height:1000});await page.goto('/');
- await page.getByRole('button',{name:'Explore the demo'}).click();
+ await page.getByRole('button',{name:'Offline fixture'}).click();
  await page.getByRole('button',{name:/Command Injection in lodash/}).click();
  const summary=page.getByRole('region',{name:'Finding and recommended action'});
  const evidence=page.getByRole('region',{name:'Source evidence'});

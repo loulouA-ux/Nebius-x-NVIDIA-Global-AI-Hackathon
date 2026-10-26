@@ -4,9 +4,9 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
 }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Ready for your next release?" }),
+    page.getByRole("heading", { name: "Check before you ship." }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
     page.getByRole("heading", { name: "2 blockers need attention" }),
   ).toBeVisible();
@@ -59,7 +59,7 @@ test("anonymous live scan is blocked before manifest processing", async ({
 test("mobile flow has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  await page.getByRole("button", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
     page.getByRole("heading", { name: "2 blockers need attention" }),
   ).toBeVisible();
@@ -82,7 +82,7 @@ test("desktop overview renders without client errors", async ({ page }) => {
     path: "test-results/welcome-desktop.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
     page.getByRole("heading", { name: "2 blockers need attention" }),
   ).toBeVisible();

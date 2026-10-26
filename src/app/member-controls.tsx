@@ -138,7 +138,7 @@ export default function MemberControls({
             </button>
           </>
         ) : loaded ? (
-          <><span className={styles.hint}>Demo mode · Sign in to save scans and connect repositories.</span><Link className="button" href="/sign-in">Sign in with GitHub</Link></>
+          <><span className={styles.hint}>Demo workspace</span><Link className="text-button" href="/sign-in">Sign in with GitHub</Link></>
         ) : (
           <span>Checking member session…</span>
         )}

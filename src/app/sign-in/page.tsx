@@ -59,7 +59,7 @@ export default function SignIn() {
             margin: "12px 0",
           }}
         />
-        <button className="button primary" disabled={busy}>
+        <button className="button" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
       </form></details>
