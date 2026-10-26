@@ -2,9 +2,9 @@ import { test, expect } from "@playwright/test";
 test("demo runs real findings, exposes evidence and manual actions", async ({
   page,
 }) => {
-  await page.goto("/?view=overview");
+  await page.goto("/scan");
   await expect(
-    page.getByRole("heading", { name: "Check before you ship." }),
+    page.getByRole("heading", { name: "New scan" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
@@ -17,7 +17,7 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
     }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: /Command Injection in lodash/ })
+    .getByRole("link", { name: /Command Injection in lodash/ })
     .click();
   await page.getByRole("button", {name:"Preview source"}).click();
   await expect(
@@ -42,18 +42,15 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
 test("anonymous live scan is blocked before manifest processing", async ({
   page,
 }) => {
-  await page.goto("/?view=overview");
-  await page
-    .getByRole("button", { name: "New scan", exact: true })
-    .first()
-    .click();
+  await page.goto("/scan");
+  await page.getByText("Paste contents instead",{exact:true}).click();
   const blocked=await page.request.post("/api/scans",{data:{mode:"live",filename:"package.json",content:"{bad json"}});
   expect(blocked.status()).toBe(401);
   expect(await blocked.json()).toMatchObject({error:"Sign in to run live scans."});
   await page.getByLabel("File format").selectOption("package.json");
   await page.getByLabel("Manifest content").fill(JSON.stringify({dependencies:{lodash:"4.17.20"}}));
   await page
-    .getByRole("button", { name: "Scan", exact: true })
+    .getByRole("button", { name: "Run scan", exact: true })
     .click();
   await expect(
     page.getByRole("alert").filter({ hasText: "Sign in to run live scans." }),
@@ -61,7 +58,7 @@ test("anonymous live scan is blocked before manifest processing", async ({
 });
 test("mobile flow has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/?view=overview");
+  await page.goto("/scan");
   await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
     page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
@@ -80,7 +77,7 @@ test("desktop overview renders without client errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/?view=overview");
+  await page.goto("/scan");
   await page.screenshot({
     path: "test-results/welcome-desktop.png",
     fullPage: true,
@@ -160,14 +157,15 @@ test("member can reopen a saved report and record a decision without changing it
     decisions.push(item);
     await route.fulfill({ status: 201, json: item });
   });
-  await page.goto("/?view=overview");
-  await expect(page.getByText("Signed in as")).toBeVisible();
+  await page.goto("/scan");
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator("main").getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await expect(
     page.getByRole("heading", { name: "Scan report" }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: /Potential credential in supplied content/ })
+    .getByRole("link", { name: /Potential credential in supplied content/ })
     .click();
   await page
     .getByLabel("Reason or review note")
@@ -218,11 +216,12 @@ test("expired decision session clears stale member state and offers sign-in", as
   await page.route(`**/api/scans/${report.id}/decisions`, (route) =>
     route.fulfill({ status: 401, json: { error: "Session expired." } }),
   );
-  await page.goto("/?view=overview");
-  await expect(page.getByText("Signed in as")).toBeVisible();
+  await page.goto("/scan");
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator("main").getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await page
-    .getByRole("button", { name: /Potential credential in supplied content/ })
+    .getByRole("link", { name: /Potential credential in supplied content/ })
     .click();
   await page.getByRole("button", { name: "Acknowledge", exact: true }).click();
   await expect(page.getByRole("link", { name: "Sign in with GitHub" })).toBeVisible();

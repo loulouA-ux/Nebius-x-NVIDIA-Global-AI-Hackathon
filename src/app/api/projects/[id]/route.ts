@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
 import { failure, json } from "@/lib/server/http";
 import { projectResponse, validateProjectId } from "@/lib/server/project-verification";
@@ -8,6 +9,8 @@ export const runtime = "nodejs";
 type Context = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: Context) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     const id = validateProjectId((await params).id);
     const query = database();

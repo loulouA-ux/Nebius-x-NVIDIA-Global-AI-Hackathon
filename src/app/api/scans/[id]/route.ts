@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
 import { requireActor } from "@/lib/server/session";
 import { Store } from "@/lib/server/store";
@@ -8,6 +9,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     const id = validateScanId((await params).id);
     const q = database(),

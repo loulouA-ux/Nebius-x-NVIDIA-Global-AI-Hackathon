@@ -46,6 +46,6 @@ for (const width of [1440, 1024, 390, 360]) {
       }
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await strip.screenshot({path: `docs/partner-strip-review/powered-by-${width}.png`});
+    await strip.screenshot({path: `docs/ui-review/final-powered-by-${width}.png`});
   });
 }

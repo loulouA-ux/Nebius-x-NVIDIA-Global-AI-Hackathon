@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
 import { beginGitHubOAuth, githubOAuthConfig, GITHUB_OAUTH_COOKIE, assertGitHubOrigin } from "@/lib/server/github-oauth";
 import { saveOAuthTransaction } from "@/lib/server/github-session";
@@ -5,6 +6,8 @@ import { failure } from "@/lib/server/http";
 import { Store } from "@/lib/server/store";
 export const runtime = "nodejs";
 export async function GET(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     const config = githubOAuthConfig();
     assertGitHubOrigin(request,config.origin);

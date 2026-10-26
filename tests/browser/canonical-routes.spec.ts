@@ -7,3 +7,8 @@ test('legacy links redirect and findings support new tabs, reload and Back',asyn
  await page.goto('/?view=scan');await expect(page).toHaveURL(/\/scan$/);await page.goto('/?view=project');await expect(page).toHaveURL(/\/hosts$/);await page.goto('/?view=overview');await expect(page).toHaveURL(/\/reports$/);
 });
 test('phone provides four direct tabs',async({page})=>{await page.setViewportSize({width:390,height:844});await page.goto('/scan');const nav=page.getByRole('navigation',{name:'Main navigation'});for(const name of ['Reports','Scan','Repairs','Hosts'])await expect(nav.getByRole('link',{name,exact:true})).toBeVisible();await nav.getByRole('link',{name:'Hosts',exact:true}).click();await expect(nav.getByRole('link',{name:'Hosts',exact:true})).toHaveAttribute('aria-current','page');});
+
+test('phone findings hide desktop column headings', async ({page}) => {
+ await page.setViewportSize({width:390,height:844});await page.goto('/reports/demo-offline');
+ await expect(page.locator('.report-row').first()).toBeVisible();await expect(page.locator('.table-heading')).toBeHidden();
+});

@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { verifyProjectForScan } from "@/lib/server/project-verification";
 import {
   scanVerifiedHost,
@@ -30,6 +31,8 @@ const inputSchema = z.discriminatedUnion("mode", [
 ]);
 let active = false;
 export async function POST(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   // Public demo uses only fixed fixtures. Live scans require an individual session and database quota.
   const url = new URL(request.url);
   const origin = request.headers.get("origin");
@@ -116,7 +119,10 @@ export async function POST(request: Request) {
       hostResult = await scanVerifiedHost(target.hostname);
     }
     processing = true;
-    const report = await runScan(parsed.data, store, hostResult);
+    const result = await runScan(parsed.data, store, hostResult);
+    const report = parsed.data.mode === "demo"
+      ? { ...result, id: "demo-offline", createdAt: "2026-10-23T00:00:00Z", durationMs: 0 }
+      : result;
     if (store && actor)
       await store.saveScan(
         actor,
@@ -141,6 +147,8 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     const query = database();
     const actor = await requireActor(request, query);

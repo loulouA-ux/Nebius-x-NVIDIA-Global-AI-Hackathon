@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import {repairAuditEvents} from "@/lib/server/repair-audit";
 import {database} from "@/lib/server/db";
 import {requireActor} from "@/lib/server/session";
@@ -10,14 +11,18 @@ import type {RepairRun} from "@/lib/repair/runner";
 import type {RepositorySnapshot} from "@/lib/server/github-repositories";
 export const runtime="nodejs";export const maxDuration=800;
 type Context={params:Promise<{id:string}>};
-export async function GET(request:Request,context:Context){try{
+export async function GET(request:Request,context:Context){
+  const denied=refusePublicDemo();if(denied)return denied;
+try{
  const query=database(),actor=await requireActor(request,query),id=validateScanId((await context.params).id),row=await getRepair(query,actor,id);
  const plan=row.plan as RepairPlan,result=row.result as RepairRun|null;
  let hash:string|null=null;
  if(row.state==="verified"&&result)try{hash=approvalHash(plan,result);}catch{ /* Preserve older evidence for review without authorizing publication. */ }
  return json({id,state:row.state,plan,result,repository:(row.snapshot as RepositorySnapshot).repository,url:row.pr_url,approvalHash:hash,auditTrail:await repairAuditEvents(query,actor,id)});
 }catch(e){return failure(e);}}
-export async function POST(request:Request,context:Context){try{
+export async function POST(request:Request,context:Context){
+  const denied=refusePublicDemo();if(denied)return denied;
+try{
  assertOrigin(request);const query=database(),actor=await requireActor(request,query),id=validateScanId((await context.params).id);
  const data=await body(request,2000) as {action?:unknown;approvalHash?:unknown};
  if(data?.action==="reconcile")return json(await reconcileRepair(query,actor,id));

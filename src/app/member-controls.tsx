@@ -40,6 +40,7 @@ export default function MemberControls({
     async function load() {
       try {
         const r = await fetch("/api/session", { cache: "no-store" });
+        if (r.status === 403) {const data=await r.json();if(data.publicDemo){if(active){setMember("");setError(data.error);setScans([]);}return;}}
         if (r.status === 401) {
           if (active) {
             setMember("");

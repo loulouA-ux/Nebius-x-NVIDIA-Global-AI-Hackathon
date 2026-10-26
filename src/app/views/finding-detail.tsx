@@ -38,7 +38,7 @@ export default function FindingDetail({finding,report,close}:{finding:Finding;re
                     {!e.dependency&&<div className="code-label">{e.location}</div>}
                     {e.dependency && <p className="evidence-dependency">{e.dependency.name}@{e.dependency.version}<br/><code>{e.dependency.path}</code></p>}
                     <AdvisoryMetadata evidence={e}/><dl className="advisory-metadata">{e.dependency&&<><dt>Package</dt><dd>{e.dependency.name}@{e.dependency.version}</dd><dt>Ecosystem</dt><dd>{e.dependency.ecosystem}</dd></>}<dt>Exploitability</dt><dd>Not assessed</dd></dl><pre>{e.excerpt}</pre>
-                    {e.url && (
+                    {e.url && /^https?:\/\//i.test(e.url) && (
                       <><a className="external-source" href={e.url} target="_blank" rel="noreferrer">{e.url.startsWith("https://osv.dev/")?"Open on OSV ↗":"Open original source ↗"}</a><SourcePreview title={e.location} excerpt={e.excerpt} url={e.url} retrievedAt={e.retrievedAt}/></>
                     )}
                     {e.retrievedAt && (

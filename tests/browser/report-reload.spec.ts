@@ -2,11 +2,11 @@ import {test,expect} from '@playwright/test';
 test('stable demo URLs survive reload and legacy views resolve to the report',async({page})=>{
  await page.goto('/?view=findings&report=demo-offline');
  await expect(page.getByRole('heading',{name:'Scan report',exact:true})).toBeVisible();
- await expect(page).toHaveURL(/view=overview/);
- await page.getByRole('button',{name:/Command Injection in lodash/}).click();
+ await expect(page).toHaveURL(/reports\/demo-offline/);
+ await page.getByRole('link',{name:/Command Injection in lodash/}).click();
  await page.reload();
  await expect(page.getByRole('heading',{name:/Command Injection in lodash/})).toBeVisible();
- await page.keyboard.press('Escape');
+ await page.getByRole('button',{name:'Back to report'}).click();
  await expect(page.getByRole('heading',{name:'Scan report',exact:true})).toBeVisible();
 });
 test('inaccessible report has its own recovery screen',async({page})=>{
@@ -15,10 +15,10 @@ test('inaccessible report has its own recovery screen',async({page})=>{
  await expect(page.getByRole('heading',{name:'Report unavailable'})).toBeVisible();
  await expect(page.getByRole('button',{name:'Run the demo',exact:true})).toHaveCount(0);
 });
-test('drawer Escape restores its row and recorded replay has provenance',async({page})=>{
+test('finding Back restores its row and recorded replay has provenance',async({page})=>{
  await page.setViewportSize({width:1440,height:900});await page.goto('/?report=demo-offline');
- const row=page.getByRole('button',{name:/Command Injection in lodash/});await row.click();await expect(page.getByRole('dialog',{name:'Finding detail'})).toBeVisible();
- await page.keyboard.press('Escape');await expect(row).toBeFocused();
+ const row=page.getByRole('link',{name:/Command Injection in lodash/});await row.click();await expect(page.getByRole('heading',{name:/Command Injection in lodash/})).toBeVisible();
+ await page.getByRole('button',{name:'Back to report'}).click();await expect(row).toBeFocused();
  await page.goto('/?report=demo-recorded');await expect(page.getByText(/Recorded live run · captured/)).toBeVisible();await expect(page.getByRole('heading',{name:'Research sources · unconfirmed'})).toBeVisible();
 });
 test('mobile unrated rows keep severity separate from title',async({page})=>{

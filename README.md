@@ -76,3 +76,9 @@ MIT applies to original ShipCheck code. Third-party dependencies and advisory da
 ## Recorded live demo capture
 
 Run `node --env-file=.env.local --import tsx scripts/capture-recorded-run.ts` locally with both provider keys configured. This makes one pipeline scan using only the existing synthetic lockfile. It refuses incomplete provider evidence, checks that configured secret values are absent, and never overwrites a capture. Review the sanitized fixture before committing. `/api/demos?mode=recorded` returns an honest unavailable state if no fixture exists; `mode=offline` rebuilds the stable offline demo.
+
+### Read-only public demo mode
+
+Set `SHIPCHECK_PUBLIC_DEMO=1` on the server to allow only the landing page, reports index and fixture-backed report/finding replay. Live scans, sign-in, project/host management, repository and repair APIs return 403 before authentication, database or provider work. The health response exposes no configured-provider state in this mode. This flag does not deploy the app or change Vercel protection.
+
+Verify the running-server boundary with `npx playwright test -c playwright.public-demo.config.ts` after a production build. Normal member workflows require this flag to be unset. The npm library, CLI and MCP tools remain **IN DEVELOPMENT** and are not published.

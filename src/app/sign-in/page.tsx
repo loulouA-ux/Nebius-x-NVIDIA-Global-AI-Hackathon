@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import styles from "../account-ux.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BrandHeader from "../brand-header";
 export default function SignIn() {
+  const [demoId, setDemoId] = useState("demo-offline");
+  useEffect(() => { fetch('/api/demos?mode=availability').then(r => r.json()).then(d => { if(d.recorded) setDemoId('demo-recorded'); }).catch(() => {}); }, []);
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
@@ -63,7 +65,7 @@ export default function SignIn() {
         </button>
       </form></details>
       <p role="alert" className={error ? "error" : undefined}>{error}</p>
-      <Link href="/reports/demo-recorded">Run the demo</Link> · <Link href="/repairs">Dependency repairs</Link>
+      <Link href={`/reports/${demoId}`}>Run the demo</Link> · <Link href="/repairs">Dependency repairs</Link>
     </section></main></>
   );
 }

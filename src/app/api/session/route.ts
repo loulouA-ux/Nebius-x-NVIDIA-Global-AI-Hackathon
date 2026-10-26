@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
 import { assertOrigin, body, json, failure, ApiError } from "@/lib/server/http";
 import {
@@ -9,6 +10,8 @@ import {
 import { Store } from "@/lib/server/store";
 export const runtime = "nodejs";
 export async function GET(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     const query=database();
     const actor=await requireActor(request,query);
@@ -19,6 +22,8 @@ export async function GET(request: Request) {
   }
 }
 export async function POST(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     const data = (await body(request, 2000)) as { key?: unknown };
@@ -35,6 +40,8 @@ export async function POST(request: Request) {
   }
 }
 export async function DELETE(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     await revokeSession(request, database());
