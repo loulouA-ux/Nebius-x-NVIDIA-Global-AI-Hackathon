@@ -65,3 +65,11 @@ The first organisation collector processed 200 repositories, but only 49 of 387 
 `scripts/rescan-manifests.ts <prior-result-directory>` retries the first 20 incomplete manifests in original inventory order using the original Git blob IDs and verifies blob hashes. It never follows a moving branch. Results include fetch/size-and-integrity/parse/OSV stages, resolved-versus-queried counts and failed batch offsets. Prior artifacts remain unchanged. No cloud compute or repository code execution occurs. This improves dependency inventory only; no CodeQL, Trivy, secret-history or C# coverage is claimed.
 
 Follow-up validation: 219 unit tests across 26 files, typecheck and production build passed. A regression initially caught changed error wording; compatibility was restored before the passing full run. The live 20-manifest trial was launched on 26 October at 17:56 London; results are in ignored `test-results/manifest-rescan-2026-10-26T17-56-56-323Z`. Do not infer a completed trial from this launch record.
+
+## Review queue and continuation
+
+The 20-manifest trial finished at 17:59 London: 5 queried without warnings, 4 partial and 11 with no supported exact versions. It queried 2,645 of 2,651 resolved dependency entries. Combining its results with the initial organisation pass yields 303 raw matches, 239 advisory/ecosystem/package/version groups and 157 distinct advisory IDs; aliases are not collapsed. None of these counts establishes exploitability. The local review queue retains commit, manifest and dependency-path provenance and orders by repository reach, not inferred severity.
+
+`scripts/triage-benchmark.ts <result-directory> ...` generates private JSON and Markdown review artifacts under ignored test-results. Tests cover duplicate runs, distinct commits/versions and unmapped advisory identities. Validation: 222 unit tests, typecheck and production build passed.
+
+Continuation launched 26 October at 18:09 London with `scripts/rescan-manifests.ts <original-result-directory> 20 1000`, targeting all remaining 318 originally incomplete manifests at their original blobs. Output directory: `test-results/manifest-rescan-2026-10-26T18-09-13-483Z`. Launch is not completion. No new cloud spend, repository code execution, push or deployment. Comparative scanner and sandbox execution remains pending.

@@ -6,15 +6,19 @@ import {parseBenchmarkManifest,queryBenchmarkDependencies,benchmarkLimits} from 
 const exec=promisify(execFile);
 async function main(){
  const source=process.argv[2];if(!source)throw Error("Source scan directory required");
+ const skip=Number(process.argv[3]??0),limit=Number(process.argv[4]??20);
+ if(!Number.isSafeInteger(skip)||skip<0||!Number.isSafeInteger(limit)||limit<1||limit>1000)throw Error("Invalid rescan bounds");
  const inventory=JSON.parse(await readFile(`${source}/inventory.json`,"utf8"));
  const directory=`test-results/manifest-rescan-${new Date().toISOString().replace(/[:.]/g,"-")}`;
  await mkdir(directory,{recursive:true,mode:0o700});
- let count=0;const results=[];
- // Initial improvement trial: first 20 incomplete manifests, newest repositories first.
+ let count=0,eligible=0;const results=[];
+ console.log(JSON.stringify({event:"rescan-started",directory,skip,limit}));
+ // Explicit bounds permit continuation without repeating the initial trial.
  for(const item of inventory){
   const old=JSON.parse(await readFile(`${source}/${item.repository.split('/')[1]}.json`,"utf8"));
   for(const prior of old.results??[]){
-   if(prior.status!=="incomplete"||count>=20)continue;
+   if(prior.status!=="incomplete"||count>=limit)continue;
+   if(eligible++<skip)continue;
    count++;
    const result:Record<string,unknown>={repository:item.repository,commit:old.commit,path:prior.path,blob:prior.blob,previousStatus:prior.status,status:"incomplete",stage:"fetch",scope:"Pinned manifest dependency check only"};
    try{
@@ -37,9 +41,9 @@ async function main(){
    results.push(result);await writeFile(`${directory}/${count}.json`,JSON.stringify(result,null,2),{mode:0o600});
    console.log(JSON.stringify({completed:count,repository:result.repository,status:result.status,dependencies:result.dependencies,queried:result.queried}));
   }
-  if(count>=20)break;
+  if(count>=limit)break;
  }
- const summary={source,finishedAt:new Date().toISOString(),attempted:count,withQueries:results.filter(r=>Number(r.queried)>0).length,queriedWithoutWarnings:results.filter(r=>r.status==="queried").length,cloudSpendGbp:0};
+ const summary={source,skip,limit,finishedAt:new Date().toISOString(),attempted:count,withQueries:results.filter(r=>Number(r.queried)>0).length,queriedWithoutWarnings:results.filter(r=>r.status==="queried").length,cloudSpendGbp:0};
  await writeFile(`${directory}/summary.json`,JSON.stringify(summary,null,2),{mode:0o600});console.log(JSON.stringify({directory,...summary}));
 }
 main().catch(()=>{console.error("Rescan stopped; partial results preserved, raw input withheld.");process.exitCode=1;});
