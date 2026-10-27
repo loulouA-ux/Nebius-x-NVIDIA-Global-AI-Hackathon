@@ -18,3 +18,5 @@ CREATE INDEX IF NOT EXISTS sc_scan_job_queue ON sc_scan_jobs(state,created_at);
 ALTER TABLE sc_scan_jobs ADD COLUMN IF NOT EXISTS lease_token uuid;
 ALTER TABLE sc_scan_jobs ADD COLUMN IF NOT EXISTS lease_expires_at timestamptz;
 ALTER TABLE sc_scan_jobs ADD COLUMN IF NOT EXISTS attempts integer NOT NULL DEFAULT 0 CHECK(attempts BETWEEN 0 AND 3);
+ALTER TABLE sc_scan_jobs ADD COLUMN IF NOT EXISTS tree_sha text;
+ALTER TABLE sc_scan_jobs ADD COLUMN IF NOT EXISTS private_repository boolean NOT NULL DEFAULT false;

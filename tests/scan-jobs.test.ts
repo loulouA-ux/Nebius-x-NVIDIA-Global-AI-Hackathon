@@ -5,18 +5,21 @@ import { randomUUID } from 'node:crypto';
 import { ScanJobs } from '../src/lib/server/scan-jobs';
 import type { Query } from '../src/lib/server/db';
 import type { Actor } from '../src/lib/server/store';
+import { Store } from '../src/lib/server/store';
+import { runRepositoryJob } from '../src/lib/server/repository-worker';
+import { scanRepository, type RepositoryReport } from '../src/lib/server/repository-scan';
 const db = new PGlite();
 const query: Query = async (sql, params = []) => (await db.query(sql, params)).rows as Record<string, unknown>[];
 const jobs = new ScanJobs(query);
 const actor: Actor = {id:'peter',workspaceId:'team',role:'member'};
-const input = () => ({requestKey:randomUUID(),repository:'heysalad-ai/nicedeck',commit:'a'.repeat(40)});
+const input = () => ({requestKey:randomUUID(),repository:'heysalad-ai/nicedeck',commit:'a'.repeat(40),tree:'b'.repeat(40),private:false});
 beforeAll(async () => {
   await db.exec(readFileSync('migrations/001_core.sql','utf8'));
   await db.exec(readFileSync('migrations/002_hosted_jobs.sql','utf8'));
   await db.exec(readFileSync('migrations/002_hosted_jobs.sql','utf8'));
 });
 beforeEach(async () => {
-  await db.exec('DELETE FROM sc_scan_jobs; DELETE FROM sc_scan_allowances;');
+  await db.exec('DELETE FROM sc_scan_jobs; DELETE FROM sc_scan_allowances; DELETE FROM sc_scans;');
   await query("INSERT INTO sc_scan_allowances(workspace_id,period_start,scan_limit) VALUES('team',date_trunc('month',now() AT TIME ZONE 'UTC')::date,3)");
 });
 afterAll(() => db.close());
@@ -75,4 +78,27 @@ it('bounds recovery to three attempts then records failure',async()=>{
   expect(await jobs.claim()).toBeNull();
   expect(await jobs.expireExhausted()).toHaveLength(1);
   expect((await query('SELECT state,failure_code FROM sc_scan_jobs'))[0]).toMatchObject({state:'failed',failure_code:'retry_exhausted'});
+});
+it('persists the report and completes its job atomically with owner isolation',async()=>{
+  const req=input();await jobs.enqueue(actor,req);
+  const report=await scanRepository({repository:req.repository,commit:req.commit,tree:req.tree,private:false,files:{},omitted:['uv.lock']});
+  const result=await runRepositoryJob(query,{
+    fetchManifests:async()=>({repository:req.repository,commit:req.commit,tree:req.tree,private:false,files:{},omitted:[]}),
+    scanRepository:async()=>report,
+  });
+  expect(result.state).toBe('completed');
+  const saved=await new Store(query).getScan(actor,report.id) as RepositoryReport;
+  expect(saved.repositoryScan.commit).toBe(req.commit);
+  expect(saved.status).toBe('Incomplete');
+  await expect(new Store(query).getScan({...actor,id:'other'},report.id)).rejects.toMatchObject({status:404});
+  expect((await query('SELECT report_id,state FROM sc_scan_jobs'))[0]).toEqual({report_id:report.id,state:'completed'});
+});
+it('does not save a report from a stale worker or a different source commit',async()=>{
+  const req=input();await jobs.enqueue(actor,req);const job=(await jobs.claim())!;
+  const report=await scanRepository({repository:req.repository,commit:'c'.repeat(40),tree:req.tree,private:false,files:{},omitted:[]});
+  await expect(jobs.saveReport(String(job.id),String(job.lease_token),report)).rejects.toMatchObject({status:409});
+  report.repositoryScan.commit=req.commit;
+  await query("UPDATE sc_scan_jobs SET lease_expires_at=now()-interval '1 second' WHERE id=$1",[job.id]);
+  await expect(jobs.saveReport(String(job.id),String(job.lease_token),report)).rejects.toMatchObject({status:409});
+  expect((await query('SELECT count(*)::int AS count FROM sc_scans'))[0].count).toBe(0);
 });

@@ -3,11 +3,15 @@ import { z } from 'zod';
 import type { Query, Row } from './db';
 import type { Actor } from './store';
 import { ApiError } from './http';
+import { maskSecrets } from '@heysalad/shiptested';
+import type { RepositoryReport } from './repository-scan';
 
 const request = z.object({
   requestKey: z.string().uuid(),
   repository: z.string().regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/),
   commit: z.string().regex(/^[a-f0-9]{40}$/),
+  tree: z.string().regex(/^[a-f0-9]{40}$/),
+  private: z.boolean(),
 }).strict();
 export type JobRequest = z.infer<typeof request>;
 
@@ -24,7 +28,7 @@ export class ScanJobs {
   }
 
   private sameRequest(row: Row, input: JobRequest) {
-    if (row.repository !== input.repository || row.commit_sha !== input.commit)
+    if (row.repository !== input.repository || row.commit_sha !== input.commit || row.tree_sha !== input.tree || row.private_repository !== input.private)
       throw new ApiError(409, 'This request key belongs to a different scan.');
     return row;
   }
@@ -41,9 +45,9 @@ export class ScanJobs {
         UPDATE sc_scan_allowances SET reserved=reserved+1
         WHERE workspace_id=$1 AND period_start=(date_trunc('month',now() AT TIME ZONE 'UTC'))::date
         AND reserved < scan_limit RETURNING period_start
-      ) INSERT INTO sc_scan_jobs(id,workspace_id,owner_id,request_key,repository,commit_sha,period_start)
-        SELECT $3,$1,$2,$4,$5,$6,period_start FROM allowance RETURNING *`,
-      [actor.workspaceId, actor.id, randomUUID(), input.requestKey, input.repository, input.commit]);
+      ) INSERT INTO sc_scan_jobs(id,workspace_id,owner_id,request_key,repository,commit_sha,period_start,tree_sha,private_repository)
+        SELECT $3,$1,$2,$4,$5,$6,period_start,$7,$8 FROM allowance RETURNING *`,
+      [actor.workspaceId, actor.id, randomUUID(), input.requestKey, input.repository, input.commit,input.tree,input.private]);
       if (job) return job;
     } catch (error) {
       // Concurrent identical requests can hit the unique key; return the winner.
@@ -100,5 +104,19 @@ export class ScanJobs {
     return this.query(`UPDATE sc_scan_jobs SET state='failed',failure_code='retry_exhausted',
       lease_token=NULL,lease_expires_at=NULL,updated_at=now()
       WHERE state='running' AND attempts=3 AND lease_expires_at < now() RETURNING id`);
+  }
+
+  async saveReport(id:string,token:string,report:RepositoryReport) {
+    const [job]=await this.query(`WITH live AS (
+      SELECT * FROM sc_scan_jobs WHERE id=$1 AND lease_token=$2 AND state='running'
+      AND lease_expires_at>now() AND repository=$5 AND commit_sha=$6 FOR UPDATE
+    ), saved AS (
+      INSERT INTO sc_scans(id,workspace_id,owner_id,report)
+      SELECT $3,workspace_id,owner_id,$4::jsonb FROM live RETURNING id
+    ) UPDATE sc_scan_jobs SET state='completed',report_id=saved.id,lease_token=NULL,
+      lease_expires_at=NULL,updated_at=now() FROM saved WHERE sc_scan_jobs.id=$1 RETURNING sc_scan_jobs.*`,
+    [id,token,report.id,maskSecrets(JSON.stringify(report)),report.repositoryScan.repository,report.repositoryScan.commit]);
+    if(!job)throw new ApiError(409,'Worker lease or report source no longer matches.');
+    return job;
   }
 }
