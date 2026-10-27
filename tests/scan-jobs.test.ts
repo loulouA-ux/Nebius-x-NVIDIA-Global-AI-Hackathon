@@ -1,0 +1,78 @@
+import { afterAll, beforeAll, beforeEach, expect, it } from 'vitest';
+import { PGlite } from '@electric-sql/pglite';
+import { readFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { ScanJobs } from '../src/lib/server/scan-jobs';
+import type { Query } from '../src/lib/server/db';
+import type { Actor } from '../src/lib/server/store';
+const db = new PGlite();
+const query: Query = async (sql, params = []) => (await db.query(sql, params)).rows as Record<string, unknown>[];
+const jobs = new ScanJobs(query);
+const actor: Actor = {id:'peter',workspaceId:'team',role:'member'};
+const input = () => ({requestKey:randomUUID(),repository:'heysalad-ai/nicedeck',commit:'a'.repeat(40)});
+beforeAll(async () => {
+  await db.exec(readFileSync('migrations/001_core.sql','utf8'));
+  await db.exec(readFileSync('migrations/002_hosted_jobs.sql','utf8'));
+  await db.exec(readFileSync('migrations/002_hosted_jobs.sql','utf8'));
+});
+beforeEach(async () => {
+  await db.exec('DELETE FROM sc_scan_jobs; DELETE FROM sc_scan_allowances;');
+  await query("INSERT INTO sc_scan_allowances(workspace_id,period_start,scan_limit) VALUES('team',date_trunc('month',now() AT TIME ZONE 'UTC')::date,3)");
+});
+afterAll(() => db.close());
+it('reserves no more than the allowance under competing submissions', async () => {
+  const results = await Promise.allSettled(Array.from({length:8},() => jobs.enqueue(actor,input())));
+  expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(3);
+  expect((await query('SELECT reserved FROM sc_scan_allowances'))[0].reserved).toBe(3);
+  expect((await query('SELECT count(*)::int AS count FROM sc_scan_jobs'))[0].count).toBe(3);
+});
+it('retries the same request without consuming additional allowance', async () => {
+  const req=input();
+  const results=await Promise.all(Array.from({length:5},()=>jobs.enqueue(actor,req)));
+  expect(new Set(results.map(r=>r.id)).size).toBe(1);
+  expect((await query('SELECT reserved FROM sc_scan_allowances'))[0].reserved).toBe(1);
+  await expect(jobs.enqueue(actor,{...req,commit:'b'.repeat(40)})).rejects.toMatchObject({status:409});
+});
+it('isolates both owner and workspace and refuses unprovisioned workspaces', async () => {
+  const row=await jobs.enqueue(actor,input());
+  await expect(jobs.get({...actor,id:'louise'},String(row.id))).rejects.toMatchObject({status:404});
+  await expect(jobs.get({...actor,workspaceId:'other'},String(row.id))).rejects.toMatchObject({status:404});
+  await expect(jobs.enqueue({...actor,workspaceId:'other'},input())).rejects.toMatchObject({status:429});
+});
+it('only cancels queued owned jobs and preserves accounting', async () => {
+  const row=await jobs.enqueue(actor,input());
+  await expect(jobs.cancelQueued({...actor,id:'louise'},String(row.id))).rejects.toMatchObject({status:404});
+  expect((await jobs.cancelQueued(actor,String(row.id))).state).toBe('cancelled');
+  await expect(jobs.cancelQueued(actor,String(row.id))).rejects.toMatchObject({status:409});
+  expect((await query('SELECT reserved FROM sc_scan_allowances'))[0].reserved).toBe(1);
+});
+it('rejects malformed source and request identity before reserving', async () => {
+  await expect(jobs.enqueue(actor,{...input(),repository:'https://evil.example/repo'})).rejects.toMatchObject({status:400});
+  await expect(jobs.enqueue(actor,{...input(),commit:'main'})).rejects.toMatchObject({status:400});
+  expect((await query('SELECT reserved FROM sc_scan_allowances'))[0].reserved).toBe(0);
+});
+it('claims once and fences expired workers when recovering a job', async () => {
+  await jobs.enqueue(actor,input());
+  const claims=await Promise.all([jobs.claim(),jobs.claim()]);
+  expect(claims.filter(Boolean)).toHaveLength(1);
+  const first=claims.find(Boolean)!;
+  await query("UPDATE sc_scan_jobs SET lease_expires_at=now()-interval '1 second' WHERE id=$1",[first.id]);
+  const second=(await jobs.claim())!;
+  expect(second.id).toBe(first.id);
+  expect(second.attempts).toBe(2);
+  expect(second.lease_token).not.toBe(first.lease_token);
+  await expect(jobs.finish(String(first.id),String(first.lease_token),{failureCode:'scan_failed'})).rejects.toMatchObject({status:409});
+  expect((await jobs.finish(String(second.id),String(second.lease_token),{failureCode:'provider_unavailable'})).state).toBe('failed');
+  expect(await jobs.claim()).toBeNull();
+});
+it('bounds recovery to three attempts then records failure',async()=>{
+  await jobs.enqueue(actor,input());
+  for(let i=0;i<3;i++){
+    const job=(await jobs.claim())!;
+    expect(job.attempts).toBe(i+1);
+    await query("UPDATE sc_scan_jobs SET lease_expires_at=now()-interval '1 second' WHERE id=$1",[job.id]);
+  }
+  expect(await jobs.claim()).toBeNull();
+  expect(await jobs.expireExhausted()).toHaveLength(1);
+  expect((await query('SELECT state,failure_code FROM sc_scan_jobs'))[0]).toMatchObject({state:'failed',failure_code:'retry_exhausted'});
+});
