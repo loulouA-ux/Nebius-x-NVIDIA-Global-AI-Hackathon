@@ -1,4 +1,5 @@
 "use client";
+import MarkScene from '../components/voyage/mark-scene';
 import Link from "next/link";
 import styles from "../account-ux.module.css";
 import { useEffect, useState } from "react";
@@ -11,7 +12,7 @@ export default function SignIn() {
   return (
     <><BrandHeader /><main id="main-content" tabIndex={-1} className="auth-layout">
       <section className="auth-panel">
-      <h1>Sign in to ShipTested</h1>
+      <MarkScene variant="gated" tone="accent"/><h1>Sign in to ShipTested</h1>
       <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
       <p>Save reports, record review decisions and verify staging hosts. Sign-in is limited to invited preview members.</p><h2>What ShipTested can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
       <p>

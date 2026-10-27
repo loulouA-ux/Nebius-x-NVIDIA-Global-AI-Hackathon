@@ -1,4 +1,3 @@
 import BrandHeader from './brand-header';
-export default function NotFound() {
-  return <><BrandHeader/><main id="main-content" className="not-found"><h1>Let’s get you back to the evidence.</h1><p>This page is unavailable. Your dashboard is the place to continue.</p><a className="button primary" href="/">Return to dashboard</a><a className="button" href="/reports">View recorded reports</a></main></>;
-}
+import MarkScene from './components/voyage/mark-scene';
+export default function NotFound(){return <><BrandHeader/><main id="main-content" className="not-found"><MarkScene variant="missing"/><h1>Page not found</h1><p>This address has no page. Open Reports to return to the evidence.</p><a className="button primary" href="/reports">View reports</a></main></>}
