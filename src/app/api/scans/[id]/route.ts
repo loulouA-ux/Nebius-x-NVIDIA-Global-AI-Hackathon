@@ -1,6 +1,6 @@
 import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
-import { requireActor } from "@/lib/server/session";
+import { requireApiActor } from "@/lib/server/api-tokens";
 import { Store } from "@/lib/server/store";
 import { failure, json } from "@/lib/server/http";
 import { validateScanId } from "@/lib/server/scan-id";
@@ -14,7 +14,7 @@ export async function GET(
   try {
     const id = validateScanId((await params).id);
     const q = database(),
-      actor = await requireActor(request, q),
+      actor = await requireApiActor(request, q),
       store = new Store(q);
     return json({
       report: await store.getScan(actor, id),

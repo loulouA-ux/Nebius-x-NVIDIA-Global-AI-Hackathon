@@ -9,3 +9,6 @@
 .content ul {list-style:none;margin:0;padding:0;display:grid;gap:12px;}
 .content li {display:flex;align-items:center;flex-wrap:wrap;gap:12px;}
 @media(max-width:600px){.page{margin:16px auto;padding:20px;}.content button{width:100%;justify-content:center;}.content h1{font-size:32px;}}
+
+.content .permission {display:flex;align-items:center;gap:12px;min-height:44px;}
+.content .permission input {width:20px;height:20px;min-height:20px;flex:none;}

@@ -41,6 +41,10 @@
     "./ai": {
       "types": "./dist/ai.d.ts",
       "import": "./dist/ai.js"
+    },
+    "./hosted": {
+      "types": "./dist/hosted.d.ts",
+      "import": "./dist/hosted.js"
     }
   },
   "scripts": {

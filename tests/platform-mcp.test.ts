@@ -5,6 +5,7 @@ import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 import {createServer} from '../packages/mcp/src/server';
 import {readLocalLockfile} from '../packages/mcp/src/local';
 import {scan} from '@heysalad/shiptested';
+import {HostedClient} from '@heysalad/shiptested/hosted';
 import {readFile,mkdtemp,mkdir,symlink,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -34,4 +35,16 @@ describe('MCP protocol',()=>{
    await expect(readLocalLockfile('../package-lock.json',join(root,'inside'))).rejects.toThrow();await expect(readLocalLockfile('package-lock.json',join(root,'inside'))).rejects.toThrow();expect((await readLocalLockfile('package-lock.json',root)).lockfile).toBe(lock);
   }finally{await rm(root,{recursive:true,force:true});}
  });
+});
+
+it('exposes account tools only on explicitly configured local MCP and preserves request keys',async()=>{
+ const calls:{url:string;body:unknown}[]=[];
+ const hosted=new HostedClient('https://example.com','st_'+'a'.repeat(64),async(input,init)=>{calls.push({url:String(input),body:JSON.parse(String(init?.body||'null'))});return Response.json({accepted:true});});
+ const local=await connect({hosted});
+ try{const tools=await local.client.listTools();expect(tools.tools.find(t=>t.name==='scan_repository')?.annotations?.readOnlyHint).toBe(false);
+ const requestKey='12345678-1234-4234-8234-123456789abc';
+ const result=await local.client.callTool({name:'scan_repository',arguments:{repository:'owner/repo',requestKey}});
+ expect(result.isError).not.toBe(true);expect(calls[0]).toEqual({url:'https://example.com/api/repository-scans',body:{repository:'owner/repo',privateAccess:false,requestKey}});
+ }finally{await local.close();}
+ const remote=await connect({remote:true,hosted});try{expect((await remote.client.listTools()).tools.some(t=>t.name==='scan_repository')).toBe(false);}finally{await remote.close();}
 });

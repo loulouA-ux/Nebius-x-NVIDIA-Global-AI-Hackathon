@@ -3,6 +3,7 @@ import {open,writeFile} from 'node:fs/promises';
 import {basename} from 'node:path';
 import {spawn} from 'node:child_process';
 import {scan,getAdvisory,maskSecrets} from '@heysalad/shiptested';
+import {HostedClient} from '@heysalad/shiptested/hosted';
 import {help,version} from './commands.js';
 import {exitCode,sarif,type Threshold} from './output.js';
 class UsageError extends Error {}
@@ -18,6 +19,19 @@ async function main(args:string[]):Promise<number>{
  if(args.length===0||args[0]==='--help'){process.stdout.write(help());return 0;}
  if(args[0]==='--version'){process.stdout.write(version+'\n');return 0;}
  const [command,...rest]=args;
+ if(['repo','job','report','usage'].includes(command)){
+  if(!process.env.SHIPTESTED_API_ORIGIN||!process.env.SHIPTESTED_API_TOKEN)throw new UsageError('Configure SHIPTESTED_API_ORIGIN and SHIPTESTED_API_TOKEN privately for managed scans.');
+  const client=new HostedClient(process.env.SHIPTESTED_API_ORIGIN,process.env.SHIPTESTED_API_TOKEN);
+  let result;
+  try {
+   if(command==='repo'){
+    if(!rest[0]||rest.length>2||(rest[1]&&rest[1]!=='--private'))throw new UsageError('Usage: repo <GitHub URL> [--private]');
+    result=await client.scanRepository(rest[0],rest[1]==='--private');
+   }else if(command==='usage'){if(rest.length)throw new UsageError('usage accepts no arguments.');result=await client.usage();}
+   else {if(rest.length!==1)throw new UsageError(`${command} requires one ID.`);result=command==='job'?await client.job(rest[0]):await client.report(rest[0]);}
+  }catch(error){if(error instanceof UsageError)throw error;throw new UsageError('Managed request failed. Check your token, allowance, IDs and configured API origin.');}
+  process.stdout.write(JSON.stringify(result,null,2)+'\n');return 0;
+ }
  if(command==='mcp'){
   if(rest.length)throw new UsageError('mcp accepts no arguments.');
   return new Promise(resolve=>{const child=spawn('shiptested-mcp',[],{stdio:'inherit',shell:false});child.on('error',()=>{process.stderr.write('Install @heysalad/shiptested-mcp alongside the CLI.\n');resolve(64);});child.on('exit',code=>resolve(code??70));});

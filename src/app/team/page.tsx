@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import styles from './team.module.css';
 import BrandHeader from '../brand-header';
+import AgentTokens from './agent-tokens';
 type Data={actor:{id:string;workspaceId:string};workspaces:{id:string;name:string;plan:string;seat_limit:number;seats_used:number;role:string}[];members:{actor_id:string;role:string}[];events:{sequence:number;actor_id:string;event_type:string;subject_id:string;created_at:string}[]};
 export default function Team(){
   const [data,setData]=useState<Data|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[invite,setInvite]=useState<{id:string;token:string}|null>(null);
@@ -17,6 +18,7 @@ export default function Team(){
     {current?.role==='owner'&&<form onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);void action({action:'invite',githubId:String(f.get('githubId')),role:'member'});}}><h2>Invite a teammate</h2><p>Use their numeric GitHub account ID. Only that signed-in account can accept. An available Team seat is required.</p><label>GitHub account ID<input name="githubId" inputMode="numeric" pattern="[1-9][0-9]*" required/></label><button className="button" disabled={busy||current.plan!=='team'||current.seats_used>=current.seat_limit}>Create invitation</button></form>}
     {invite&&<section className="panel scope"><p>Send this one-time code privately to your teammate. It expires in seven days.</p><label>Invitation code<input readOnly value={invite.token}/></label><button className="button" disabled={busy} onClick={()=>{void action({action:'revokeInvite',id:invite.id});setInvite(null);}}>Revoke invitation</button></section>}
     <form onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);void action({action:'accept',token:String(f.get('token')).trim()});}}><h2>Join a workspace</h2><label>Invitation code<input name="token" autoComplete="off" required pattern="[a-f0-9]{64}"/></label><button className="button" disabled={busy}>Accept invitation</button></form>
+    <AgentTokens key={data.actor.workspaceId}/>
     <details className="panel scope"><summary>Workspace audit history</summary><ol>{data.events.map(e=><li key={e.sequence}>{new Date(e.created_at).toLocaleString()} · {e.actor_id} · {e.event_type.replaceAll('_',' ')} · {e.subject_id}</li>)}</ol></details>
     </>}</section></main></>;
 }
