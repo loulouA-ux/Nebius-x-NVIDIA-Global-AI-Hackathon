@@ -34,7 +34,7 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 
 ## Current evidence
 
-Latest acceptance audit: 28 October 2026, London. The checkpoint sections below are chronological; older statements such as "not deployed" describe that checkpoint, not the latest branch.
+Latest acceptance audit: 27 October 2026, 23:59 London time. The checkpoint sections below are chronological; older statements such as "not deployed" describe that checkpoint, not the latest branch.
 
 | Gate | Current evidence | Still needed for completion |
 | --- | --- | --- |
