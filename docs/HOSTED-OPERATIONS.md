@@ -7,7 +7,7 @@ Status: implementation branch, not an activated hosted service. The public produ
 1. Use Node 22, `npm ci` and `npm run build:packages`.
 2. Configure a dedicated development Neon database privately in `.env.local`. Confirm its project and branch in Neon before running `npm run db:migrate`; never infer development isolation from the filename. The migration command applies all numbered plain SQL migrations in one transaction. Take a provider backup/branch before a production migration.
 3. Configure GitHub OAuth with this development origin and `/api/auth/github/callback`. Keep a small numeric user allowlist in `SHIPTESTED_GITHUB_MEMBER_IDS`; use two distinct test identities. Keep open registration off until abuse handling and customer onboarding are reviewed.
-4. For private repositories, install the configured GitHub App only on selected repositories and configure the administrator-owned actor-to-installation mapping. General customer installation onboarding is not implemented yet. Identity OAuth alone does not authorize private repository reads.
+4. For private repositories, install the configured GitHub App only on selected repositories and configure the administrator-owned actor-to-installation mapping. Customer onboarding is implemented behind `SHIPTESTED_CUSTOMER_REPOSITORIES=1` but has not passed live provider acceptance. See the configuration section below; keep this disabled until then. Identity OAuth alone does not authorize private repository reads.
 5. Start the app with `npm run dev`. A second terminal can run `node --env-file=.env.local --import tsx scripts/repository-worker.ts` to process one queued job. Jobs are durable, lease-fenced and limited to three attempts. Scans read bounded manifests; they do not execute repository code.
 6. Test the complete account → repository → queued job → persisted report journey. Sign out and sign back in to confirm the report URL persists. A second account must get a denial for that private report. Test explicit share creation, expiry, revocation, disabled owner and seat loss separately.
 
@@ -36,3 +36,16 @@ Local MCP uses the same environment variables to enable its managed tools; the a
 ## Release and recovery
 
 Keep schema, package and app versions aligned. Build, typecheck and test before a reviewable PR. Verify a protected hosted deployment with actual authentication and a dedicated database before changing public production. Preserve old reports and audit history during rollback; rolling back code is not permission to drop tables or reset allowances. Revoke a compromised agent token immediately, disable the affected account if necessary, and retain token-free audit evidence.
+
+
+## Customer GitHub App repository authorization (not activated)
+
+This is distinct from identity-only OAuth. Configure the existing GitHub App's **client ID and client secret** as `GITHUB_APP_CLIENT_ID` and `GITHUB_APP_CLIENT_SECRET`, its exact slug as `GITHUB_APP_SLUG`, and its app ID/private key through the existing app settings. Register the exact callback `<origin>/api/github/connect/callback` with no wildcard. Store an independent 32-byte random AES key as 64 lowercase hex characters in `SHIPTESTED_CONNECTION_ENCRYPTION_KEY`; do not use an OAuth secret as an encryption key.
+
+Apply migration 008 to the intended database. Only after live acceptance, enable `SHIPTESTED_CUSTOMER_REPOSITORIES=1`. While enabled, repository token issuance uses customer-authorized grants rather than the legacy administrator mapping. The website's identity login remains separate. Tokens for this connection are encrypted with AES-GCM and bound to account/workspace, expire locally after at most one hour and require explicit renewal; refresh tokens are not stored. Disconnect deletes the locally stored token. Removing provider-side authorization or the installation remains a GitHub action. This is not unattended long-term repository authorization yet.
+
+In `/team`, first choose repositories in the configured GitHub App installation, then authorize repository access using the same GitHub account as sign-in. Select an installation from the server-verified list. Before minting each repository token, the server lists that user's installations and repository access again, then restricts the installation token to their intersection. Read-only repository users cannot obtain a write token. Installations and user-visible repositories are bounded; unsupported totals fail explicitly.
+
+Live acceptance still required: an actual owner and a read-only collaborator, an organization installation, revoked organization membership, removal of one repository, expired authorization, reconnect/disconnect and repair write denial. Unit tests and fixture browser journeys do not prove GitHub's deployed callback or permission configuration.
+
+Provider references: https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/about-the-setup-url and https://docs.github.com/en/rest/apps/installations .

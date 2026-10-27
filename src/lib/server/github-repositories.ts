@@ -26,7 +26,16 @@ export async function githubRequest(path:string,token:string,init:RequestInit={}
 }
 export async function installationToken(actor:Actor,repositoryId?:number,write=false,fetcher:typeof fetch=fetch,readPullRequests=false){
  if(write&&!repositoryId)throw Error("Write access must be scoped to one repository.");
- const result=z.object({token:z.string().min(1)}).parse(await githubRequest(`/app/installations/${installationFor(actor)}/access_tokens`,appJwt(),{method:"POST",body:JSON.stringify({...(repositoryId?{repository_ids:[repositoryId]}:{}),permissions:write?{contents:"write",pull_requests:"write"}:{contents:"read",...(readPullRequests?{pull_requests:"read"}:{})}})},fetcher));
+ let installationId:number,repositoryIds:number[]|undefined;
+ if(brandEnv('CUSTOMER_REPOSITORIES')==='1'){
+  const {authorizedRepositoryGrant}=await import('./repository-connections');const {database}=await import('./db');
+  const grant=await authorizedRepositoryGrant(database(),actor,fetcher);installationId=grant.installationId;
+  if(repositoryId&&!grant.repositoryIds.includes(repositoryId))throw new ApiError(404,'Repository is not authorized for your account.');
+  if(write&&repositoryId&&!grant.writableRepositoryIds.includes(repositoryId))throw new ApiError(403,'Your GitHub account cannot write to this repository.');
+  repositoryIds=repositoryId?[repositoryId]:grant.repositoryIds;
+  if(!repositoryIds.length)throw new ApiError(403,'No repositories are authorized for this account.');
+ }else{installationId=installationFor(actor);repositoryIds=repositoryId?[repositoryId]:undefined;}
+ const result=z.object({token:z.string().min(1)}).parse(await githubRequest(`/app/installations/${installationId}/access_tokens`,appJwt(),{method:"POST",body:JSON.stringify({...(repositoryIds?{repository_ids:repositoryIds}:{}),permissions:write?{contents:"write",pull_requests:"write"}:{contents:"read",...(readPullRequests?{pull_requests:"read"}:{})}})},fetcher));
  return result.token;
 }
 export const MAX_CONNECTED_REPOSITORIES=200;
