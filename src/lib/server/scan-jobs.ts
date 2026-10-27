@@ -45,8 +45,11 @@ export class ScanJobs {
         UPDATE sc_scan_allowances SET reserved=reserved+1
         WHERE workspace_id=$1 AND period_start=(date_trunc('month',now() AT TIME ZONE 'UTC'))::date
         AND reserved < scan_limit RETURNING period_start
-      ) INSERT INTO sc_scan_jobs(id,workspace_id,owner_id,request_key,repository,commit_sha,period_start,tree_sha,private_repository)
-        SELECT $3,$1,$2,$4,$5,$6,period_start,$7,$8 FROM allowance RETURNING *`,
+      ), changed AS (INSERT INTO sc_scan_jobs(id,workspace_id,owner_id,request_key,repository,commit_sha,period_start,tree_sha,private_repository)
+        SELECT $3,$1,$2,$4,$5,$6,period_start,$7,$8 FROM allowance RETURNING *), audit AS (
+        INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+        SELECT workspace_id,owner_id,'scan_queued',id::text FROM changed
+      ) SELECT * FROM changed`,
       [actor.workspaceId, actor.id, randomUUID(), input.requestKey, input.repository, input.commit,input.tree,input.private]);
       if (job) return job;
     } catch (error) {
@@ -69,7 +72,7 @@ export class ScanJobs {
 
   async cancelQueued(actor: Actor, id: string) {
     await this.get(actor, id);
-    const [job] = await this.query("UPDATE sc_scan_jobs SET state='cancelled',updated_at=now() WHERE id=$1 AND workspace_id=$2 AND owner_id=$3 AND state='queued' RETURNING *", [id, actor.workspaceId, actor.id]);
+    const [job] = await this.query(`WITH changed AS (UPDATE sc_scan_jobs SET state='cancelled',updated_at=now() WHERE id=$1 AND workspace_id=$2 AND owner_id=$3 AND state='queued' RETURNING *), audit AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id) SELECT workspace_id,owner_id,'scan_cancelled',id::text FROM changed) SELECT * FROM changed`, [id, actor.workspaceId, actor.id]);
     if (!job) throw new ApiError(409, 'Only queued scans can be cancelled here.');
     return job;
   }
@@ -81,9 +84,12 @@ export class ScanJobs {
       SELECT id FROM sc_scan_jobs WHERE attempts < 3 AND
       (state='queued' OR (state='running' AND lease_expires_at < now()))
       ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1
-    ) UPDATE sc_scan_jobs j SET state='running',attempts=attempts+1,
+    ), changed AS (UPDATE sc_scan_jobs j SET state='running',attempts=attempts+1,
       lease_token=$1,lease_expires_at=now()+interval '5 minutes',updated_at=now()
-      FROM candidate WHERE j.id=candidate.id RETURNING j.*`, [token]);
+      FROM candidate WHERE j.id=candidate.id RETURNING j.*), audit AS (
+      INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+      SELECT workspace_id,owner_id,'scan_started',id::text FROM changed
+    ) SELECT * FROM changed`, [token]);
     return job ?? null;
   }
 
@@ -92,18 +98,24 @@ export class ScanJobs {
     if (!z.string().uuid().safeParse(id).success || !z.string().uuid().safeParse(token).success ||
       (reportId !== null && !z.string().uuid().safeParse(reportId).success))
       throw new ApiError(400, 'Invalid worker result identity.');
-    const [job] = await this.query(`UPDATE sc_scan_jobs SET state=$3,report_id=$4,failure_code=$5,
+    const [job] = await this.query(`WITH changed AS (UPDATE sc_scan_jobs SET state=$3,report_id=$4,failure_code=$5,
       lease_token=NULL,lease_expires_at=NULL,updated_at=now()
-      WHERE id=$1 AND lease_token=$2 AND state='running' AND lease_expires_at > now() RETURNING *`,
+      WHERE id=$1 AND lease_token=$2 AND state='running' AND lease_expires_at > now() RETURNING *), audit AS (
+      INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+      SELECT workspace_id,owner_id,'scan_'||state,id::text FROM changed
+    ) SELECT * FROM changed`,
       [id,token,reportId?'completed':'failed',reportId,'failureCode' in result?result.failureCode:null]);
     if (!job) throw new ApiError(409, 'Worker lease expired or job already finished.');
     return job;
   }
 
   async expireExhausted() {
-    return this.query(`UPDATE sc_scan_jobs SET state='failed',failure_code='retry_exhausted',
+    return this.query(`WITH changed AS (UPDATE sc_scan_jobs SET state='failed',failure_code='retry_exhausted',
       lease_token=NULL,lease_expires_at=NULL,updated_at=now()
-      WHERE state='running' AND attempts=3 AND lease_expires_at < now() RETURNING id`);
+      WHERE state='running' AND attempts=3 AND lease_expires_at < now() RETURNING *), audit AS (
+      INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+      SELECT workspace_id,owner_id,'scan_retry_exhausted',id::text FROM changed
+    ) SELECT id FROM changed`);
   }
 
   async saveReport(id:string,token:string,report:RepositoryReport) {
@@ -113,8 +125,11 @@ export class ScanJobs {
     ), saved AS (
       INSERT INTO sc_scans(id,workspace_id,owner_id,report)
       SELECT $3,workspace_id,owner_id,$4::jsonb FROM live RETURNING id
-    ) UPDATE sc_scan_jobs SET state='completed',report_id=saved.id,lease_token=NULL,
-      lease_expires_at=NULL,updated_at=now() FROM saved WHERE sc_scan_jobs.id=$1 RETURNING sc_scan_jobs.*`,
+    ), changed AS (UPDATE sc_scan_jobs SET state='completed',report_id=saved.id,lease_token=NULL,
+      lease_expires_at=NULL,updated_at=now() FROM saved WHERE sc_scan_jobs.id=$1 RETURNING sc_scan_jobs.*), audit AS (
+      INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+      SELECT workspace_id,owner_id,'scan_completed',id::text FROM changed
+    ) SELECT * FROM changed`,
     [id,token,report.id,maskSecrets(JSON.stringify(report)),report.repositoryScan.repository,report.repositoryScan.commit]);
     if(!job)throw new ApiError(409,'Worker lease or report source no longer matches.');
     return job;

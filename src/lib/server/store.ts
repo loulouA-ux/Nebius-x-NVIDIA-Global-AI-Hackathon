@@ -126,7 +126,9 @@ export class Store {
   async saveScan(actor: Actor, report: ScanReport, projectId?: string) {
     if (projectId) await this.getProject(actor, projectId);
     await this.query(
-      "INSERT INTO sc_scans(id,workspace_id,owner_id,project_id,report) VALUES($1,$2,$3,$4,$5::jsonb)",
+      `WITH saved AS (INSERT INTO sc_scans(id,workspace_id,owner_id,project_id,report) VALUES($1,$2,$3,$4,$5::jsonb) RETURNING id)
+       INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+       SELECT $2,$3,'report_saved',id::text FROM saved WHERE EXISTS(SELECT 1 FROM sc_workspaces WHERE id=$2)`,
       [
         report.id,
         actor.workspaceId,
@@ -163,7 +165,10 @@ export class Store {
     if (!report.findings.some((f) => f.id === findingId))
       throw new ApiError(404, "Finding not found.");
     const [r] = await this.query(
-      "INSERT INTO sc_decisions(id,scan_id,workspace_id,owner_id,finding_id,action,reason) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id,finding_id,action,reason,created_at",
+      `WITH decision AS (INSERT INTO sc_decisions(id,scan_id,workspace_id,owner_id,finding_id,action,reason) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id,finding_id,action,reason,created_at),
+       audit AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+         SELECT $3,$4,'finding_'||action,id::text FROM decision WHERE EXISTS(SELECT 1 FROM sc_workspaces WHERE id=$3))
+       SELECT * FROM decision`,
       [
         randomUUID(),
         id,

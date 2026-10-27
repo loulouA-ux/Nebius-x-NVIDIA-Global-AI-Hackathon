@@ -73,3 +73,19 @@ it('shares only explicitly owned reports and stores hashes, with immediate revoc
   await query('DELETE FROM sc_workspace_events');
   expect(await teams.history(owner)).toHaveLength(history.length);
 });
+
+it('disables shared links when their owner is disabled or loses an entitled seat',async()=>{
+  const member=await createGitHubSession(query,{githubId:'2',login:'member'});
+  const invite=await teams.invite(owner,'2');await teams.accept(member.actor,invite.token);
+  const actor={...member.actor,workspaceId:owner.workspaceId};
+  const report=await scanRepository({repository:'owner/repo',commit:'a'.repeat(40),tree:'b'.repeat(40),private:true,files:{},omitted:[]});
+  report.id=randomUUID();await new Store(query).saveScan(actor,report);
+  const share=await shares.create(actor,report.id);expect((await shares.read(share.token)).id).toBe(report.id);
+  await query("UPDATE sc_github_accounts SET disabled=true WHERE github_id='2'");
+  await expect(shares.read(share.token)).rejects.toMatchObject({status:404});
+  await query("UPDATE sc_github_accounts SET disabled=false WHERE github_id='2'");
+  await query("UPDATE sc_workspaces SET seat_limit=1 WHERE id=$1",[owner.workspaceId]);
+  await expect(shares.read(share.token)).rejects.toMatchObject({status:404});
+  await query("UPDATE sc_workspaces SET seat_limit=2,plan='free' WHERE id=$1",[owner.workspaceId]);
+  await expect(shares.read(share.token)).rejects.toMatchObject({status:404});
+});

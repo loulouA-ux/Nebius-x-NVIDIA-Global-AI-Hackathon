@@ -2,7 +2,8 @@ import {randomBytes,randomUUID} from 'node:crypto';
 import type {Query} from './db';
 import {Store,type Actor} from './store';
 import {ApiError} from './http';
-import {shareTokenHash} from './team-access';
+import {shareTokenHash,activeMembership} from './team-access';
+import {githubMemberAllowed} from './github-session';
 import type {ScanReport} from '../types';
 export class ReportSharing {
   constructor(private query:Query) {}
@@ -31,11 +32,18 @@ export class ReportSharing {
   }
   async read(token:string):Promise<ScanReport> {
     if(!/^[a-f0-9]{64}$/.test(token))throw new ApiError(404,'Share link is unavailable.');
-    const [row]=await this.query(`SELECT scans.report FROM sc_report_shares share JOIN sc_scans scans
+    const [row]=await this.query(`SELECT scans.report,share.workspace_id,share.owner_id FROM sc_report_shares share JOIN sc_scans scans
       ON scans.id=share.scan_id AND scans.workspace_id=share.workspace_id AND scans.owner_id=share.owner_id
       JOIN sc_workspace_members member ON member.workspace_id=share.workspace_id AND member.actor_id=share.owner_id
       WHERE share.token_hash=$1 AND share.expires_at>now() AND share.revoked_at IS NULL`,[shareTokenHash(token)]);
     if(!row)throw new ApiError(404,'Share link is expired or revoked.');
+    const ownerId=String(row.owner_id),workspaceId=String(row.workspace_id);
+    if(!await activeMembership(this.query,workspaceId,ownerId))throw new ApiError(404,'Share link is expired or revoked.');
+    if(ownerId.startsWith('github:')){
+      const githubId=ownerId.slice(7);
+      const [account]=await this.query('SELECT disabled FROM sc_github_accounts WHERE github_id=$1',[githubId]);
+      if(!githubMemberAllowed(githubId)||!account||account.disabled)throw new ApiError(404,'Share link is expired or revoked.');
+    }
     return row.report as ScanReport;
   }
 }

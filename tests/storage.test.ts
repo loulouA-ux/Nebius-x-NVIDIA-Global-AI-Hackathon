@@ -33,6 +33,7 @@ const peter: Actor = {
 const key = "sc_" + "a".repeat(64);
 beforeAll(async () => {
   await db.exec(readFileSync("migrations/001_core.sql", "utf8"));
+for(const f of ['002_hosted_jobs','003_workspaces','004_team_sharing'])await db.exec(readFileSync(`migrations/${f}.sql`,'utf8'));
   await db.exec(readFileSync("migrations/001_core.sql", "utf8"));
 });
 afterAll(() => db.close());
@@ -87,6 +88,7 @@ describe("real Postgres storage boundary", () => {
     expect(outcomes.filter((r) => r.status === "rejected")).toHaveLength(5);
   });
   it("masks stored evidence and preserves verdict across decision events", async () => {
+    await query("INSERT INTO sc_workspaces(id,owner_id,name) VALUES($1,$2,'Test')",[peter.workspaceId,peter.id]);
     const report = await runScan({ mode: "demo" });
     // Storage uses UUIDs for member scans; demo replay IDs are never persisted.
     report.id = "df44ab44-2b67-4918-abf0-d588b0a2572d";
@@ -115,7 +117,11 @@ describe("real Postgres storage boundary", () => {
       "reconsidered",
     );
     expect(await store.getScan(peter, report.id)).toEqual(original);
-    expect(await store.decisions(peter, report.id)).toHaveLength(2);
+    const decisions=await store.decisions(peter, report.id);
+    expect(decisions).toHaveLength(2);
+    const history=await query('SELECT event_type,subject_id FROM sc_workspace_events WHERE workspace_id=$1 ORDER BY sequence',[peter.workspaceId]);
+    expect(history).toEqual([{event_type:'report_saved',subject_id:report.id},{event_type:'finding_dismiss',subject_id:decisions[0].id},{event_type:'finding_acknowledge',subject_id:decisions[1].id}]);
+    expect(JSON.stringify(history)).not.toContain('checked');
     await expect(
       store.decide(peter, report.id, "invented", "dismiss", ""),
     ).rejects.toMatchObject({ status: 404 });

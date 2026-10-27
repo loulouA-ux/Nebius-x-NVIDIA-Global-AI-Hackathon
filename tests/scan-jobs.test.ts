@@ -14,7 +14,8 @@ const jobs = new ScanJobs(query);
 const actor: Actor = {id:'peter',workspaceId:'team',role:'member'};
 const input = () => ({requestKey:randomUUID(),repository:'heysalad-ai/nicedeck',commit:'a'.repeat(40),tree:'b'.repeat(40),private:false});
 beforeAll(async () => {
-  await db.exec(readFileSync('migrations/001_core.sql','utf8'));
+  for(const file of ['001_core','002_hosted_jobs','003_workspaces','004_team_sharing'])await db.exec(readFileSync(`migrations/${file}.sql`,'utf8'));
+  await query("INSERT INTO sc_workspaces(id,owner_id,name) VALUES('team','peter','Test workspace')");
   await db.exec(readFileSync('migrations/002_hosted_jobs.sql','utf8'));
   await db.exec(readFileSync('migrations/002_hosted_jobs.sql','utf8'));
 });
@@ -34,6 +35,7 @@ it('retries the same request without consuming additional allowance', async () =
   const results=await Promise.all(Array.from({length:5},()=>jobs.enqueue(actor,req)));
   expect(new Set(results.map(r=>r.id)).size).toBe(1);
   expect((await query('SELECT reserved FROM sc_scan_allowances'))[0].reserved).toBe(1);
+  expect(await query("SELECT * FROM sc_workspace_events WHERE subject_id=$1 AND event_type='scan_queued'",[results[0].id])).toHaveLength(1);
   await expect(jobs.enqueue(actor,{...req,commit:'b'.repeat(40)})).rejects.toMatchObject({status:409});
 });
 it('isolates both owner and workspace and refuses unprovisioned workspaces', async () => {
@@ -101,4 +103,14 @@ it('does not save a report from a stale worker or a different source commit',asy
   await query("UPDATE sc_scan_jobs SET lease_expires_at=now()-interval '1 second' WHERE id=$1",[job.id]);
   await expect(jobs.saveReport(String(job.id),String(job.lease_token),report)).rejects.toMatchObject({status:409});
   expect((await query('SELECT count(*)::int AS count FROM sc_scans'))[0].count).toBe(0);
+});
+
+it('records state transitions atomically and refuses stale workers without extra audit events',async()=>{
+ const row=await jobs.enqueue(actor,input());const claim=await jobs.claim();
+ await jobs.finish(String(row.id),String(claim!.lease_token),{failureCode:'scan_failed'});
+ await expect(jobs.finish(String(row.id),String(claim!.lease_token),{failureCode:'scan_failed'})).rejects.toMatchObject({status:409});
+ const events=await query('SELECT event_type FROM sc_workspace_events WHERE subject_id=$1 ORDER BY sequence',[row.id]);
+ expect(events.map(e=>e.event_type)).toEqual(['scan_queued','scan_started','scan_failed']);
+ const cancelled=await jobs.enqueue(actor,input());await jobs.cancelQueued(actor,String(cancelled.id));
+ expect((await query('SELECT event_type FROM sc_workspace_events WHERE subject_id=$1 ORDER BY sequence',[cancelled.id])).map(e=>e.event_type)).toEqual(['scan_queued','scan_cancelled']);
 });
