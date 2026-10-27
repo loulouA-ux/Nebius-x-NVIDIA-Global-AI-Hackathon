@@ -8,7 +8,7 @@ export function proxy(request:NextRequest){
  const next=()=>NextResponse.next({request:{headers:incoming}});
  let response:NextResponse;
  const p=request.nextUrl.pathname;
- const site=process.env.NEXT_PUBLIC_SITE_URL;
+ const site=process.env.NEXT_PUBLIC_SITE_URL || "https://shiptested.com";
  let canonical:URL|undefined;try{canonical=site?new URL(site):undefined;}catch{}
  if(canonical&&request.headers.get("host")===`www.${canonical.host}`){const url=request.nextUrl.clone();url.hostname=canonical.hostname;url.protocol=canonical.protocol;url.port=canonical.port;response=NextResponse.redirect(url,308);}
  else if(!publicDemo())response=next();

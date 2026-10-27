@@ -7,3 +7,9 @@ test('replay renders on the server and scripts carry nonces',async({request,page
  for(const path of ['/privacy','/security','/robots.txt','/sitemap.xml','/.well-known/security.txt','/opengraph-image'])expect((await request.get(path)).status()).toBe(200);
  expect((await request.get('/unknown-page')).status()).toBe(404);
 });
+
+test('canonical www host redirects without a site environment override',async({request})=>{
+ const r=await request.get('/reports/demo-recorded?source=www',{headers:{host:'www.shiptested.com'},maxRedirects:0});
+ expect(r.status()).toBe(308);
+ expect(r.headers().location).toBe('https://shiptested.com/reports/demo-recorded?source=www');
+});
