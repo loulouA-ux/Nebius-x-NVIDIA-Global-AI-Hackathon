@@ -16,6 +16,16 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm run build -w @shiptested/mcp-app
+      - run: npm run build -w @shiptested/docs
+      - run: npm run build -w @shiptested/dev
+      - name: Record CLI coverage of this monorepo (observational)
+        run: node scripts/platform/scan-repository.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shiptested-repository-scan
+          path: test-results/platform/repository-scan.json
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
       - run: npx playwright test --config playwright.public-demo.config.ts
