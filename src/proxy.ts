@@ -8,13 +8,13 @@ export function proxy(request:NextRequest){
  const next=()=>NextResponse.next({request:{headers:incoming}});
  let response:NextResponse;
  const p=request.nextUrl.pathname;
- const site=process.env.NEXT_PUBLIC_SITE_URL;
+ const site=process.env.NEXT_PUBLIC_SITE_URL || "https://shiptested.com";
  let canonical:URL|undefined;try{canonical=site?new URL(site):undefined;}catch{}
  if(canonical&&request.headers.get("host")===`www.${canonical.host}`){const url=request.nextUrl.clone();url.hostname=canonical.hostname;url.protocol=canonical.protocol;url.port=canonical.port;response=NextResponse.redirect(url,308);}
  else if(!publicDemo())response=next();
  else {
   const read=request.method==='GET'||request.method==='HEAD';
-  const allowed=read&&(p==='/'||p==='/reports'||/^\/reports\/demo-(recorded|offline)(\/findings\/[^/]+)?$/.test(p)||['/privacy','/security','/robots.txt','/sitemap.xml','/.well-known/security.txt','/opengraph-image','/twitter-image','/api/demos','/api/health','/favicon.ico','/manifest.webmanifest'].includes(p)||p.startsWith('/_next/')||p.startsWith('/brand/')||p.startsWith('/partners/'));
+  const allowed=read&&(p==='/'||p==='/reports'||/^\/reports\/demo-(recorded|offline)(\/findings\/[^/]+)?$/.test(p)||['/privacy','/security','/developers','/robots.txt','/sitemap.xml','/.well-known/security.txt','/opengraph-image','/twitter-image','/api/demos','/api/health','/favicon.ico','/manifest.webmanifest'].includes(p)||p.startsWith('/_next/')||p.startsWith('/brand/')||p.startsWith('/partners/'));
   if(allowed)response=next();
   else if(!read||p.startsWith('/api/'))response=NextResponse.json({error:demoMessage,publicDemo:true},{status:403,headers:{'Cache-Control':'no-store'}});
   else if(['/scan','/hosts','/repairs','/sign-in'].some(path=>p===path||p.startsWith(path+'/'))||p.startsWith('/reports/'))response=NextResponse.rewrite(new URL('/demo-access',request.url),{status:403,request:{headers:incoming},headers:{'Cache-Control':'no-store'}});

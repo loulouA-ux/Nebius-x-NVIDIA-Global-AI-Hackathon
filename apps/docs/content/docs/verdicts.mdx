@@ -1,0 +1,17 @@
+---
+title: How verdicts work
+---
+
+## Deterministic decisions
+
+High findings produce **Blocked**. Incomplete required coverage produces **Incomplete** when no higher-priority blocking finding exists. Other findings produce **Review required**. With complete required checks and no findings, the result is **Checks passed**.
+
+The CLI uses exit 3 for an Incomplete report and exit 1 for Blocked or its configured finding threshold. Never interpret an incomplete check as a clean scan. Inspect every coverage entry even when a blocking finding is already present.
+
+## Severity and fixes
+
+OSV advisory metadata supplies severity. Unsupported or absent severity requires review; the model does not invent a score. Fixed-version extraction is tied to the exact dependency and relevant advisory ranges. A suggested version must still be tested in the application.
+
+## AI boundaries
+
+Optional AI adds notes and unconfirmed research only. The scanner's finding list and verdict are immutable during enrichment. Notes are constrained to approved scanner descriptions/actions, with a safe scanner fallback.

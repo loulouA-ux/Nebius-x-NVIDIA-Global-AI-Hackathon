@@ -1,0 +1,58 @@
+[
+  {
+    "route": "/",
+    "width": 1440,
+    "theme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/docs/cli",
+    "width": 1440,
+    "theme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/",
+    "width": 1440,
+    "theme": "dark",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/docs/cli",
+    "width": 1440,
+    "theme": "dark",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/docs/cli",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "route": "/docs/cli",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "violations": []
+  }
+]
