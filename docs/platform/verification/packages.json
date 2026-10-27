@@ -1,0 +1,104 @@
+{
+  "checkedAt": "2026-10-27T16:26:09.378Z",
+  "packages": [
+    {
+      "name": "@heysalad/shiptested",
+      "version": "0.1.0",
+      "filename": "heysalad-shiptested-0.1.0.tgz",
+      "size": 13360,
+      "unpackedSize": 43730,
+      "integrity": "sha512-RbH4feNNCMuPo6vO+nNRyhfgYcMigN+pZud8BiB+5EFhbRBC3xjYe885DtTKdtejOq6GMFYAXv20dCZiRfEYcg==",
+      "files": [
+        "LICENSE",
+        "README.md",
+        "dist/advisory-metadata.d.ts",
+        "dist/advisory-metadata.js",
+        "dist/ai.d.ts",
+        "dist/ai.js",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "dist/osv.d.ts",
+        "dist/osv.js",
+        "dist/parser.d.ts",
+        "dist/parser.js",
+        "dist/scanner.d.ts",
+        "dist/scanner.js",
+        "dist/transport.d.ts",
+        "dist/transport.js",
+        "dist/types.d.ts",
+        "dist/types.js",
+        "package.json"
+      ],
+      "publishDryRun": true
+    },
+    {
+      "name": "@heysalad/shiptested-cli",
+      "version": "0.1.0",
+      "filename": "heysalad-shiptested-cli-0.1.0.tgz",
+      "size": 4980,
+      "unpackedSize": 12446,
+      "integrity": "sha512-jtoSVM3XNpNrzjSe7UmLpzhVvrmHvdltcRjNdqblqrMUgw/6vAj7JSh98UHRVRjbO4ztbOW/oduiOPSHcxEWhw==",
+      "files": [
+        "LICENSE",
+        "README.md",
+        "dist/commands.d.ts",
+        "dist/commands.js",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "dist/output.d.ts",
+        "dist/output.js",
+        "package.json"
+      ],
+      "publishDryRun": true
+    },
+    {
+      "name": "@heysalad/shiptested-mcp",
+      "version": "0.1.0",
+      "filename": "heysalad-shiptested-mcp-0.1.0.tgz",
+      "size": 5663,
+      "unpackedSize": 19209,
+      "integrity": "sha512-lLKDzuYu5dUI1yVD58xaZDUrPMUBf9GgO7pDgTut9oJS5jWhqYd4zM4pWP8ssGwSrDVANjem7oSI3YP/wfaCSg==",
+      "files": [
+        "LICENSE",
+        "README.md",
+        "dist/local.d.ts",
+        "dist/local.js",
+        "dist/server.d.ts",
+        "dist/server.js",
+        "dist/stdio.d.ts",
+        "dist/stdio.js",
+        "package.json"
+      ],
+      "publishDryRun": true
+    }
+  ],
+  "installedCli": {
+    "exitCode": 1,
+    "status": "Blocked",
+    "findings": 5,
+    "coverage": [
+      {
+        "name": "Dependency coverage",
+        "state": "complete",
+        "detail": "1 exact dependency versions resolved."
+      },
+      {
+        "name": "Credential patterns",
+        "state": "complete",
+        "detail": "Four supported patterns in supplied text only. No git history or credential validity checks."
+      },
+      {
+        "name": "OSV advisories",
+        "state": "complete",
+        "detail": "Live exact-version queries. Applicability requires human review."
+      }
+    ]
+  },
+  "installedMcpTools": [
+    "scan_lockfile",
+    "check_package",
+    "get_advisory"
+  ],
+  "publication": "dry run only; no package published",
+  "artifacts": "/var/folders/vz/j9vqx5yj09bd_0mc4h_0m_y40000gn/T/shiptested-pack-gate-wtz6w7"
+}

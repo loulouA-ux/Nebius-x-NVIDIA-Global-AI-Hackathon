@@ -1,0 +1,33 @@
+[
+  {
+    "width": 1440,
+    "theme": "light",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "width": 1440,
+    "theme": "dark",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "playgroundUnavailable": "The remote MCP service is not available. Use the local CLI or try again after endpoint activation."
+  }
+]

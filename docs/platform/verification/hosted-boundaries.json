@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-27T16:53:09.400Z",
+  "oversize": 413,
+  "remotePathRejected": true,
+  "toolNames": [
+    "scan_lockfile",
+    "check_package",
+    "get_advisory"
+  ],
+  "remoteScanProperties": [
+    "content"
+  ],
+  "health": 200,
+  "headers": {
+    "nosniff": "nosniff",
+    "frame": "DENY",
+    "cspPresent": true
+  }
+}

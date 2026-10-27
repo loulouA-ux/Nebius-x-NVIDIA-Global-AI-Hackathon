@@ -1,0 +1,11 @@
+---
+title: AI triage
+---
+
+AI is optional and separate from deterministic scanning. The default CLI, core and remote MCP require no model key.
+
+Local `--ai` reads your `NEBIUS_API_KEY` and/or `TAVILY_API_KEY`. The library accepts keys explicitly through `@heysalad/shiptested/ai`; it never reads the environment on import. Keep keys in a private environment, never in a repository or prompt.
+
+Tavily receives selected package names and versions for research. Nebius Token Factory runs NVIDIA Nemotron to select approved notes from supplied findings and evidence. Do not send confidential evidence without authorization. Research is labelled unconfirmed; provider failure leaves the deterministic verdict unchanged.
+
+Remote MCP has no AI tool and uses no team provider credentials. OAuth, tenant billing and managed AI are planned, not available.
