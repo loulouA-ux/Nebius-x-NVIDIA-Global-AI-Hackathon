@@ -18,7 +18,8 @@ These are stacked PRs: review and integrate in order. No PR was merged by Codex.
 | [11](https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/pull/11) | `4804c0f` | Generated docs, real example outputs, agent instructions |
 | [12](https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/pull/12) | `c0630b8` | Developer portal, live registry status, remote playground |
 | [13](https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/pull/13) | `c8a622d`, `9bbd021` | Pack/install/publish dry-run and subprocess gates |
-| [14](https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/pull/14) | `a855dce`, `e0fd2a9`, `87ea5b7` | Hosted connection URLs, truthful landing/nav, scoped CI builds, phone wrapping, app icons |
+| [14](https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/pull/14) | `a855dce`, `e0fd2a9`, `87ea5b7`, `79c559d` | Hosted connection URLs, truthful landing/nav, scoped CI builds, phone wrapping, app icons, release evidence |
+| [15](https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/pull/15) | `ac4fc54` | Real stage streaming over stateless SSE, response cancellation, developer progress timeline |
 
 PR6 is based on the existing PR5 integration branch. The website remains at repository root. The root prebuild now generates Fumadocs types before Next's workspace typecheck, fixing the earlier package-stack preview failure.
 
@@ -28,19 +29,19 @@ Peter explicitly approved the new apps' first production deployments. Existing w
 
 | Surface | Public URL | Current deployment |
 |---|---|---|
-| MCP | https://shiptested-mcp.vercel.app/mcp | `dpl_2vf2aLZ7UB1Rijy7bcc3sWjJx7Te` — https://shiptested-kieuc9x2k-hey-salad-inc.vercel.app |
-| Docs | https://shiptested-docs.vercel.app | `dpl_5vSywQigh4Uz43K818GHTvrWJBNa` — https://shiptested-docs-gqqg28t2k-hey-salad-inc.vercel.app |
-| Developer portal | https://shiptested-dev.vercel.app | `dpl_EYvdFiDhLBtEJZi6GUgKVEe3wvqc` — https://shiptested-m65af4l8l-hey-salad-inc.vercel.app |
+| MCP | https://shiptested-mcp.vercel.app/mcp | `dpl_9Nb2etQTpaf8eE1pGaHRHuzWqeDB` — https://shiptested-68s8v9ro2-hey-salad-inc.vercel.app |
+| Docs | https://shiptested-docs.vercel.app | `dpl_46KJieqCMmNPT4tiQBUTKdRyQKsW` — https://shiptested-docs-3o28q8q5m-hey-salad-inc.vercel.app |
+| Developer portal | https://shiptested-dev.vercel.app | `dpl_BN5RrYQTy5SCHA2MoAAVmguFsbNu` — https://shiptested-5s5l3qqgd-hey-salad-inc.vercel.app |
 
 Landing-page availability and navigation changes are in PR14's tested preview, **not yet on shiptested.com**. npm availability remains false; source commands and the live remote endpoint are shown honestly. No vendor app-directory approval is claimed.
 
-Rollback targets for the new apps: MCP `dpl_EUBZxjvGXjEceF7Wu8ChzzV9xVgC`, docs `dpl_5946wGTdwzYq9pU55Xsnf9ppwQuw`, dev `dpl_HRCQqYsGanm2LobSEd22Yh1pS4My` (pre-icon versions). Existing website production remains `dpl_BrSu3JHjqhjXUDpV43Xh8dVKvpmR`, previous rollback `dpl_D9K3WZYjpmnMtQJF8CDsr4sgiPJ1`. Do not roll back automatically.
+Rollback targets for the new apps: MCP `dpl_2vf2aLZ7UB1Rijy7bcc3sWjJx7Te`, docs `dpl_5vSywQigh4Uz43K818GHTvrWJBNa`, dev `dpl_EYvdFiDhLBtEJZi6GUgKVEe3wvqc` (pre-streaming versions). Existing website production remains `dpl_BrSu3JHjqhjXUDpV43Xh8dVKvpmR`, previous rollback `dpl_D9K3WZYjpmnMtQJF8CDsr4sgiPJ1`. Do not roll back automatically.
 
 Two initial MCP deployment attempts were removed after discovering that Vercel promotes a new project's first deployment to production even when preview is requested. The production deployments listed above followed Peter's explicit approval.
 
 ## Verification
 
-- 277 unit tests across 38 files and TypeScript passed. Root website and all three app production builds passed.
+- 279 unit tests across 38 files and TypeScript passed. Root website and all three app production builds passed.
 - 59 regular Playwright tests and 28 public-demo tests passed during integration; the updated developer route was rechecked after switching to verified public URLs. Public live API remains 403 in demo mode.
 - Actual installed-tarball CLI scan: synthetic lodash fixture, five findings, Blocked, exit 1. JSON parsed; SARIF validates against the official OASIS 2.1.0 schema in tests.
 - Actual installed-tarball local MCP connected through the official SDK and listed exactly the three deterministic tools. SDK integration tests exercise structured results, local path boundaries and progress events.
@@ -80,7 +81,7 @@ After propagation, verify all three domains and MCP client connections before re
 
 ## Transport, clients and honest boundaries
 
-Official MCP SDK 1.32.2: local stdio; remote WebStandardStreamableHTTPServerTransport, stateless JSON-response mode. Remote tools accept content only, expose no AI, do not execute code, and use only the bounded OSV transport. Maximum 2 MB body / 5,000 packages / 20 seconds; redirects refused. In-memory advisory cache and rate-limiter maps are bounded. No uploaded-content persistence or application logging.
+Official MCP SDK 1.32.2: local stdio; remote WebStandardStreamableHTTPServerTransport, stateless SSE-response mode. Remote tools accept content only, expose no AI, do not execute code, and use only the bounded OSV transport. Maximum 2 MB body / 5,000 packages / 20 seconds; redirects refused. In-memory advisory cache and rate-limiter maps are bounded. No uploaded-content persistence or application logging.
 
 Rate limit is 30 requests/minute/IP **per server instance**, not a distributed global quota. Peter may optionally configure a Vercel Firewall rule after reviewing plan cost. OAuth and tenant quotas are planned. Hosting/provider infrastructure metadata is outside the application's no-content-logging guarantee.
 
@@ -88,7 +89,7 @@ Manual snippets were checked against official Claude Code, Codex, Cursor, Gemini
 
 Recordings: [actual CLI output replay](platform/verification/cli-demo.mp4), [source terminal capture](platform/verification/cli.cast), [actual hosted playground scan](platform/verification/hosted-playground.mp4). Claude Code’s configured GLM-through-Cloudflare integration check succeeded: one actual `mcp__shiptested__scan_lockfile` call, five findings, Blocked, correct coverage caveats. [Captured client/tool transcript](platform/verification/claude-glm-mcp.json) and [actual-output replay](platform/verification/claude-glm-mcp.mp4). This tests Claude Code with GLM, not an Anthropic model.
 
-Remote JSON mode returns completed structured evidence; it does not stream intermediate progress to the playground. The UI says it is waiting, never simulates progress. Local CLI/MCP emit real stages. Website scan SSE remains a stretch item. Existing OSV advisory-detail budget can yield Incomplete for large inputs; 5,000 packages is an input cap, not a full-coverage guarantee. Workspace-link resolution, pnpm/yarn support, automatic remediation, exploitability and compliance certification are not added by this release.
+Remote SSE now sends real core stage notifications before the final structured report. The developer server forwards them as newline-delimited JSON and the UI shows an actual-event timeline. Unit tests hold OSV open to prove progress arrives before completion, and prove response-stream cancellation cancels the upstream lookup. Hosted tests received all six events (Lockfile, Secrets and OSV running/done), then Blocked with five findings. Desktop/phone and both themes have no axe violations, page errors or overflow after a live scan. See [stage timing](platform/verification/hosted-stage-events.json) and [hosted UI checks](platform/verification/hosted-stage-ui.json). Local CLI/MCP also emit real stages. Website scan SSE remains a stretch item. Existing OSV advisory-detail budget can yield Incomplete for large inputs; 5,000 packages is an input cap, not a full-coverage guarantee. Workspace-link resolution, pnpm/yarn support, automatic remediation, exploitability and compliance certification are not added by this release.
 
 ## Remaining human release gates
 

@@ -25,9 +25,10 @@ export async function handleMcp(request:Request,options:HandlerOptions={}){
  if(!(options.limiter||limiter).allow(ip))return failure(429,'Rate limit: 30 requests per minute per IP per instance.');
  if(!request.headers.get('content-type')?.toLowerCase().startsWith('application/json'))return failure(415,'Use application/json.');
  if(Number(request.headers.get('content-length')||0)>2_000_000)return failure(413,'Request body exceeds 2 MB.');
- const controller=new AbortController();const signal=AbortSignal.any([controller.signal,request.signal]);let transport:WebStandardStreamableHTTPServerTransport|undefined;
+ const controller=new AbortController();const signal=AbortSignal.any([controller.signal,request.signal]);let transport:WebStandardStreamableHTTPServerTransport|undefined;let handedOff=false;
  const timer=setTimeout(()=>controller.abort(),20000);
  const server=createServer({remote:true,cache,fetcher:options.fetcher,signal});
+ let cleaned=false;const cleanup=async()=>{if(cleaned)return;cleaned=true;clearTimeout(timer);controller.abort();await server.close();};
  try{
   if(!request.body)return failure(400,'Empty body.');
   const reader=request.body.getReader();signal.addEventListener('abort',()=>{void reader.cancel();},{once:true});
@@ -37,11 +38,17 @@ export async function handleMcp(request:Request,options:HandlerOptions={}){
   const bytes=new Uint8Array(size);let at=0;for(const c of chunks){bytes.set(c,at);at+=c.byteLength;}
   let body:unknown;try{body=JSON.parse(new TextDecoder().decode(bytes));}catch{return failure(400,'Invalid JSON.');}
   if(Array.isArray(body))return failure(400,'Batch requests are not supported.');
-  transport=new WebStandardStreamableHTTPServerTransport({sessionIdGenerator:undefined,enableJsonResponse:true,maxRequestBodySize:2_000_000});
+  transport=new WebStandardStreamableHTTPServerTransport({sessionIdGenerator:undefined,enableJsonResponse:false,maxRequestBodySize:2_000_000});
   await server.connect(transport);
   const response=await transport.handleRequest(request,{parsedBody:body});
   const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');headers.set('X-Content-Type-Options','nosniff');
-  return new Response(await response.arrayBuffer(),{status:response.status,headers});
+  if(!response.body)return new Response(null,{status:response.status,headers});
+  const outputReader=response.body.getReader();handedOff=true;
+  const bodyStream=new ReadableStream<Uint8Array>({
+   async pull(out){try{const next=await outputReader.read();if(next.done){out.close();await cleanup();}else out.enqueue(next.value);}catch(error){out.error(error);await cleanup();}},
+   async cancel(){try{await outputReader.cancel();}finally{await cleanup();}},
+  });
+  return new Response(bodyStream,{status:response.status,headers});
  }catch{return failure(signal.aborted?408:400,signal.aborted?'Request timed out.':'Request could not be completed.');}
- finally{clearTimeout(timer);controller.abort();await server.close();}
+ finally{if(!handedOff)await cleanup();}
 }
