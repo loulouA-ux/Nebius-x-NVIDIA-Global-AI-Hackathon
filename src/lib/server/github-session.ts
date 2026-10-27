@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 import { randomBytes } from "node:crypto";
 import type { Query } from "./db";
 import { hash } from "./session";
@@ -5,7 +6,7 @@ import { ApiError } from "./http";
 import { validateGitHubTransaction, type OAuthTransaction } from "./github-oauth";
 
 export function githubMemberAllowed(id: string) {
-  return (process.env.SHIPCHECK_GITHUB_MEMBER_IDS || "").split(",").map(v => v.trim()).includes(id);
+  return (brandEnv("GITHUB_MEMBER_IDS") || "").split(",").map(v => v.trim()).includes(id);
 }
 export async function saveOAuthTransaction(query: Query, tx: OAuthTransaction) {
   await query("DELETE FROM sc_oauth_transactions WHERE expires_at<=now()");

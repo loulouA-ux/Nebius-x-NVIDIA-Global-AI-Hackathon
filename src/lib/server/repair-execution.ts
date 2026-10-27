@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 import {auditRepairMutation} from "./repair-audit";
 import {z} from "zod";
 import type {Query} from "./db";
@@ -15,11 +16,11 @@ export function approvalHash(plan:RepairPlan,result:RepairRun){
 }
 export function repairRunLimits(env:Record<string,string|undefined>=process.env){
  const read=(name:string)=>{
-  const raw=env[name]??"1";
+  const raw=brandEnv(name,env)??"1";
   if(!/^[1-5]$/.test(raw))throw new ApiError(503,"Repair run allowance must be an integer between 1 and 5.");
   return Number(raw);
  };
- return {daily:read("SHIPCHECK_REPAIR_DAILY_RUNS"),total:read("SHIPCHECK_REPAIR_TOTAL_RUNS")};
+ return {daily:read("REPAIR_DAILY_RUNS"),total:read("REPAIR_TOTAL_RUNS")};
 }
 export async function reserveRepairRun(query:Query,limit:number){
  // Lifetime allowance has a fixed window. Failed/abandoned reservations are not refunded.

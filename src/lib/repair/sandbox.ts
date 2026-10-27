@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 import { Sandbox } from "@vercel/sandbox";
 import { randomUUID } from "node:crypto";
 import { maskSecrets } from "../scanner";
@@ -19,7 +20,7 @@ export const sandboxCommands={
  build:["run","build","--ignore-scripts"],
 } as const;
 export function vercelSandboxFactory():SandboxFactory{
- if(process.env.SHIPCHECK_REPAIR_SANDBOX_ENABLED!=="true")throw Error("Paid repair sandboxes are not enabled.");
+ if(brandEnv("REPAIR_SANDBOX_ENABLED")!=="true")throw Error("Paid repair sandboxes are not enabled.");
  return async(phase)=>{
   const sandbox=await Sandbox.create({name:`shipcheck-${phase}-${randomUUID()}`,persistent:false,timeout:180000,resources:{vcpus:1},ports:[],networkPolicy:"deny-all"});
   const cwd=`${sandbox.cwd}/project`;

@@ -11,9 +11,9 @@ export default function SignIn() {
   return (
     <><BrandHeader /><main id="main-content" tabIndex={-1} className="auth-layout">
       <section className="auth-panel">
-      <h1>Sign in to ShipCheck</h1>
+      <h1>Sign in to ShipTested</h1>
       <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
-      <p>Save reports, record review decisions and verify staging hosts. Sign-in is limited to invited preview members.</p><h2>What ShipCheck can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
+      <p>Save reports, record review decisions and verify staging hosts. Sign-in is limited to invited preview members.</p><h2>What ShipTested can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
       <p>
         Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
       </p>

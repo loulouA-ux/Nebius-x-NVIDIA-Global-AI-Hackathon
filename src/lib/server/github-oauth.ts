@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { boundedJson } from "../providers";
@@ -10,10 +11,11 @@ export type OAuthTransaction = { state: string; verifier: string; browserHash: s
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
 
 export function githubOAuthConfig(): GitHubOAuthConfig {
-  const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SHIPCHECK_APP_ORIGIN } = process.env;
-  if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET || !SHIPCHECK_APP_ORIGIN)
+  const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = process.env;
+  const appOrigin = brandEnv("APP_ORIGIN");
+  if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET || !appOrigin)
     throw new ApiError(503, "GitHub sign-in is not configured.");
-  const url = new URL(SHIPCHECK_APP_ORIGIN);
+  const url = new URL(appOrigin);
   if (url.username || url.password || url.search || url.hash || url.pathname !== "/" ||
       (url.protocol !== "https:" && !(url.protocol === "http:" && url.hostname === "127.0.0.1")))
     throw new ApiError(503, "GitHub callback origin is invalid.");
@@ -58,7 +60,7 @@ export async function exchangeGitHubIdentity(config: GitHubOAuthConfig, code: st
   const token=parsedToken.data;
   const userResponse = await boundedJson("https://api.github.com/user", {
     redirect: "error", signal: AbortSignal.timeout(10000),
-    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token.access_token}`, "User-Agent": "ShipCheck" },
+    headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${token.access_token}`, "User-Agent": "ShipTested" },
   }, request);
   const parsedUser=z.object({id:z.number().int().positive().max(Number.MAX_SAFE_INTEGER),login:z.string().regex(/^[a-zA-Z0-9-]{1,39}$/)}).safeParse(userResponse);
   if (!parsedUser.success)
@@ -73,5 +75,5 @@ export async function exchangeGitHubIdentity(config: GitHubOAuthConfig, code: st
 export function assertGitHubOrigin(request:Request,origin:string){
  const actual=new URL(request.url),expected=new URL(origin),host=request.headers.get("host");
  const loopbackAlias=expected.protocol==="http:"&&expected.hostname==="127.0.0.1"&&actual.protocol==="http:"&&actual.hostname==="localhost"&&actual.port===expected.port&&host===expected.host;
- if((actual.origin!==expected.origin&&!loopbackAlias)||(host!==null&&host!==expected.host))throw new ApiError(400,"Use the configured ShipCheck sign-in address.");
+ if((actual.origin!==expected.origin&&!loopbackAlias)||(host!==null&&host!==expected.host))throw new ApiError(400,"Use the configured ShipTested sign-in address.");
 }

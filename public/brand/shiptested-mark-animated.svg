@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><style>
+.lt,.gt{opacity:0;animation:in .36s cubic-bezier(.2,.8,.2,1) forwards}.lt{animation-delay:.05s;transform:translateX(4px)}.gt{animation-delay:.12s;transform:translateX(-4px)}
+.tk{stroke-dasharray:32;stroke-dashoffset:32;animation:draw .42s cubic-bezier(.65,0,.35,1) .32s forwards}
+.ship{animation:bob 3.2s ease-in-out .8s infinite}
+@keyframes in{to{opacity:1;transform:none}}@keyframes draw{to{stroke-dashoffset:0}}@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.2px)}}
+@media (prefers-reduced-motion:reduce){.lt,.gt,.tk,.ship{animation:none;opacity:1;transform:none;stroke-dashoffset:0}}
+</style><g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><g class="ship"><path d="M8 44h48l-6 10H14z" stroke="#F2F5F9"/><path class="lt" d="M23 20l-8 8 8 8" stroke="#F2F5F9"/><path class="gt" d="M41 20l8 8-8 8" stroke="#F2F5F9"/><path class="tk" d="M26 33l3.5 5.5L36 14" stroke="#5EEAD4"/></g><path d="M6 58c3-2 5-2 8 0s5 2 8 0 5-2 8 0 5-2 8 0 5-2 8 0 5-2 8 0" stroke="#F2F5F9"/></g></svg>

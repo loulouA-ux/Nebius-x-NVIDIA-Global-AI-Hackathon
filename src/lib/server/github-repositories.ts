@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 import { createSign,createHash } from "node:crypto";
 import { z } from "zod";
 import { boundedJson } from "../providers";
@@ -8,7 +9,7 @@ const repoSchema=z.object({id:z.number().int().positive(),name:z.string(),full_n
 export type GitHubRepository=z.infer<typeof repoSchema>;
 // Server-admin grants bind installation IDs to app actors. Never accept a client-supplied installation ID.
 export function installationFor(actor:Actor){
- const grants=z.record(z.string(),z.number().int().positive()).parse(JSON.parse(process.env.SHIPCHECK_GITHUB_INSTALLATIONS||"{}"));
+ const grants=z.record(z.string(),z.number().int().positive()).parse(JSON.parse(brandEnv("GITHUB_INSTALLATIONS")||"{}"));
  if(!Object.hasOwn(grants,actor.id))throw new ApiError(403,"No repository installation is connected to this account.");
  return grants[actor.id];
 }
@@ -21,7 +22,7 @@ function appJwt(){
 }
 export async function githubRequest(path:string,token:string,init:RequestInit={},fetcher:typeof fetch=fetch){
  if(!path.startsWith("/")||path.startsWith("//")||path.includes("\\"))throw Error("Invalid GitHub API path.");
- return boundedJson("https://api.github.com"+path,{...init,headers:{Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"ShipCheck","Content-Type":"application/json",Authorization:`Bearer ${token}`}},fetcher);
+ return boundedJson("https://api.github.com"+path,{...init,headers:{Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"ShipTested","Content-Type":"application/json",Authorization:`Bearer ${token}`}},fetcher);
 }
 export async function installationToken(actor:Actor,repositoryId?:number,write=false,fetcher:typeof fetch=fetch,readPullRequests=false){
  if(write&&!repositoryId)throw Error("Write access must be scoped to one repository.");

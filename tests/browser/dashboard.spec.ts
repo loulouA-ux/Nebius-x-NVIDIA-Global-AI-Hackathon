@@ -96,6 +96,8 @@ test("desktop overview renders without client errors", async ({ page }) => {
 test("sign-in form rejects an invalid key without exposing it", async ({
   page,
 }) => {
+  // Isolate UI rejection behavior from database credentials; server auth has unit coverage.
+  await page.route("**/api/session", route => route.fulfill({status:401,contentType:"application/json",body:JSON.stringify({error:"Invalid access key."})}));
   await page.goto("/sign-in");
   await page.getByLabel("Individual access key").fill("invalid-test-key");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();

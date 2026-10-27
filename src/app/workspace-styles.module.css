@@ -497,7 +497,7 @@
 :global(.verdict[data-status="Checks passed"] .verdict-icon) { color: var(--success-text); }
 :global(.coverage-row[data-state="complete"] > svg),:global(.coverage-row[data-state="complete"] .coverage-state) { color: var(--success-text); }
 :global(.coverage-row[data-state="incomplete"] > svg),:global(.coverage-row[data-state="incomplete"] .coverage-state),:global(.coverage-row[data-state="snapshot"] > svg),:global(.coverage-row[data-state="snapshot"] .coverage-state) { color: var(--warning); }
-/* ShipCheck brand system v2: preserve the functional dashboard beneath the identity. */
+/* ShipTested brand system v2: preserve the functional dashboard beneath the identity. */
 :global(.brand-symbol) { object-fit: contain; }
 :global(.nav-link) { display:flex; align-items:center; gap:10px; padding:12px; border-radius:9px; font-size:14px; color:var(--muted); text-decoration:none; }
 :global(.nav-link:hover) { background:var(--soft); color:var(--ink); }
@@ -767,7 +767,7 @@
 :global(::placeholder){color:var(--muted);opacity:1}
 :global(.change-chip){font-weight:600}
 :global(.change-chip span){display:inline-block;padding:4px 8px;background:var(--success-soft);color:var(--success-text);border-radius:6px}
-/* Approved ShipCheck handoff: shared application chrome and report index. */
+/* Approved ShipTested handoff: shared application chrome and report index. */
 
 :global(.sidebar-brand){margin:0 8px 32px}
 :global(.sidebar-brand .brand){font-size:22px}

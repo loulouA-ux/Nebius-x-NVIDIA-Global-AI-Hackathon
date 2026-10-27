@@ -9,10 +9,10 @@ import type { Check, ScanInput, ScanReport } from "./types";
 export const demoFiles = {
   "package-lock.json": JSON.stringify(
     {
-      name: "shipcheck-demo",
+      name: "shiptested-demo",
       lockfileVersion: 3,
       packages: {
-        "": { name: "shipcheck-demo" },
+        "": { name: "shiptested-demo" },
         "node_modules/lodash": { version: "4.17.20" },
       },
     },
@@ -20,9 +20,9 @@ export const demoFiles = {
     2,
   ),
   "next.config.ts": "export default { productionBrowserSourceMaps: true };",
-  "demo.env.fixture": "PAYMENT_KEY=sk_live_SHIPCHECK_SYNTHETIC_000000000000"
+  "demo.env.fixture": "PAYMENT_KEY=sk_live_SHIPTESTED_SYNTHETIC_000000000000"
     .replaceAll("_SYNTHETIC_", "SYNTHETIC")
-    .replace("SHIPCHECK_", "SHIPCHECK"),
+    .replace("SHIPTESTED_", "SHIPTESTED"),
 };
 export async function runScan(
   input: ScanInput,
@@ -179,7 +179,7 @@ export async function runScan(
     explanations,
     durationMs: demo ? 0 : Date.now() - start,
     policy:
-      "shipcheck-v0.1: high findings block; incomplete coverage cannot pass; other findings require review.",
+      "shiptested-v0.1: high findings block; incomplete coverage cannot pass; other findings require review.",
   };
   return JSON.parse(maskSecrets(JSON.stringify(result))) as ScanReport;
 }

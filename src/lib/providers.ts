@@ -1,3 +1,4 @@
+import { brandEnv } from "./brand-env";
 import { z } from "zod";
 import { maskSecrets } from "./scanner";
 import type { Dependency, Explanation, Finding, Source } from "./types";
@@ -264,7 +265,7 @@ export async function explain(
           },
           body: JSON.stringify({
             model:
-              process.env.SHIPCHECK_MODEL ||
+              brandEnv("MODEL") ||
               "nvidia/nemotron-3-super-120b-a12b",
             temperature: 0,
             max_tokens: 2400,

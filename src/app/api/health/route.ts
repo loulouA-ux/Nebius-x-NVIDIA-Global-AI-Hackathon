@@ -1,3 +1,4 @@
+import { brandEnv } from "../../../lib/brand-env";
 import {publicDemo} from '@/lib/server/public-demo';
 export async function GET() {
   return Response.json(
@@ -10,8 +11,8 @@ export async function GET() {
       },
       persistence: Boolean(process.env.DATABASE_URL),
       memberAccess: Boolean(
-        process.env.SHIPCHECK_PETER_KEY_HASH &&
-          process.env.SHIPCHECK_LOUISE_KEY_HASH,
+        brandEnv("PETER_KEY_HASH") &&
+          brandEnv("LOUISE_KEY_HASH"),
       ),
       urlScanning: !publicDemo(),
       note: "Configuration presence only; not a live provider or database health check.",

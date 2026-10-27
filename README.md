@@ -1,4 +1,4 @@
-# ShipCheck
+# ShipTested
 
 Earlier working name: Agent Shielda.
 
@@ -71,7 +71,7 @@ Remaining: independent partner review, private member-key delivery, public judgi
 - [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search).
 - Lucide icons and Figtree font retain their upstream licences; Google Fonts is requested by the browser with a system-font fallback.
 
-MIT applies to original ShipCheck code. Third-party dependencies and advisory data retain their licences.
+MIT applies to original ShipTested code. Third-party dependencies and advisory data retain their licences.
 
 ## Recorded live demo capture
 
@@ -85,8 +85,8 @@ Verify the running-server boundary with `npx playwright test -c playwright.publi
 
 ## Brand boilerplate
 
-ShipCheck helps small teams check a release before it ships. Paste or drop a lockfile and it resolves exact versions, matches them against OSV advisories, looks for exposed credentials and, once you prove you own a staging host, runs passive checks against it. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds live research, but deterministic rules set the verdict, and no model can remove a finding. Every report says what was checked and what wasn't. For supported npm fixes, ShipCheck tests the patch in an isolated sandbox and opens a draft pull request only after you approve it. ShipCheck is open source under MIT, built by HeySalad.
+ShipTested helps small teams check a release before it ships. Paste or drop a lockfile and it resolves exact versions, matches them against OSV advisories, looks for exposed credentials and, once you prove you own a staging host, runs passive checks against it. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds live research, but deterministic rules set the verdict, and no model can remove a finding. Every report says what was checked and what wasn't. For supported npm fixes, ShipTested tests the patch in an isolated sandbox and opens a draft pull request only after you approve it. ShipTested is open source under MIT, built by HeySalad.
 
 ## Hackathon summary
 
-ShipCheck is a pre-release security check for small teams. It matches exact dependency versions against OSV, masks secrets and checks verified staging hosts. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds dated research, while deterministic rules keep the verdict honest. Supported npm fixes are tested in a sandbox before a person approves the pull request.
+ShipTested is a pre-release security check for small teams. It matches exact dependency versions against OSV, masks secrets and checks verified staging hosts. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds dated research, while deterministic rules keep the verdict honest. Supported npm fixes are tested in a sandbox before a person approves the pull request.
