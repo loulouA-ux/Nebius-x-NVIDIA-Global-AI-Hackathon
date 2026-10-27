@@ -11,9 +11,14 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "db:migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
-    "db:smoke": "node --env-file=.env.local --import tsx scripts/db-smoke.ts"
+    "db:smoke": "node --env-file=.env.local --import tsx scripts/db-smoke.ts",
+    "build:packages": "npm run build -w @heysalad/shiptested && npm run build -w @heysalad/shiptested-cli && npm run build -w @heysalad/shiptested-mcp",
+    "prebuild": "npm run build:packages && npm exec -w @shiptested/docs -- fumadocs-mdx",
+    "pretypecheck": "npm run build:packages && npm exec -w @shiptested/docs -- fumadocs-mdx",
+    "pretest": "npm run build:packages"
   },
   "dependencies": {
+    "@heysalad/shiptested": "0.1.0",
     "@neondatabase/serverless": "^1.2.0",
     "@vercel/sandbox": "3.9.0",
     "lucide-react": "^0.468.0",
@@ -24,12 +29,17 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@electric-sql/pglite": "^0.5.11",
     "@playwright/test": "^1.56.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/semver": "^7.7.0",
+    "ajv": "^8.20.0",
+    "ajv-draft-04": "^1.0.0",
+    "ajv-formats": "^3.0.1",
+    "lighthouse": "^13.5.0",
     "tsx": "^4.23.15",
     "typescript": "^5.9.0",
     "vitest": "5.0.5"
@@ -38,5 +48,9 @@
     "@vercel/cli-config": {
       "zod": "4.6.7"
     }
-  }
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
 }

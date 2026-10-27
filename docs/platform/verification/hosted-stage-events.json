@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-10-27T16:59:57.796Z",
+  "events": [
+    {
+      "elapsedMs": 1548,
+      "progress": 1,
+      "total": 6,
+      "message": "Lockfile: running — Resolving supplied exact versions"
+    },
+    {
+      "elapsedMs": 1549,
+      "progress": 2,
+      "total": 6,
+      "message": "Lockfile: done — 1 exact packages resolved"
+    },
+    {
+      "elapsedMs": 1549,
+      "progress": 3,
+      "total": 6,
+      "message": "Secrets: running — Checking supported patterns"
+    },
+    {
+      "elapsedMs": 1549,
+      "progress": 4,
+      "total": 6,
+      "message": "Secrets: done — Supported patterns checked; values masked"
+    },
+    {
+      "elapsedMs": 1549,
+      "progress": 5,
+      "total": 6,
+      "message": "OSV: running — Querying exact package versions"
+    },
+    {
+      "elapsedMs": 1905,
+      "progress": 6,
+      "total": 6,
+      "message": "OSV: done — 5 matched advisory findings"
+    }
+  ],
+  "completedMs": 1910,
+  "status": "Blocked",
+  "findings": 5
+}

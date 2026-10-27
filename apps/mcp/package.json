@@ -1,0 +1,18 @@
+{
+  "name": "@shiptested/mcp-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev --port 3180"
+  },
+  "dependencies": {
+    "@heysalad/shiptested": "0.1.0",
+    "@heysalad/shiptested-mcp": "0.1.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  }
+}
