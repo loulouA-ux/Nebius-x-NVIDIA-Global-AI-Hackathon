@@ -2,6 +2,7 @@ import type { Query } from './db';
 import { ScanJobs } from './scan-jobs';
 import { fetchManifests } from './repository-manifests';
 import { scanRepository } from './repository-scan';
+import {activeMembership} from './team-access';
 
 export async function runRepositoryJob(query:Query,dependencies={fetchManifests,scanRepository}) {
   const jobs=new ScanJobs(query);
@@ -10,9 +11,11 @@ export async function runRepositoryJob(query:Query,dependencies={fetchManifests,
   if(!job)return {processed:false};
   const id=String(job.id),token=String(job.lease_token);
   try {
+    if(String(job.owner_id).startsWith('github:')&&!await activeMembership(query,String(job.workspace_id),String(job.owner_id)))throw Error('Workspace access revoked.');
     const snapshot=await dependencies.fetchManifests({id:String(job.owner_id),workspaceId:String(job.workspace_id),role:'member'},
       {repository:String(job.repository),commit:String(job.commit_sha),tree:String(job.tree_sha),private:Boolean(job.private_repository)});
     const report=await dependencies.scanRepository(snapshot,AbortSignal.timeout(180000));
+    if(String(job.owner_id).startsWith('github:')&&!await activeMembership(query,String(job.workspace_id),String(job.owner_id)))throw Error('Workspace access revoked.');
     await jobs.saveReport(id,token,report);
     return {processed:true,id,state:'completed',reportId:report.id};
   } catch {

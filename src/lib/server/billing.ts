@@ -55,7 +55,7 @@ export async function createCheckout(query:Query,actor:Actor,seats:number,reques
     line_items:[{price:config.price,quantity:seats}],client_reference_id:actor.workspaceId,
     metadata:{seats:String(seats)},
     integration_identifier:'shiptested_hosted_abcdefgh',
-    success_url:`${config.origin}/team?billing=processing`,cancel_url:`${config.origin}/team?billing=cancelled`,
+    success_url:`${config.origin}/usage?billing=processing`,cancel_url:`${config.origin}/usage?billing=cancelled`,
     subscription_data:{metadata:{shiptested_workspace:actor.workspaceId}},
   },{idempotencyKey:`shiptested-checkout-${actor.workspaceId}-${requestKey}`});
   await query('UPDATE sc_billing_accounts SET checkout_session_id=$3 WHERE workspace_id=$1 AND checkout_lease=$2',[actor.workspaceId,lease,session.id]);
@@ -68,7 +68,7 @@ export async function createCheckout(query:Query,actor:Actor,seats:number,reques
 export async function createPortal(query:Query,actor:Actor){
   const store=new BillingStore(query),account=await store.account(actor),config=billingConfig();
   if(!account.customer_id)throw new ApiError(409,'No billing account exists yet.');
-  const portal=await config.client.billingPortal.sessions.create({customer:String(account.customer_id),return_url:`${config.origin}/team`});
+  const portal=await config.client.billingPortal.sessions.create({customer:String(account.customer_id),return_url:`${config.origin}/usage`});
   return {url:portal.url};
 }
 
