@@ -23,3 +23,5 @@ Core acceptance: identical deterministic functions are imported by web/core; off
 - Step 10: landing/nav/agent availability built and tested in PR14 preview; main-site production unchanged.
 - Step 11: hosted accessibility, Lighthouse, package/CLI/MCP evidence and recordings saved in `docs/platform/verification`; see `docs/PLATFORM-REPORT.md` for exact limits and human release gates.
 - Not claimed: full workspace coverage, global rate limits, marketplace approval, npm publication or main merge.
+
+- PR15 closes the remote progress gap: actual stage events reach the playground before completion; response cancellation cancels upstream work. Hosted UI checks pass in both themes at desktop/phone widths. Website scan SSE remains the separate stretch item.
