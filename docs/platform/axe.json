@@ -1,0 +1,142 @@
+[
+  {
+    "name": "landing",
+    "theme": "dark",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "privacy",
+    "theme": "dark",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "security",
+    "theme": "dark",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "dark",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "landing",
+    "theme": "dark",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "privacy",
+    "theme": "dark",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "security",
+    "theme": "dark",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "dark",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "landing",
+    "theme": "light",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "privacy",
+    "theme": "light",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "security",
+    "theme": "light",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "light",
+    "width": 1440,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "landing",
+    "theme": "light",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "privacy",
+    "theme": "light",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "security",
+    "theme": "light",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "light",
+    "width": 390,
+    "fits": true,
+    "violations": []
+  }
+]

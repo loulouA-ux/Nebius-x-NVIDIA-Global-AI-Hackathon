@@ -6,7 +6,7 @@ Verified 27 October 2026, Europe/London using authenticated Vercel CLI project/d
 - Root directory: `.`. Next.js, Node 22.x, `npm ci`, `npm run build`.
 - Git integration: loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon; production branch `main`. A main push can deploy production. Do not merge or force-push.
 - Current production: `dpl_Fm4WkEEgwavUguCi48Az5BHMy3AN`, READY, source `cli`, target `production`, release metadata `6d1967f`. Inspecting shiptested.com resolves to this deployment.
-- Both CLI deployment and Git integration exist. Current production was CLI-deployed; the authorized minimal release path is CLI from a clean HEAD after all gates pass, without changing main.
+- Both CLI deployment and Git integration exist. Although the current production artifact was CLI-deployed, the project still has Git-triggered production on main. Follow the brief's main-branch gate: push the reviewed branch, open a PR and stop for Peter to merge; do not bypass that gate with a CLI production deployment.
 - Rollback target recorded before release: `vercel rollback dpl_Fm4WkEEgwavUguCi48Az5BHMy3AN --scope hey-salad-inc`.
 - Existing environment variables and Deployment Protection must remain unchanged.
 

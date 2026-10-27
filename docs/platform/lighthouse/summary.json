@@ -1,0 +1,46 @@
+[
+  {
+    "name": "landing",
+    "mode": "desktop",
+    "exit": 0,
+    "scores": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 100
+    },
+    "pass": true
+  },
+  {
+    "name": "landing",
+    "mode": "mobile",
+    "exit": 0,
+    "scores": {
+      "performance": 98,
+      "accessibility": 100,
+      "best-practices": 100
+    },
+    "pass": true
+  },
+  {
+    "name": "report",
+    "mode": "desktop",
+    "exit": 0,
+    "scores": {
+      "performance": 100,
+      "accessibility": 100,
+      "best-practices": 96
+    },
+    "pass": true
+  },
+  {
+    "name": "report",
+    "mode": "mobile",
+    "exit": 0,
+    "scores": {
+      "performance": 95,
+      "accessibility": 100,
+      "best-practices": 96
+    },
+    "pass": true
+  }
+]
