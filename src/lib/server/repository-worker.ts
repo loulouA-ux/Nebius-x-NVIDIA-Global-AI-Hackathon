@@ -3,6 +3,14 @@ import { ScanJobs } from './scan-jobs';
 import { fetchManifests } from './repository-manifests';
 import { scanRepository } from './repository-scan';
 import {activeMembership} from './team-access';
+import {githubMemberAllowed} from './github-session';
+
+async function requireJobOwner(query:Query,workspaceId:string,ownerId:string){
+  if(!ownerId.startsWith('github:'))return; // Legacy operator jobs retain their existing access path.
+  const githubId=ownerId.slice(7);
+  const [account]=await query('SELECT disabled FROM sc_github_accounts WHERE github_id=$1',[githubId]);
+  if(!githubMemberAllowed(githubId)||!account||account.disabled||!await activeMembership(query,workspaceId,ownerId))throw Error('Job owner access revoked.');
+}
 
 export async function runRepositoryJob(query:Query,dependencies={fetchManifests,scanRepository}) {
   const jobs=new ScanJobs(query);
@@ -11,11 +19,11 @@ export async function runRepositoryJob(query:Query,dependencies={fetchManifests,
   if(!job)return {processed:false};
   const id=String(job.id),token=String(job.lease_token);
   try {
-    if(String(job.owner_id).startsWith('github:')&&!await activeMembership(query,String(job.workspace_id),String(job.owner_id)))throw Error('Workspace access revoked.');
+    await requireJobOwner(query,String(job.workspace_id),String(job.owner_id));
     const snapshot=await dependencies.fetchManifests({id:String(job.owner_id),workspaceId:String(job.workspace_id),role:'member'},
       {repository:String(job.repository),commit:String(job.commit_sha),tree:String(job.tree_sha),private:Boolean(job.private_repository)});
     const report=await dependencies.scanRepository(snapshot,AbortSignal.timeout(180000));
-    if(String(job.owner_id).startsWith('github:')&&!await activeMembership(query,String(job.workspace_id),String(job.owner_id)))throw Error('Workspace access revoked.');
+    await requireJobOwner(query,String(job.workspace_id),String(job.owner_id));
     await jobs.saveReport(id,token,report);
     return {processed:true,id,state:'completed',reportId:report.id};
   } catch {

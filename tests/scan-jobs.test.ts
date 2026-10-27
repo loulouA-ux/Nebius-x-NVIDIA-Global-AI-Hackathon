@@ -1,4 +1,5 @@
-import { afterAll, beforeAll, beforeEach, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest';
+import {createGitHubSession} from '../src/lib/server/github-session';
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -113,4 +114,22 @@ it('records state transitions atomically and refuses stale workers without extra
  expect(events.map(e=>e.event_type)).toEqual(['scan_queued','scan_started','scan_failed']);
  const cancelled=await jobs.enqueue(actor,input());await jobs.cancelQueued(actor,String(cancelled.id));
  expect((await query('SELECT event_type FROM sc_workspace_events WHERE subject_id=$1 ORDER BY sequence',[cancelled.id])).map(e=>e.event_type)).toEqual(['scan_queued','scan_cancelled']);
+});
+
+afterEach(()=>vi.unstubAllEnvs());
+it('does not fetch code for disabled accounts or persist results after mid-scan revocation',async()=>{
+ vi.stubEnv('SHIPTESTED_OPEN_REGISTRATION','1');
+ const session=await createGitHubSession(query,{githubId:'900001',login:'synthetic-worker-test'});
+ const req=input();await jobs.enqueue(session.actor,req);
+ await query("UPDATE sc_github_accounts SET disabled=true WHERE github_id='900001'");
+ const fetchManifests=vi.fn().mockResolvedValue({repository:req.repository,commit:req.commit,tree:req.tree,private:false,files:{},omitted:[]});
+ expect((await runRepositoryJob(query,{fetchManifests,scanRepository})).state).toBe('failed');expect(fetchManifests).not.toHaveBeenCalled();
+ await query("UPDATE sc_github_accounts SET disabled=false WHERE github_id='900001'");
+ const second=await jobs.enqueue(session.actor,{...req,requestKey:randomUUID()});
+ const scanThenRevoke:typeof scanRepository=async(snapshot,signal)=>{
+   const report=await scanRepository(snapshot,signal);
+   await query("UPDATE sc_github_accounts SET disabled=true WHERE github_id='900001'");return report;
+ };
+ expect((await runRepositoryJob(query,{fetchManifests,scanRepository:scanThenRevoke})).state).toBe('failed');
+ expect((await jobs.get(session.actor,String(second.id))).report_id).toBeNull();
 });

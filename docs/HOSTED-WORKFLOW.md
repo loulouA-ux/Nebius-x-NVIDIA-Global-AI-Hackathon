@@ -112,3 +112,9 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Ran `scripts/hosted-acceptance.ts` against actual Neon with synthetic account identities and live public GitHub/OSV requests. Nicedeck commit `2bb5203218e88f2993ec0d96dcd997d3ba86e96e`: four pinned dependencies, zero known advisory findings, scoped verdict Checks passed. This is not a source-code/exploitability assessment.
 - Passed: idempotent allowance reservation, durable queue/worker/report persistence, cross-account job/report denial, fresh-session retrieval, explicit share revocation, read-only/revoked token denial and atomic lifecycle audit. One allowance unit consumed. Evidence: `../outputs/hosted-acceptance/database-pipeline.json`; branch screenshot: `../outputs/hosted-acceptance/neon-branch.png`.
 - This proves the database/live pipeline boundary, not browser OAuth or hosted HTTP acceptance. No actual customer identity, Stripe purchase or live paid activation was used. The acceptance branch is disposable; its report IDs are not production report URLs.
+
+### Worker revocation and protected preview configuration
+
+- Queued GitHub jobs now check account admission/disabled state as well as membership before fetching manifests and again before saving results. Tests prove a disabled owner triggers no fetch and disabling an owner during scanning prevents report persistence.
+- Verified: 318 unit/database tests and typecheck. Vercel project API confirms all previews require team sign-in; production branch is main.
+- Configured only `codex/hosted-workflow` Preview environment overrides for the isolated Neon branch, scheduler secret, closed registration, test/member admission and fixed branch origin. Production environment unchanged. No schedule activated; the temporary database expires on 28 October at 23:09 GMT.
