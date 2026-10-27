@@ -9,6 +9,7 @@ for(const theme of ['light','dark'] as const){test(`landing controls fit and lin
   await expect(source.locator('svg')).toHaveCount(2);
   await expect(page.getByRole('navigation',{name:'Main'}).getByRole('link',{name:'Developers'})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  if(width<=600)await expect(page.locator('header').getByRole('link',{name:'Run the demo'})).toBeHidden();
   const size=await source.boundingBox();expect(size!.height).toBeGreaterThanOrEqual(44);
   expect(await source.evaluate(el=>getComputedStyle(el).borderRadius)).toBe('8px');
   await page.screenshot({path:info.outputPath(`landing-${theme}-${width}.png`),fullPage:true});

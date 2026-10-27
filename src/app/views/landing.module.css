@@ -32,4 +32,4 @@
 @media(max-width:900px){.header{flex-wrap:wrap;gap:12px}.header nav{display:flex;order:4;width:100%;margin:0;border-top:1px solid var(--line);padding-top:8px;gap:24px}.header nav a{font-size:13px}.header>:global(.button){margin-left:auto}}
 @media(max-width:600px){.header{padding:12px 20px}.header>:global(.button){padding:10px 12px;font-size:13px}.header nav{gap:20px}.heroCopy p{font-size:16px}.actions a{min-height:48px}.agents>a{width:100%}}
 @media(prefers-reduced-motion:reduce){.landing a:global(.button){transition:none}}
-@media(max-width:600px){.header>:global(.button){display:none}.header>:global(button){margin-left:auto}.header nav{justify-content:space-between;gap:12px}}
+@media(max-width:600px){.landing .header>a:global(.button){display:none}.header>:global(button){margin-left:auto}.header nav{justify-content:space-between;gap:12px}}
