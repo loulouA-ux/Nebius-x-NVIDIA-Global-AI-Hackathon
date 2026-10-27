@@ -1,0 +1,6 @@
+import type {ScanReport} from '@/lib/types';
+export type VoyageEvent={stage:string;status:'done'|'failed';detail?:string;tone:'ok'|'warn'|'danger'|'neutral';durationMs?:number};
+export const stages=['Lockfile','Secrets','OSV','Tavily','Nemotron'];
+export function reportEvents(report:ScanReport):VoyageEvent[]{return stages.map((stage,i)=>{const terms=[/dependenc|lockfile/i,/secret|credential/i,/osv/i,/tavily|research/i,/nemotron|triage/i];const check=report.checks.find(c=>terms[i].test(c.name));if(!check||check.state==='not-in-scope')return {stage,status:'failed',detail:check?.detail||'Not recorded',tone:'neutral'};const failed=check.state==='incomplete';return {stage,status:failed?'failed':'done',detail:check.detail,tone:failed?'neutral':stage==='OSV'&&report.findings.some(f=>f.severity==='high')?'danger':'ok'};});}
+export function completedStage(events:VoyageEvent[]){let n=-1;for(const stage of stages){const e=events.find(e=>e.stage===stage);if(e?.status!=='done')break;n++;}return n;}
+export function voyageOutcome(events:VoyageEvent[],verdict:string){return events.some(e=>e.status==='failed')?'Incomplete':verdict;}
