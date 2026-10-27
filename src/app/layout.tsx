@@ -1,3 +1,4 @@
+import {headers} from "next/headers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./brand-motion.css";
@@ -14,12 +15,14 @@ export const metadata: Metadata = {
   icons: { icon: "/brand/favicon.svg", apple: "/brand/app-icon.svg" },
   manifest: "/manifest.webmanifest",
   openGraph: {title:"ShipTested — Check before you ship.", description:"Evidence for every finding. Tests for every fix."},
+  twitter:{card:"summary_large_image",title:"ShipTested — Check before you ship."},
   description: "Pre-release security checks for small teams. ShipTested scans your lockfile, secrets and staging host, shows the evidence for every finding and tests fixes before you approve them.",
 };
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const nonce=(await headers()).get("x-nonce")||undefined;
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
+      <head><script nonce={nonce} dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
       <body className={`${styles.root} ${geist.variable} ${mono.variable}`}><SkipLink /><RouteFocus/>{children}</body>
     </html>
   );

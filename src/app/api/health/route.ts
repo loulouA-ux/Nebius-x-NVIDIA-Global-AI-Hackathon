@@ -9,8 +9,8 @@ export async function GET() {
         tavily: !publicDemo() && Boolean(process.env.TAVILY_API_KEY),
         nebius: !publicDemo() && Boolean(process.env.NEBIUS_API_KEY),
       },
-      persistence: Boolean(process.env.DATABASE_URL),
-      memberAccess: Boolean(
+      persistence: !publicDemo() && Boolean(process.env.DATABASE_URL),
+      memberAccess: !publicDemo() && Boolean(
         brandEnv("PETER_KEY_HASH") &&
           brandEnv("LOUISE_KEY_HASH"),
       ),

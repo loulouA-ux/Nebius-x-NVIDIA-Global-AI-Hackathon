@@ -11,11 +11,11 @@ function navigationUrl(query:URLSearchParams){
  const id=query.get('report'),finding=query.get('finding');
  return id?`/reports/${encodeURIComponent(id)}${finding?`/findings/${encodeURIComponent(finding)}`:''}`:'/reports';
 }
-export default function useReportNavigation(busy:boolean,setError:(s:string)=>void){
+export default function useReportNavigation(busy:boolean,setError:(s:string)=>void,initialReport?:ScanReport,initialFinding?:string){
   const pathname=usePathname();
   const [view, setView] = useState<View>("overview");
-  const [report, setReport] = useState<ScanReport | null>(null);
-  const [selected, setSelected] = useState<Finding | null>(null);
+  const [report, setReport] = useState<ScanReport | null>(initialReport||null);
+  const [selected, setSelected] = useState<Finding | null>(initialReport?.findings.find(f=>f.id===initialFinding)||null);
   const desktop=false;
 
   const [unavailable,setUnavailable]=useState(false);
@@ -50,11 +50,11 @@ export default function useReportNavigation(busy:boolean,setError:(s:string)=>vo
       setError("");setUnavailable(false);
       const id=query.get("report") || latestReport()?.id, finding=query.get("finding");
       if(!id){setReport(null);setSelected(null);return;}
-      let loaded=recalledReport(id);
+      let loaded=recalledReport(id)||(initialReport?.id===id?initialReport:undefined);
       if(!loaded){try{const r=await fetch(id==='demo-offline'||id==='demo-recorded'?`/api/demos?mode=${id==='demo-offline'?'offline':'recorded'}`:`/api/scans/${encodeURIComponent(id)}`);if(r.ok){const data=await r.json();loaded=data.report||data;}}catch{/* Offer recovery below. */}}
       if(!active || ticket!==generation)return;
       if(loaded){rememberReport(loaded);setReport(loaded);setFilters(recalledFilters(loaded.id));setSelected(loaded.findings.find(f=>f.id===finding)||null);
-        query.set('report',loaded.id);window.history.replaceState(window.history.state,'',navigationUrl(query));
+        query.set('report',loaded.id);const canonical=navigationUrl(query);if(window.location.pathname+window.location.search!==canonical)window.history.replaceState(window.history.state,'',canonical);
         const listQuery=new URLSearchParams(query);listQuery.delete('finding');setDashboardLocation(requested,navigationUrl(listQuery));
       }
       else {setReport(null);setSelected(null);setUnavailable(true);}

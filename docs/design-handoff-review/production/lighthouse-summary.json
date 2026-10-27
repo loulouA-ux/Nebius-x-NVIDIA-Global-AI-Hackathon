@@ -1,0 +1,52 @@
+[
+  {
+    "mode": "mobile",
+    "page": "landing",
+    "scores": {
+      "performance": 0.96,
+      "accessibility": 1,
+      "best-practices": 1
+    },
+    "runtimeError": null
+  },
+  {
+    "mode": "mobile",
+    "page": "report",
+    "scores": {
+      "performance": null,
+      "accessibility": null,
+      "best-practices": null
+    },
+    "runtimeError": {
+      "code": "NO_FCP",
+      "message": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)",
+      "errorStack": "LighthouseError: NO_FCP\n    at Timeout.<anonymous> (file:///private/tmp/shiptested-audit-tools/node_modules/lighthouse/core/gather/driver/wait-for-condition.js:85:14)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+      "artifactKey": "PageLoadError"
+    }
+  },
+  {
+    "mode": "desktop",
+    "page": "landing",
+    "scores": {
+      "performance": 1,
+      "accessibility": 1,
+      "best-practices": 1
+    },
+    "runtimeError": null
+  },
+  {
+    "mode": "desktop",
+    "page": "report",
+    "scores": {
+      "performance": null,
+      "accessibility": null,
+      "best-practices": null
+    },
+    "runtimeError": {
+      "code": "NO_FCP",
+      "message": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)",
+      "errorStack": "LighthouseError: NO_FCP\n    at Timeout.<anonymous> (file:///private/tmp/shiptested-audit-tools/node_modules/lighthouse/core/gather/driver/wait-for-condition.js:85:14)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
+      "artifactKey": "PageLoadError"
+    }
+  }
+]

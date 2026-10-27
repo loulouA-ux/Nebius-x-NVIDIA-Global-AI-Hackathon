@@ -31,13 +31,13 @@ const defaultManifest = JSON.stringify(
   null,
   2,
 );
-export default function Home() {
+export default function Home({initialReport,initialFinding,demoOnly=false}:{initialReport?:ScanReport;initialFinding?:string;demoOnly?:boolean}) {
   const [busy, setBusy] = useState(false);
   const [recent,setRecent]=useState<{signedIn:boolean;scans:Saved[];error:string}>({signedIn:false,scans:[],error:""});
   const [recorded,setRecorded]=useState<boolean|null>(null);
   useEffect(()=>{fetch("/api/demos?mode=availability").then(r=>r.json()).then(d=>setRecorded(d.recorded)).catch(()=>setRecorded(false));},[]);
   const [error, setError] = useState("");
-  const {view,report,selected,setSelected,desktop,unavailable,mainRef,focusPending,filters,setFilters,navigate}=useReportNavigation(busy,setError);
+  const {view,report,selected,setSelected,desktop,unavailable,mainRef,focusPending,filters,setFilters,navigate}=useReportNavigation(busy,setError,initialReport,initialFinding);
   const [filename, setFilename] = useState("package-lock.json");
   const [content, setContent] = useState(defaultManifest);
   const [research, setResearch] = useState(false);
@@ -112,16 +112,16 @@ export default function Home() {
   return (
     <div className="app with-mobile-navigation">
       <BrandHeader />
-      <MobileNavigation view={view} onNavigate={navigate} />
+      <MobileNavigation demoOnly={demoOnly} view={view} onNavigate={navigate} />
       <div className="shell">
-        <WorkspaceSidebar view={view} onNavigate={navigate}/>
+        <WorkspaceSidebar demoOnly={demoOnly} view={view} onNavigate={navigate}/>
         <main ref={mainRef} id="main-content" tabIndex={-1}>
-          <MemberControls onHistory={setRecent}
+          {!demoOnly&&<MemberControls onHistory={setRecent}
             refresh={report?.id || ""}
             onReport={(saved) => {
               navigate("overview",saved);
             }}
-          />
+          />}
           {error && (
             <div role="alert" className="error">
               <TriangleAlert size={18} />

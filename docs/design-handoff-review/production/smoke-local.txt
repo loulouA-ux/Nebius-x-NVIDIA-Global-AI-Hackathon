@@ -1,0 +1,7 @@
+PASS landing and title
+PASS server-rendered replay
+PASS security headers
+PASS live scan denied
+PASS robots
+PASS security contact
+PASS www redirects to root
