@@ -10,6 +10,8 @@ for(const theme of ['light','dark'] as const){
   await expect(voyage).toHaveAttribute('data-playing','false',{timeout:15000});
   await expect(voyage).toHaveAttribute('data-arrived','true');
   await page.evaluate(()=>document.fonts.ready);
+  await expect(voyage.locator('.voyage-desktop .voyage-stamp')).not.toHaveAttribute('transform');
+  expect(await voyage.locator('svg [transform]').evaluateAll(elements=>elements.every(e=>{const s=getComputedStyle(e);return s.transformBox!=='fill-box'&&s.scale==='none'&&s.rotate==='none'&&s.translate==='none';}))).toBe(true);
   await voyage.locator('.voyage-desktop .voyage-stamp').evaluate(async e=>{
    await Promise.all(e.getAnimations().map(a=>a.finished));
   });
@@ -38,6 +40,7 @@ for(const theme of ['light','dark'] as const){
     }
     // Include the stamp rotation in the measured viewBox-space margin.
     expect((geometry.scene.right-geometry.stamp.right)/geometry.scene.width*geometry.viewBoxWidth).toBeGreaterThanOrEqual(16);
+    expect(Math.abs(geometry.stamp.left-(geometry.scene.left+890*geometry.scene.width/1200))).toBeLessThanOrEqual(2);
     expect(geometry.scene.width).toBeLessThanOrEqual(width);
     expect(geometry.scroll).toBeLessThanOrEqual(width);
     await page.screenshot({path:testInfo.outputPath(`stamp-${theme}-${width}.png`)});
