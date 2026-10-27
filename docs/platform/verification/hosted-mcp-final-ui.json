@@ -1,0 +1,38 @@
+[
+  {
+    "name": "mcp",
+    "width": 1440,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 1440,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 390,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 390,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  }
+]

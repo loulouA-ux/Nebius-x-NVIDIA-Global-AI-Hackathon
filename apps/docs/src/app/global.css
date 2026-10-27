@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+:root{--color-fd-background:#FAFAF8;--color-fd-foreground:#0B0E13;--color-fd-primary:#0E7A6B;--color-fd-primary-foreground:#FFFFFF;--color-fd-muted-foreground:#5D6672;--color-fd-card:#FFFFFF;font-family:var(--font-body),sans-serif;scrollbar-color:#8E98A6 #FAFAF8}
+.dark{--color-fd-background:#0B0E13;--color-fd-foreground:#EDF0F5;--color-fd-primary:#34D3B4;--color-fd-primary-foreground:#0B0E13;--color-fd-muted-foreground:#B4BCC8;--color-fd-card:#11151B;scrollbar-color:#8E98A6 #0B0E13}
+h1,h2,h3{font-family:var(--font-display),sans-serif;text-wrap:balance}code,pre{font-family:var(--font-mono),monospace}a{text-underline-offset:.2em}:focus-visible{outline:2px solid var(--color-fd-primary);outline-offset:4px}::selection{background:#0E7A6B;color:white}body{caret-color:var(--color-fd-primary)}pre{max-width:100%;overflow:auto}.platform-logo{width:30px;height:30px;object-fit:contain}.platform-home{max-width:72ch;margin:10vh auto;padding:24px}.platform-home h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.1}.platform-home p{margin-block:24px;line-height:1.7}.platform-home a{display:inline-block;padding:12px 0;color:var(--color-fd-primary)}
+
+body{font-family:var(--font-body),sans-serif}
+
+.mobile-contents{margin:20px 0;padding:12px 0;border-block:1px solid var(--color-fd-border)}.mobile-contents summary{cursor:pointer}@media(min-width:1280px){.mobile-contents{display:none}}

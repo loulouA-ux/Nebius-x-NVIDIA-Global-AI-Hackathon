@@ -1,0 +1,3 @@
+{
+  "ignoreCommand": "node ../../scripts/platform/ignore-build.mjs docs"
+}

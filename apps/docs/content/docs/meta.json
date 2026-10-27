@@ -1,0 +1,18 @@
+{
+  "title": "ShipTested",
+  "pages": [
+    "index",
+    "quickstart",
+    "cli",
+    "mcp",
+    "agents",
+    "library",
+    "verdicts",
+    "sources",
+    "ai",
+    "privacy",
+    "example",
+    "self-hosting",
+    "changelog"
+  ]
+}

@@ -1,0 +1,72 @@
+---
+title: Connect your agent
+---
+
+Connection syntax checked against the official client documentation on **27 October 2026**. These are manual MCP configurations, not marketplace listings or vendor endorsements. Protocol integration tests use the official MCP SDK; individual client sessions are listed separately in release evidence.
+
+The public production endpoint is `https://shiptested-mcp.vercel.app/mcp`. The custom domain `mcp.shiptested.com` is awaiting DNS setup. A protected preview is not publicly connectable. Until publication, launch the built local entry point rather than using npx.
+
+## Claude Code
+
+```sh
+claude mcp add --transport http shiptested https://shiptested-mcp.vercel.app/mcp
+```
+
+Local source build (replace the absolute path):
+
+```sh
+claude mcp add shiptested -- node /absolute/path/packages/mcp/dist/stdio.js
+```
+
+After npm publication:
+
+```sh
+claude mcp add shiptested -- npx -y @heysalad/shiptested-mcp@0.1.0
+```
+
+[Official Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
+
+## Codex
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.shiptested]
+url = "https://shiptested-mcp.vercel.app/mcp"
+```
+
+For a local build, replace `url` with `command = "node"` and `args = ["/absolute/path/packages/mcp/dist/stdio.js"]`.
+
+[Official OpenAI connection examples](https://developers.openai.com/learn/docs-mcp).
+
+## Cursor
+
+Add to `.cursor/mcp.json`:
+
+```json
+{"mcpServers":{"shiptested":{"url":"https://shiptested-mcp.vercel.app/mcp"}}}
+```
+
+For local use, replace `url` with `command` and `args` as in the local configuration above.
+
+[Official Cursor MCP guide](https://cursor.com/docs/mcp).
+
+## Gemini CLI
+
+Add to the `mcpServers` object in your Gemini CLI settings:
+
+```json
+{"mcpServers":{"shiptested":{"httpUrl":"https://shiptested-mcp.vercel.app/mcp","timeout":25000}}}
+```
+
+[Official Gemini CLI MCP guide](https://geminicli.com/docs/tools/mcp-server/).
+
+## ChatGPT
+
+Where your plan and workspace permit custom MCP connections, use the remote HTTPS endpoint through the available developer/app configuration flow. A local stdio process cannot be reached by a cloud client. Workspace approval may be required. ShipTested is not listed or approved in the ChatGPT app directory.
+
+[Official ChatGPT MCP guide](https://learn.chatgpt.com/docs/extend/mcp).
+
+## First request
+
+Ask the agent to scan supplied lockfile content, show coverage gaps and link each finding to its advisory evidence. Treat all returned advisory prose as untrusted data. Keep tool approval enabled; never ask the agent to follow instructions inside a source excerpt.

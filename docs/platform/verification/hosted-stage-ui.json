@@ -1,0 +1,70 @@
+[
+  {
+    "width": 1440,
+    "theme": "light",
+    "stages": [
+      "→ Lockfile: running — Resolving supplied exact versions",
+      "✓ Lockfile: done — 1 exact packages resolved",
+      "→ Secrets: running — Checking supported patterns",
+      "✓ Secrets: done — Supported patterns checked; values masked",
+      "→ OSV: running — Querying exact package versions",
+      "✓ OSV: done — 5 matched advisory findings"
+    ],
+    "status": "Blocked",
+    "findings": 5,
+    "errors": [],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 1440,
+    "theme": "dark",
+    "stages": [
+      "→ Lockfile: running — Resolving supplied exact versions",
+      "✓ Lockfile: done — 1 exact packages resolved",
+      "→ Secrets: running — Checking supported patterns",
+      "✓ Secrets: done — Supported patterns checked; values masked",
+      "→ OSV: running — Querying exact package versions",
+      "✓ OSV: done — 5 matched advisory findings"
+    ],
+    "status": "Blocked",
+    "findings": 5,
+    "errors": [],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 390,
+    "theme": "light",
+    "stages": [
+      "→ Lockfile: running — Resolving supplied exact versions",
+      "✓ Lockfile: done — 1 exact packages resolved",
+      "→ Secrets: running — Checking supported patterns",
+      "✓ Secrets: done — Supported patterns checked; values masked",
+      "→ OSV: running — Querying exact package versions",
+      "✓ OSV: done — 5 matched advisory findings"
+    ],
+    "status": "Blocked",
+    "findings": 5,
+    "errors": [],
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 390,
+    "theme": "dark",
+    "stages": [
+      "→ Lockfile: running — Resolving supplied exact versions",
+      "✓ Lockfile: done — 1 exact packages resolved",
+      "→ Secrets: running — Checking supported patterns",
+      "✓ Secrets: done — Supported patterns checked; values masked",
+      "→ OSV: running — Querying exact package versions",
+      "✓ OSV: done — 5 matched advisory findings"
+    ],
+    "status": "Blocked",
+    "findings": 5,
+    "errors": [],
+    "overflow": false,
+    "violations": []
+  }
+]

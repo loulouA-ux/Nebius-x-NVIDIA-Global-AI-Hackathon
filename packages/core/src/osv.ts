@@ -114,7 +114,8 @@ function checkedFetch(opts:OsvOptions,fetcher:typeof fetch){
 export async function getAdvisory(id:string,opts:OsvOptions={}){
  if(!/^[A-Za-z0-9._-]{1,160}$/.test(id))throw Error('Invalid advisory ID.');
  opts.signal?.throwIfAborted();const fetcher=checkedFetch(opts,opts.fetcher||fetch);
- const key=`https://api.osv.dev/v1/vulns/${id}`,cached=opts.cache?.get(key);
+ const key=`https://api.osv.dev/v1/vulns/${id}`,entry=opts.cache?.get(key);
+ const cached=entry&&entry.expiresAt>Date.now()?entry:undefined;
  const value=cached||{value:await boundedJson(key,{},fetcher),retrievedAt:new Date().toISOString(),expiresAt:Date.now()+3600000};
  const advisory=advisorySchema.parse(value.value);if(advisory.id!==id)throw Error('Advisory identity mismatch.');
  if(!cached)opts.cache?.set(key,value);

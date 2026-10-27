@@ -1,0 +1,20 @@
+{
+  "lighthouse-dev-home": {
+    "url": "http://localhost:3182/",
+    "fetchTime": "2026-10-27T16:22:58.570Z",
+    "scores": {
+      "performance": 98,
+      "accessibility": 100,
+      "best-practices": 100
+    }
+  },
+  "lighthouse-dev-releases": {
+    "url": "http://localhost:3182/releases",
+    "fetchTime": "2026-10-27T16:23:09.347Z",
+    "scores": {
+      "performance": 98,
+      "accessibility": 100,
+      "best-practices": 100
+    }
+  }
+}
