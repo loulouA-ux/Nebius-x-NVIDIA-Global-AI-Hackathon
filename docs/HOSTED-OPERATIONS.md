@@ -49,3 +49,11 @@ In `/team`, first choose repositories in the configured GitHub App installation,
 Live acceptance still required: an actual owner and a read-only collaborator, an organization installation, revoked organization membership, removal of one repository, expired authorization, reconnect/disconnect and repair write denial. Unit tests and fixture browser journeys do not prove GitHub's deployed callback or permission configuration.
 
 Provider references: https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/about-the-setup-url and https://docs.github.com/en/rest/apps/installations .
+
+## Bounded persistent worker acceptance
+
+`scripts/hosted-worker.ts` can run on a trusted persistent host instead of manually invoking HTTP handlers. Supply credentials via the host's secret store, explicitly set `SHIPTESTED_PUBLIC_DEMO=0`, and pin `SHIPTESTED_WORKER_DB_HOST` to the intended database hostname. Set `SHIPTESTED_WORKER_STOP_AT` to an ISO timestamp within the next 24 hours. This bounded runner is suitable for preview acceptance; it deliberately does not create an unattended indefinite service against the disposable database.
+
+Run `node --env-file=.env.hosted-acceptance --import tsx scripts/hosted-worker.ts` with those variables supplied. It processes one scan per cycle, waits 15 seconds after work, and records worker outcomes. Optional `SHIPTESTED_WORKER_BILLING=1` enables billing reconciliation only after billing configuration validates. Scan failures do not suppress billing work. SIGTERM/SIGINT finish the active operation and prevent the next cycle; allow at least the longest worker operation as the supervisor's shutdown grace. Errors are sanitized. Retries of jobs remain governed by database leases, not the supervisor.
+
+An always-on cloud worker/scheduler is still an activation gate: select its runtime, deploy secrets privately, bind it to the non-disposable hosted database, verify backlog/recovery and monitor costs before customer release. This script is not evidence that a recurring cloud schedule is running.

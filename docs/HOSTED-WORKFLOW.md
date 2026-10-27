@@ -150,3 +150,9 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Real concurrent invitation acceptance versus billing downgrade exposed inconsistent membership in 3 of 8 synthetic Neon runs. Membership acceptance/removal and billing reconciliation now use Serializable transactions with bounded retries only for database-confirmed serialization/deadlock aborts. All 8 repeated live database cases preserve seat/member consistency after the fix. Evidence: `../outputs/hosted-acceptance/seat-concurrency.json`; repeatable harness: `scripts/hosted-seat-race.ts` (requires explicit disposable host pin).
 - Verification: 333 unit/database tests, TypeScript and production build passed. No production data changes.
 - Registered identity-only GitHub OAuth application `ShipTested by HeySalad — Hosted Preview` (application 3970250) under chilu18 with the exact protected-preview callback and wildcard/device flow disabled. Public client ID is configured only for Preview branch `codex/hosted-workflow`. Peter must privately generate/configure the client secret before redeployment and browser sign-in acceptance. Registration alone is not verified sign-in.
+
+### Bounded worker supervisor
+
+- Added a sequential scan/billing supervisor with explicit database host pin, demo-mode refusal, a stop deadline within 24 hours, graceful SIGTERM/SIGINT handling, sanitized failures and no overlapping cycles. Billing work can continue when scan processing fails; billing must be explicitly enabled and configured.
+- A live acceptance run against the disposable Neon branch completed one cycle with zero failures and stopped at its deadline. This verifies the runner and database telemetry path, not an always-on cloud scheduler.
+- Verification: 336 unit/database tests and TypeScript pass. Focused supervisor tests cover failure recovery, sequential execution, deadline and shutdown boundaries. Hosted runtime selection and persistent scheduling remain open.
