@@ -1,3 +1,4 @@
+import {advisoryMetadata} from "./advisory-metadata";
 import { brandEnv } from "./brand-env";
 import { z } from "zod";
 import { maskSecrets } from "./scanner";
@@ -38,6 +39,9 @@ const advisorySchema = z.object({
   summary: z.string().optional(),
   details: z.string().optional(),
   withdrawn: z.string().optional(),
+  database_specific:z.object({severity:z.string().optional()}).optional(),
+  severity:z.array(z.object({type:z.string(),score:z.string()})).optional(),
+  affected:z.array(z.object({package:z.object({name:z.string(),ecosystem:z.string()}).optional(),ranges:z.array(z.object({type:z.string(),events:z.array(z.object({introduced:z.string().optional(),fixed:z.string().optional(),last_affected:z.string().optional(),limit:z.string().optional()}))})).optional()})).optional(),
 });
 export async function queryOsv(
   dependencies: Dependency[],
@@ -106,8 +110,8 @@ export async function queryOsv(
         {
           id: `${a.id}:${d.name}@${d.version}`,
           title: maskSecrets(a.summary ?? a.id),
-          severity: "review" as const,
-          description: `OSV reports ${d.name}@${d.version} as affected. Severity and application-level exploitability require review; no severity is inferred by the model.`,
+          ...advisoryMetadata(a,d),
+          description: `OSV reports ${d.name}@${d.version} as affected. Application-level exploitability has not been checked; severity comes only from advisory metadata.`,
           action:
             "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
           evidence: [

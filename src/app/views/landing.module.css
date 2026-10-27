@@ -5,3 +5,10 @@
 .development{font:12px var(--mono);letter-spacing:.08em;margin-bottom:20px}@media(max-width:767px){.actions{display:grid;grid-template-columns:1fr;justify-content:stretch}.actions a{width:100%}}
 
 .heroCopy{min-width:0}.eyebrow{font:12px var(--mono);color:var(--muted);letter-spacing:.06em}.landing main{max-width:none;padding:0}.section h2,.section h3{font-weight:600}.meter{display:flex;gap:4px;margin-top:16px}.meter span{height:6px;flex:1;background:var(--seg-off);border-radius:3px}.meter [data-complete="true"]{background:var(--success)}
+
+/* Shared alignment and restrained spacing across the landing page. */
+.landing a:global(.button){text-decoration:none}
+.hero,.section,.header,.footer{max-width:1200px;margin-inline:auto;box-sizing:border-box}
+.hero h1{text-wrap:balance}.section{padding-block:64px}
+.agents{display:grid;grid-template-columns:1fr 1fr;column-gap:48px}.agents>h2,.agents>p,.agents>a{grid-column:1}.agents>div{grid-column:2;grid-row:1 / span 5;align-content:center;display:grid;gap:16px}
+@media(max-width:767px){.agents{display:block}.section{padding-block:40px}}

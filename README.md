@@ -90,3 +90,9 @@ ShipTested helps small teams check a release before it ships. Paste or drop a lo
 ## Hackathon summary
 
 ShipTested is a pre-release security check for small teams. It matches exact dependency versions against OSV, masks secrets and checks verified staging hosts. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds dated research, while deterministic rules keep the verdict honest. Supported npm fixes are tested in a sandbox before a person approves the pull request.
+
+## Policy
+
+OSV database severity CRITICAL/HIGH maps to High, MODERATE to Medium and LOW to Low. Otherwise a valid CVSS v3 base vector maps scores ≥7 to High, ≥4 to Medium and lower scores to Low. Missing or invalid metadata stays Unrated. The highest valid v3 score is used; the vector and source are retained. CVSS is owned by FIRST and used by permission: https://www.first.org/cvss/v3.1/specification-document . Models never set severity. High findings keep the deterministic Blocked verdict.
+
+Fixed versions are advisory candidates from the matching npm package's affected interval, not tested repairs. Unsupported ecosystem range interpretation remains unknown. A grouped fix is shown only when every advisory in the group has a candidate; the highest candidate still requires a complete rescan and tests. Recorded reports retain their original captured verdict unless a separately dated metadata enrichment is explicitly supplied.

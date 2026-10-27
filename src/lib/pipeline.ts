@@ -163,7 +163,7 @@ export async function runScan(
       detail:
         "No verified staging project was selected. No target site was contacted.",
     });
-  const severityOrder = { high: 0, medium: 1, review: 2 };
+  const severityOrder = { high: 0, medium: 1, low: 2, review: 3 };
   findings.sort(
     (a, b) => severityOrder[a.severity] - severityOrder[b.severity],
   );

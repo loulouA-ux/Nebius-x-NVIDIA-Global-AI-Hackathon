@@ -19,7 +19,7 @@ test('finding Back restores its row and recorded replay has provenance',async({p
  await page.setViewportSize({width:1440,height:900});await page.goto('/?report=demo-offline');
  const row=page.getByRole('link',{name:/Command Injection in lodash/});await row.click();await expect(page.getByRole('heading',{name:/Command Injection in lodash/})).toBeVisible();
  await page.getByRole('button',{name:'Back to report'}).click();await expect(row).toBeFocused();
- await page.goto('/?report=demo-recorded');await expect(page.getByText(/Recorded live run · captured/)).toBeVisible();await expect(page.getByRole('heading',{name:'Tavily research · unconfirmed · never changes the verdict'})).toBeVisible();
+ await page.goto('/?report=demo-recorded');await expect(page.getByText(/Recorded live run · captured/)).toBeVisible();await expect(page.locator('.research-sources')).not.toHaveAttribute('open','');await page.locator('.research-sources>summary').click();await expect(page.getByText('Tavily research · unconfirmed · never changes the verdict',{exact:true})).toBeVisible();
 });
 test('mobile unrated rows keep severity separate from title',async({page})=>{
  await page.setViewportSize({width:375,height:812});await page.goto('/?report=demo-recorded');const row=page.locator('.report-row').first();await expect(row).toBeVisible();const tag=await row.locator('.severity').boundingBox(),title=await row.locator('.finding-copy').boundingBox();expect(tag!.x+tag!.width).toBeLessThanOrEqual(title!.x);expect(await row.evaluate(e=>e.getBoundingClientRect().height)).toBeLessThanOrEqual(80);
