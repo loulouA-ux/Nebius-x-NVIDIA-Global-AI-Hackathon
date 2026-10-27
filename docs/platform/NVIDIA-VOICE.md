@@ -10,4 +10,4 @@ Official endpoint and sample: https://build.nvidia.com/nvidia/magpie-tts-multili
 4. Listen to the sample, checking ShipTested, Nebius, Tavily and technical terms. Then generate each scene separately and retime the FFmpeg edit to the actual audio lengths.
 5. Keep the synthetic-voice disclosure. Send the revised video for team review before final publication.
 
-The generator validates a WAV response, refuses to overwrite output, times out after 90 seconds and never logs credentials or response bodies. A key is currently missing, so live NVIDIA synthesis and account entitlement are not verified. No GPU deployment or paid plan has been provisioned.
+The generator validates a WAV response, refuses to overwrite output, times out after 90 seconds and never logs credentials or response bodies. Live hosted synthesis was verified on 27 October 2026 with seven Aria WAV segments. The key was supplied privately through process memory and was not persisted. The revised 116.6-second review video passed full media decoding. Future runs still require a privately supplied key. No GPU deployment or paid plan has been provisioned.
