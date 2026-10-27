@@ -1,6 +1,6 @@
 # Production readiness review — 27 October 2026, London
 
-**Not approved for deployment. Phase 3 has a remaining report-performance measurement blocker. Gate A has not been reached.**
+**Gate A local engineering requirements are cleared. Ready for Peter’s preview-deployment gate; this is not deployment approval. No push, deploy, Vercel settings change or npm publication was performed. Security inbox delivery verification remains a separate release prerequisite.**
 
 ## Commits and scope
 
@@ -9,15 +9,24 @@
 - Phase 3: local hardening commit accompanying this report; no push, Vercel settings change, preview/production deploy or npm publication.
 - Phase 4 CLI/library/MCP remains intentionally pending the production gates. The landing page still says planned; it does not claim unpublished packages are ready.
 
-## Evidence
+## Gate A fixup evidence
 
-- Typecheck and 239 unit tests pass. Production build uses a separate verification copy excluding `.env*` and `.private`, with only a nonsecret local canonical URL set for the build.
-- Full browser suite: 59 tests; public demo suite: 2 tests. Final run: 59/59 and 2/2 passed after the last source changes.
-- Axe: zero violations across 24 captures (six routes, two viewport sizes, two themes). Screenshots are in this folder. Error-boundary rendering exists; 404, privacy and security routes are included in captures.
-- Lighthouse landing: mobile performance 96 / accessibility 100 / best practices 100; desktop 100 / 100 / 100.
-- Lighthouse report: no valid score. Both device configurations returned NO_FCP. A retry with background throttling disabled and another after removing a redundant history rewrite also failed. Browser screenshots, axe, response-body tests and user interactions render the report successfully; that does not substitute for the requested performance score. Failed audit JSON is retained. Investigate the Lighthouse trace/Chrome environment before declaring the report performance gate passed.
-- Self-scan: 192 resolved dependencies queried, zero lookup failures and zero OSV matches. This is dependency evidence, not a claim of application security. The administrative batch parser was used; public 200 KB/50-dependency limits remain unchanged.
-- Local smoke: all seven checks pass. The www probe uses a loopback Host header; real-domain DNS, HTTPS and redirects remain unverified.
+- Typecheck, **248 unit tests in 31 files**, production build, **59 full browser tests**, **9 public-demo tests**, and seven smoke checks pass. Builds run in an isolated mirror excluding every `.env*` file and `.private/`; no provider credentials are used.
+- Five pre-navigation PerformanceObservers now record real LCP on `/`, `/privacy`, `/security`, `/reports` and `/reports/demo-recorded`, with JavaScript and normal motion enabled. `paint-timings.json` records fresh entries. Regression tests make no clicks, focus changes, scrolling or CSS overrides before the measurement.
+- Root cause: `.page-transition` initially animated the entire page from opacity zero. In a controlled reproduction, removing that one rule from the stylesheet response **before first paint** restored LCP: landing h1, privacy/security text, reports intro and report banner. No initial focus/scroll event was observed. Removing CSS after rendering is too late to reproduce this intervention. The page-wide fade is now disabled; useful local component motion remains.
+- Root `loading.tsx` is removed. Actual scan progress retains its loading animation.
+- All eight desktop/mobile Lighthouse headless-shell audits meet 85/95/95: performance 99–100, accessibility 100, best practices 100. The separate new-headless mobile report scores 97/100/100. Per-route scores, FCP/LCP and execution timestamps are in `lighthouse-summary.json`; raw JSON files are retained. A separate Chrome new-headless report run is also retained. Earlier NO_FCP reports remain as historical failures; they are not counted as passes.
+- `scripts/lighthouse.mjs` repeats the eight required runs and optional new-headless comparison, writes JSON, and fails if a required result is missing or below target. It uses explicitly configured browser/Lighthouse binaries and does not install software or change the site.
+- Axe: **zero violations** across 24 captures (six routes, two widths, two themes). Updated landing/report screenshots include both themes at 1440 and 390 pixels. Desktop sidebar controls have `min-height:100dvh`, stay sticky to the viewport bottom after end-of-report scrolling, and the column background/border continues for the full document height. Both themes pass the viewport-bottom assertion.
+- OSV enrichment is offline at render time: exactly the five captured advisory IDs were fetched from `api.osv.dev`, stored in `fixtures/recorded-advisory-metadata.json` with retrieval time, and passed through the same severity/fixed-version policy as live findings. The original model explanations and evidence are untouched. The replay explicitly labels the metadata retrieval date separately from the original capture date.
+- Before: **Review required**, five Unrated findings, no CVSS/fixes. After: **Blocked**, two High and three Medium findings, policy-derived CVSS and candidate fixed versions. Candidates are not tested repairs. The brand test's previous “5 findings need a person to decide” expectation was intentionally updated to “2 high-severity findings need a decision”; safety assertions were not weakened. The dash explanation now appears only when a visible finding lacks a fixed version.
+- Prior self-scan evidence remains unchanged: 192 resolved dependencies queried, zero lookup failures and zero OSV matches. No dependency versions changed in this fixup; this is not a claim of application security.
+
+## Resend and security contact
+
+The ShipTested Resend account lists `updates.shiptested.com` as **Verified**. A private server notification adapter is implemented and tested, disabled by default and in every public-demo environment. It is not connected to scan events, an outbox or user email preferences yet; no real email was sent and delivery is unproven. See `docs/EMAIL-SETUP.md` for the exact remaining activation steps.
+
+Peter approved Cloudflare forwarding for `security@shiptested.com` to the designated Gmail inbox and explicitly approved replacing the old Namecheap MX/root-SPF records. The approved DNS migration is complete: authoritative MX/SPF now point to Cloudflare. The destination is Verified, the exact security forwarding rule is Active, and catch-all is disabled. Actual inbox delivery remains untested.
 
 ## Safety and headers
 
@@ -29,8 +38,8 @@ Legacy names remain only where compatibility requires them: environment fallback
 
 ## Peter's gates — do not execute yet
 
-Resolve the report performance check first. Then Gate A: optionally push `codex/branded-dashboard`; set `SHIPTESTED_PUBLIC_DEMO=1` and `NEXT_PUBLIC_SITE_URL=https://shiptested.com` before building Preview and Production; remove provider/GitHub/database credentials from public Production, confirm Preview is appropriate for a credential-free demo; deploy a preview and run the smoke script. Authenticated preview protection may require Peter's session. No hosted state was inspected or changed in this task.
+Gate A is ready for Peter: optionally push `codex/branded-dashboard`; set `SHIPTESTED_PUBLIC_DEMO=1` and `NEXT_PUBLIC_SITE_URL=https://shiptested.com` before building Preview and Production; remove provider/GitHub/database credentials from public Production, confirm Preview is appropriate for a credential-free demo; deploy a preview and run the smoke script. Authenticated preview protection may require Peter's session. No Vercel state was changed. After preview smoke tests, Peter should also run PageSpeed Insights on the preview URL.
 
 Gate B: only after preview acceptance, Peter promotes/deploys Production and changes Production Vercel Authentication, then runs `node scripts/smoke.mjs https://shiptested.com`. See PRODUCTION.md for rollback instructions.
 
-Confirm security@shiptested.com receives mail before release. The privacy page makes no unverified retention or service-level promises. Recorded findings retain their captured Unrated state because the capture does not contain severity metadata; live scans use the new documented policy. Fixed-version candidates are not verified repairs.
+Confirm security@shiptested.com receives mail before release. The privacy page makes no unverified retention or service-level promises. The replay now uses the dated OSV metadata snapshot; original captured model notes retain their original provenance. Fixed-version candidates are not verified repairs.

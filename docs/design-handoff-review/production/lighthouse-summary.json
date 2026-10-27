@@ -1,52 +1,174 @@
-[
-  {
-    "mode": "mobile",
-    "page": "landing",
-    "scores": {
-      "performance": 0.96,
-      "accessibility": 1,
-      "best-practices": 1
-    },
-    "runtimeError": null
+{
+  "measuredAt": "2026-10-27T02:28:22.556Z",
+  "base": "http://127.0.0.1:3168",
+  "thresholds": {
+    "performance": 85,
+    "accessibility": 95,
+    "best-practices": 95
   },
-  {
-    "mode": "mobile",
-    "page": "report",
-    "scores": {
-      "performance": null,
-      "accessibility": null,
-      "best-practices": null
+  "entries": [
+    {
+      "name": "landing",
+      "path": "/",
+      "form": "desktop",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-landing-desktop.json",
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 264.911,
+      "lcpMs": 630.5942500000001,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
     },
-    "runtimeError": {
-      "code": "NO_FCP",
-      "message": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)",
-      "errorStack": "LighthouseError: NO_FCP\n    at Timeout.<anonymous> (file:///private/tmp/shiptested-audit-tools/node_modules/lighthouse/core/gather/driver/wait-for-condition.js:85:14)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
-      "artifactKey": "PageLoadError"
+    {
+      "name": "landing",
+      "path": "/",
+      "form": "mobile",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-landing-mobile.json",
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 913.97,
+      "lcpMs": 1588.9699999999998,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "report",
+      "path": "/reports/demo-recorded",
+      "form": "desktop",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-report-desktop.json",
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 247.38600000000002,
+      "lcpMs": 586.079,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "report",
+      "path": "/reports/demo-recorded",
+      "form": "mobile",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-report-mobile.json",
+      "scores": {
+        "performance": 99,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 905.3040000000001,
+      "lcpMs": 2107.956,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "privacy",
+      "path": "/privacy",
+      "form": "desktop",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-privacy-desktop.json",
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 244.894,
+      "lcpMs": 502.341,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "privacy",
+      "path": "/privacy",
+      "form": "mobile",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-privacy-mobile.json",
+      "scores": {
+        "performance": 99,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 905.04,
+      "lcpMs": 1957.56,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "security",
+      "path": "/security",
+      "form": "desktop",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-security-desktop.json",
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 252.839,
+      "lcpMs": 372.839,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "security",
+      "path": "/security",
+      "form": "mobile",
+      "engine": "chrome-headless-shell",
+      "required": true,
+      "filename": "lighthouse-security-mobile.json",
+      "scores": {
+        "performance": 99,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 903.9929999999999,
+      "lcpMs": 1955.9895,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "name": "report",
+      "path": "/reports/demo-recorded",
+      "form": "mobile",
+      "engine": "Chrome new headless",
+      "required": false,
+      "filename": "lighthouse-report-mobile-new-headless.json",
+      "scores": {
+        "performance": 97,
+        "accessibility": 100,
+        "best-practices": 100
+      },
+      "fcpMs": 907.5192999999999,
+      "lcpMs": 2662.27895,
+      "error": null,
+      "exitCode": 0,
+      "passed": true
     }
-  },
-  {
-    "mode": "desktop",
-    "page": "landing",
-    "scores": {
-      "performance": 1,
-      "accessibility": 1,
-      "best-practices": 1
-    },
-    "runtimeError": null
-  },
-  {
-    "mode": "desktop",
-    "page": "report",
-    "scores": {
-      "performance": null,
-      "accessibility": null,
-      "best-practices": null
-    },
-    "runtimeError": {
-      "code": "NO_FCP",
-      "message": "The page did not paint any content. Please ensure you keep the browser window in the foreground during the load and try again. (NO_FCP)",
-      "errorStack": "LighthouseError: NO_FCP\n    at Timeout.<anonymous> (file:///private/tmp/shiptested-audit-tools/node_modules/lighthouse/core/gather/driver/wait-for-condition.js:85:14)\n    at listOnTimeout (node:internal/timers:585:17)\n    at process.processTimers (node:internal/timers:521:7)",
-      "artifactKey": "PageLoadError"
-    }
-  }
-]
+  ],
+  "followUp": "Peter must run PageSpeed Insights against the preview URL after Gate A. New-headless failures are recorded separately, not counted as passing."
+}

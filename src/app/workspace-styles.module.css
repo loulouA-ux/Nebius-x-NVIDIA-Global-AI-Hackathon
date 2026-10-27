@@ -834,4 +834,7 @@
 :global(.phone-verdict-filters){display:none}@media(max-width:767px){:global(.desktop-verdict-filter){display:none!important}:global(.phone-verdict-filters){display:flex;gap:6px;flex-wrap:wrap}:global(.phone-verdict-filters .button){padding:8px;font-size:12px}}
 @media(max-width:767px){:global(.report-row){padding:6px 12px;min-height:64px}:global(.finding-copy){min-width:0}:global(.finding-copy small){display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}:global(.finding-copy strong){line-height:17px}}
 
-@media(min-width:768px){:global(.shell>aside){position:sticky;top:0;height:100dvh;align-self:start;overflow-y:auto;box-sizing:border-box}}
+@media(min-width:768px){:global(.shell>aside){position:sticky;top:0;height:100dvh;min-height:100dvh;align-self:start;overflow-y:auto;box-sizing:border-box}}
+
+/* Continue the sidebar column below its sticky, viewport-height controls. */
+@media(min-width:768px){:global(.shell){background:linear-gradient(to right,var(--surface) 219px,var(--line) 219px,var(--line) 220px,transparent 220px)}}

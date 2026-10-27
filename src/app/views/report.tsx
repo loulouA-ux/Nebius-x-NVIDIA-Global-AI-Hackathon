@@ -8,7 +8,7 @@ import FindingsTable from '../components/findings-table';
 import {plural,stateLabel} from '../components/presentation';
 type Props={report:ScanReport;filtered:Finding[];filters:FindingFilters;update:(v:Partial<FindingFilters>)=>void;open:(f:Finding)=>void;scan:()=>void;decisions:Record<string,string>;decisionState:string};
 export default function ReportView({report,filtered,filters,update,open,scan,decisions,decisionState}:Props){return <>
- <p className="demo-banner">{report.recording?`Recorded live run · captured ${new Date(report.recording.recordedAt).toLocaleString('en-GB')} · Nemotron ${report.recording.model} on Nebius · replayed, no live requests`:report.mode==='demo'?'Offline fixture · synthetic inputs · no live requests':'Live scan'}{report.mode==='demo'?' · Demo decisions are not saved.':''}</p>
+ <p className="demo-banner">{report.recording?`Recorded live run · captured ${new Date(report.recording.recordedAt).toLocaleString('en-GB')} · Nemotron ${report.recording.model} on Nebius · replayed, no live requests`:report.mode==='demo'?'Offline fixture · synthetic inputs · no live requests':'Live scan'}{report.recording?.advisoryMetadataRetrievedAt?` · Advisory metadata retrieved ${report.recording.advisoryMetadataRetrievedAt.slice(0,10)} (OSV snapshot)`:''}{report.mode==='demo'?' · Demo decisions are not saved.':''}</p>
  <nav className="report-breadcrumb" aria-label="Breadcrumb"><Link href="/reports">Reports</Link><span>/</span><span>{report.id}</span></nav><div className="page-heading"><h1>Scan report</h1><div className="report-tools"><CsvExport report={report}/><button className="button" onClick={scan}>Rescan</button></div></div>
 
  <VerdictCard report={report}/>

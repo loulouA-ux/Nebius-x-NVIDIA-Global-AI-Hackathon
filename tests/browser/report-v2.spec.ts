@@ -5,4 +5,6 @@ test('groups captured findings, keeps evidence and caps research',async({page})=
  await page.getByRole('button',{name:'All advisories',exact:true}).click();await expect(page.locator('.report-row')).toHaveCount(5);
  const research=page.locator('.research-sources');await expect(research).not.toHaveAttribute('open','');await research.locator('summary').first().click();expect(await research.locator('.research-item').count()).toBeLessThanOrEqual(5);
  await expect(page.locator('.row-decision')).toHaveCount(0);
+ await expect(page.getByText('— means no fixed version is listed or confirmed for that finding.',{exact:true})).toHaveCount(0);
+ await expect(page.locator('.demo-banner')).toContainText('Advisory metadata retrieved');
 });

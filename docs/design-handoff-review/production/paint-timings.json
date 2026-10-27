@@ -1,0 +1,110 @@
+{
+  "measuredAt": "2026-10-27T02:25:37.224Z",
+  "results": [
+    {
+      "path": "/",
+      "entries": [
+        {
+          "type": "paint",
+          "name": "first-paint",
+          "time": 36
+        },
+        {
+          "type": "paint",
+          "name": "first-contentful-paint",
+          "time": 36
+        },
+        {
+          "type": "largest-contentful-paint",
+          "name": "",
+          "time": 36,
+          "element": "H1"
+        }
+      ]
+    },
+    {
+      "path": "/privacy",
+      "entries": [
+        {
+          "type": "paint",
+          "name": "first-paint",
+          "time": 24
+        },
+        {
+          "type": "paint",
+          "name": "first-contentful-paint",
+          "time": 24
+        },
+        {
+          "type": "largest-contentful-paint",
+          "name": "",
+          "time": 24,
+          "element": "P"
+        }
+      ]
+    },
+    {
+      "path": "/security",
+      "entries": [
+        {
+          "type": "paint",
+          "name": "first-paint",
+          "time": 28
+        },
+        {
+          "type": "paint",
+          "name": "first-contentful-paint",
+          "time": 28
+        },
+        {
+          "type": "largest-contentful-paint",
+          "name": "",
+          "time": 28,
+          "element": "P"
+        }
+      ]
+    },
+    {
+      "path": "/reports",
+      "entries": [
+        {
+          "type": "paint",
+          "name": "first-paint",
+          "time": 28
+        },
+        {
+          "type": "paint",
+          "name": "first-contentful-paint",
+          "time": 28
+        },
+        {
+          "type": "largest-contentful-paint",
+          "name": "",
+          "time": 28,
+          "element": "P"
+        }
+      ]
+    },
+    {
+      "path": "/reports/demo-recorded",
+      "entries": [
+        {
+          "type": "paint",
+          "name": "first-paint",
+          "time": 36
+        },
+        {
+          "type": "paint",
+          "name": "first-contentful-paint",
+          "time": 36
+        },
+        {
+          "type": "largest-contentful-paint",
+          "name": "",
+          "time": 36,
+          "element": "P"
+        }
+      ]
+    }
+  ]
+}

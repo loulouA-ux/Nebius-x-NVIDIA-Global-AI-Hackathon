@@ -8,7 +8,7 @@ for(const theme of ['dark','light'] as const)test(`tick-only accent and brand co
  await expect(mark.locator('[data-logo-tick]')).toHaveCSS('stroke',theme==='dark'?'rgb(94, 234, 212)':'rgb(15, 118, 110)');
  for(const path of ['/brand/favicon.svg','/brand/app-icon.svg','/manifest.webmanifest'])expect((await request.get(path)).ok()).toBe(true);
  const manifest=await (await request.get('/manifest.webmanifest')).json();expect(manifest.icons[0].src).toBe('/brand/app-icon.svg');
- await page.goto('/reports/demo-recorded');await expect(page.getByText('5 findings need a person to decide.',{exact:true})).toBeVisible();
+ await page.goto('/reports/demo-recorded');await expect(page.getByText('2 high-severity findings need a decision.',{exact:true})).toBeVisible();
  const durations=await page.locator('*').evaluateAll(els=>els.flatMap(e=>{const s=getComputedStyle(e);return [s.animationDuration,s.transitionDuration].flatMap(v=>v.split(',').map(x=>parseFloat(x)*1000));}));expect(Math.max(...durations)).toBeLessThanOrEqual(1);
 });
 test('member empty state uses brand copy',async({page})=>{await page.route('**/api/scans',r=>r.fulfill({json:{scans:[]}}));await page.goto('/reports');await expect(page.getByText("No reports yet — Scan a lockfile to see what you're about to ship.",{exact:false})).toBeVisible();});
