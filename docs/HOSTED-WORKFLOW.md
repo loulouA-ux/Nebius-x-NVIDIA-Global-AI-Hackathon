@@ -104,3 +104,11 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Verified: 317 unit/database tests, typecheck and production build. Tests cover disabled owners, lost seats, idempotent queue audit entries and stale workers producing no extra terminal audit event; review events retain the original verdict.
 - Added `HOSTED-OPERATIONS.md` and `OPEN-SOURCE-AND-RIGHTS.md`, plus hosted environment placeholders. Existing MIT notices remain intact. These documents distinguish published packages from branch-only functionality and identify future rights/terms decisions rather than claiming legal approval.
 - Neon console inspection found only the existing main branch before development setup; no migrations were applied to that branch.
+
+### Actual Neon database and live pipeline acceptance
+
+- Created `hosted-workflow-acceptance`, a schema-only child of the existing Neon database, with no copied customer rows. UI branch identity: `br-crimson-silence-b77lzznj`; it expires 28 October 2026 at 23:09 GMT. Compute shown as 0.25 CU. Private connection configuration is gitignored, mode 0600; no credentials were displayed or committed.
+- Confirmed zero reports/sessions before testing and applied migrations 001–007 successfully to that branch only. Main was not migrated.
+- Ran `scripts/hosted-acceptance.ts` against actual Neon with synthetic account identities and live public GitHub/OSV requests. Nicedeck commit `2bb5203218e88f2993ec0d96dcd997d3ba86e96e`: four pinned dependencies, zero known advisory findings, scoped verdict Checks passed. This is not a source-code/exploitability assessment.
+- Passed: idempotent allowance reservation, durable queue/worker/report persistence, cross-account job/report denial, fresh-session retrieval, explicit share revocation, read-only/revoked token denial and atomic lifecycle audit. One allowance unit consumed. Evidence: `../outputs/hosted-acceptance/database-pipeline.json`; branch screenshot: `../outputs/hosted-acceptance/neon-branch.png`.
+- This proves the database/live pipeline boundary, not browser OAuth or hosted HTTP acceptance. No actual customer identity, Stripe purchase or live paid activation was used. The acceptance branch is disposable; its report IDs are not production report URLs.
