@@ -1,3 +1,3 @@
-// Verified public Vercel aliases; custom-domain DNS remains a separate handoff.
+// Verified HTTPS custom domains; Vercel aliases remain available as fallbacks.
 export const sitesLive=true;
-export const docsLink=(page='index')=>`https://shiptested-docs.vercel.app/docs/${page==='index'?'':page}`;
+export const docsLink=(page='index')=>`https://docs.shiptested.com/docs/${page==='index'?'':page}`;

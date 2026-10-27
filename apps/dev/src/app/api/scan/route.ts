@@ -27,7 +27,7 @@ export async function POST(request:Request){
   async start(out){
    const send=(event:unknown)=>{if(!closed)out.enqueue(encoder.encode(JSON.stringify(event)+'\n'));};
    try{
-    await client.connect(new StreamableHTTPClientTransport(new URL('https://shiptested-mcp.vercel.app/mcp')),{timeout:5000,signal});
+    await client.connect(new StreamableHTTPClientTransport(new URL('https://mcp.shiptested.com/mcp')),{timeout:5000,signal});
     const result=await client.callTool({name:'scan_lockfile',arguments:{content}},undefined,{
      timeout:20000,signal,
      onprogress:progress=>send({type:'stage',progress:progress.progress,total:progress.total,message:progress.message}),
