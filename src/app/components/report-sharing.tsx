@@ -1,0 +1,11 @@
+'use client';
+import {useEffect,useState} from 'react';
+import {Link2,Copy,X} from 'lucide-react';
+type Share={id:string;expires_at:string;revoked_at:string|null};
+export default function ReportSharing({id}:{id:string}) {
+  const [shares,setShares]=useState<Share[]>([]),[link,setLink]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[copied,setCopied]=useState(false);
+  async function load(){const r=await fetch(`/api/scans/${id}/shares`,{cache:'no-store'});if(!r.ok)throw Error('Share settings are unavailable.');setShares((await r.json()).shares);}
+  useEffect(()=>{setLink('');setCopied(false);void load().catch(()=>{});},[id]);
+  async function change(shareId?:string){setBusy(true);setError('');try{const r=await fetch(`/api/scans/${id}/shares`,{method:shareId?'DELETE':'POST',headers:{'Content-Type':'application/json'},body:shareId?JSON.stringify({id:shareId}):undefined});const d=await r.json();if(!r.ok)throw Error(d.error||'Unable to change sharing.');if(!shareId){setLink(`${location.origin}/shared#${d.token}`);setCopied(false);}else{setLink('');setCopied(false);}await load();}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
+  return <details className="panel scope"><summary>Share this report</summary><p>Private by default. Creating a link lets anyone with it read this report, including repository names and evidence, for seven days. They cannot change decisions or run scans.</p><button className="button" onClick={()=>change()} disabled={busy}><Link2 size={17} aria-hidden="true"/>Create read-only link</button>{link&&<div><label>New share link<input readOnly value={link} aria-label="New share link"/></label><button className="button" onClick={async()=>{try{await navigator.clipboard.writeText(link);setCopied(true);}catch{setError('Copy unavailable. Select the link and copy it manually.');}}}><Copy size={17} aria-hidden="true"/>{copied?'Copied':'Copy link'}</button></div>}{error&&<p role="alert">{error}</p>}<ul>{shares.map(s=><li key={s.id}>{s.revoked_at?'Revoked':new Date(s.expires_at).getTime()<Date.now()?'Expired':`Expires ${new Date(s.expires_at).toLocaleString()}`}{!s.revoked_at&&<button className="button" onClick={()=>change(s.id)} disabled={busy}><X size={16} aria-hidden="true"/>Revoke link</button>}</li>)}</ul></details>;
+}

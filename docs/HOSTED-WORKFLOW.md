@@ -61,3 +61,11 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Verified: 294 unit/database tests, typecheck and production build; eight focused browser checks, then the strengthened two-test repository flow (including private report navigation and reload) passed. Browser APIs are fixtures; this proves UI behavior, not hosted account integration. Mobile screenshot inspected; captures retained in `../outputs/hosted-workflow-ui/`.
 - Peter selected **GBP 3 per seat per month** for Team. Working allowance assumption: five repository scans per seat per month, configurable, overages disabled, AI and sandbox execution excluded. Payments remain unconfigured/test-only until verified.
 - Remaining: actual scheduled worker and hosted migration, team invitations/roles and shared access, revocable report sharing, billing lifecycle, metrics dashboard, authenticated hosted CLI/MCP, and end-to-end hosted acceptance. Public production is unchanged.
+
+### Team access and explicit report sharing checkpoint
+
+- Targeted seven-day invitations bind to numeric GitHub identities. Only owners manage invitations/removals; accepting consumes an available Team seat atomically. Switching workspaces validates membership. Removal deletes active workspace sessions; each subsequent GitHub session check revalidates membership.
+- Report owners can create/revoke seven-day read-only links. Tokens are stored hashed and are carried in the browser fragment/POST body, not ordinary request URLs. Report evidence remains owner-private until explicitly shared. Team membership alone does not expose another member's reports.
+- Added workspace settings, seat display, invitation acceptance and audit history; shared-report rendering omits mutation actions. Audit rows omit tokens and are protected against ordinary UPDATE/DELETE statements by database rules (not tamper-proof against a database administrator).
+- Verified: 298 unit/database tests, typecheck and build; five focused browser tests and a final three-test sharing run pass. Captures: `../outputs/hosted-workflow-sharing/`. Browser responses are fixtures; database tests exercise real PGlite/Postgres semantics.
+- Not deployed. Billing must reconcile Team plan and seat limits before real customers can invite teammates. Hosted lifecycle, client authentication, metrics and billing gates remain open.
