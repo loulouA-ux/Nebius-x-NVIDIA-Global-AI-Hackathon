@@ -1,6 +1,8 @@
 # ShipTested platform release evidence
 
-Checked 27 October 2026, Europe/London (GMT). The library, CLI, local MCP, public remote MCP, documentation and developer portal are implemented. Package publication and main-branch integration remain separate human release steps. A successful dependency check is not proof of application security.
+Historical build evidence below. For the subsequent authorised public release, see [release acceptance](platform/RELEASE-2026-10-27.md) and [registry/domain verification](platform/verification/public-release.json). PRs #5–15 are now merged; 0.1.0 packages are published and custom domains verified.
+
+Initial build checked 27 October 2026, Europe/London (GMT). The library, CLI, local MCP, public remote MCP, documentation and developer portal are implemented. Package publication and main-branch integration remain separate human release steps. A successful dependency check is not proof of application security.
 
 The earlier Phase 0 evidence is preserved in [the historical ledger](platform/PHASE-0-LEDGER.md).
 

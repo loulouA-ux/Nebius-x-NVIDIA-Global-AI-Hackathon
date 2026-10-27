@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-27T16:26:09.378Z",
+  "checkedAt": "2026-10-27T17:43:41.453Z",
   "packages": [
     {
       "name": "@heysalad/shiptested",
@@ -100,5 +100,5 @@
     "get_advisory"
   ],
   "publication": "dry run only; no package published",
-  "artifacts": "/var/folders/vz/j9vqx5yj09bd_0mc4h_0m_y40000gn/T/shiptested-pack-gate-wtz6w7"
+  "artifacts": "/var/folders/vz/j9vqx5yj09bd_0mc4h_0m_y40000gn/T/shiptested-pack-gate-qkU94U"
 }

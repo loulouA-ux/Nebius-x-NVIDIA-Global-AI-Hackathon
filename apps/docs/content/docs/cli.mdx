@@ -2,7 +2,7 @@
 title: CLI reference
 ---
 
-Generated from the CLI command definitions. Packages are not published yet. Build from source first.
+Generated from the CLI command definitions. Version 0.1.0 is published. Requires Node 20.19 or newer.
 
 ## scan [path]
 
@@ -42,7 +42,7 @@ Incomplete coverage takes precedence over finding thresholds. SARIF output refus
 
 ## GitHub Actions
 
-After npm publication, pin the reviewed package version in your workflow. Before publication use a checked-out build and the Node entry point.
+Pin the reviewed published package version in your workflow.
 
 ```yaml
 permissions:
@@ -53,13 +53,11 @@ steps:
   - uses: actions/setup-node@v4
     with:
       node-version: 22
-  - run: npm ci
-  - run: npm run build:packages
-  - run: node packages/cli/dist/index.js scan package-lock.json --sarif shiptested.sarif
+  - run: npx --yes @heysalad/shiptested-cli@0.1.0 scan package-lock.json --sarif shiptested.sarif
   - uses: github/codeql-action/upload-sarif@v3
     if: always() && hashFiles('shiptested.sarif') != ''
     with:
       sarif_file: shiptested.sarif
 ```
 
-This source-build workflow assumes the ShipTested monorepo. In another repository, install the published version after release. GitHub code scanning availability depends on the repository and plan.
+Run this workflow in the repository whose package-lock.json you intend to check. GitHub code scanning availability depends on the repository and plan.

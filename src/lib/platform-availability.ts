@@ -1,8 +1,8 @@
-// Registry publication is a separate human release gate.
-export const AGENT_PACKAGES_PUBLISHED=false;
+// Public 0.1.0 registry integrity and clean installation verified 27 October 2026.
+export const AGENT_PACKAGES_PUBLISHED=true;
 export const PLATFORM_SITES_LIVE=true;
-export const platformSource='https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/tree/codex/platform-landing';
-export const platformDocs='https://shiptested-docs.vercel.app/docs';
-export const platformDevelopers='https://shiptested-dev.vercel.app';
-export const platformMcp='https://shiptested-mcp.vercel.app/mcp';
-export const agentGuides='https://shiptested-docs.vercel.app/docs/agents';
+export const platformSource='https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon/tree/main';
+export const platformDocs='https://docs.shiptested.com/docs';
+export const platformDevelopers='https://dev.shiptested.com';
+export const platformMcp='https://mcp.shiptested.com/mcp';
+export const agentGuides='https://docs.shiptested.com/docs/agents';

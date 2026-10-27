@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-10-27T17:50:49.595Z",
+  "registry": [
+    {
+      "name": "@heysalad/shiptested",
+      "version": "0.1.0",
+      "integrity": "sha512-RbH4feNNCMuPo6vO+nNRyhfgYcMigN+pZud8BiB+5EFhbRBC3xjYe885DtTKdtejOq6GMFYAXv20dCZiRfEYcg=="
+    },
+    {
+      "name": "@heysalad/shiptested-cli",
+      "version": "0.1.0",
+      "integrity": "sha512-jtoSVM3XNpNrzjSe7UmLpzhVvrmHvdltcRjNdqblqrMUgw/6vAj7JSh98UHRVRjbO4ztbOW/oduiOPSHcxEWhw=="
+    },
+    {
+      "name": "@heysalad/shiptested-mcp",
+      "version": "0.1.0",
+      "integrity": "sha512-lLKDzuYu5dUI1yVD58xaZDUrPMUBf9GgO7pDgTut9oJS5jWhqYd4zM4pWP8ssGwSrDVANjem7oSI3YP/wfaCSg=="
+    }
+  ],
+  "cli": {
+    "exit": 1,
+    "status": "Blocked",
+    "findings": 5
+  },
+  "libraryImport": true,
+  "localMcpTools": [
+    "scan_lockfile",
+    "check_package",
+    "get_advisory"
+  ],
+  "remote": {
+    "status": "Blocked",
+    "findings": 5,
+    "stages": [
+      "Lockfile: running — Resolving supplied exact versions",
+      "Lockfile: done — 1 exact packages resolved",
+      "Secrets: running — Checking supported patterns",
+      "Secrets: done — Supported patterns checked; values masked",
+      "OSV: running — Querying exact package versions",
+      "OSV: done — 5 matched advisory findings"
+    ]
+  },
+  "websites": [
+    {
+      "host": "mcp",
+      "status": 200
+    },
+    {
+      "host": "docs",
+      "status": 200
+    },
+    {
+      "host": "dev",
+      "status": 200
+    }
+  ]
+}
