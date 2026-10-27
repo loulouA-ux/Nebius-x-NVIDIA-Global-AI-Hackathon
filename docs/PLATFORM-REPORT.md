@@ -23,3 +23,14 @@ See DEPLOY.md. Current production was CLI-deployed, but main remains the configu
 - Open PR to main; Peter merges under the explicit Phase0 step4 gate. Live production smoke, demo403, headers, no-JS hero and screenshots are pending that release. Stop before proceeding to platform implementation.
 - No npm publishing, DNS changes, paid features, production environment edits, force pushes or main merges are authorized here.
 - Packages/core, CLI, local/remote MCP, docs and developer portal remain planned. No npm tarballs or new subdomain projects exist yet. DNS records will be reported from Vercel when those projects are actually provisioned; do not invent them.
+
+## Phase 0 merge handoff
+
+- Fresh HEAD preview: b9f75dc, READY deployment `dpl_5T6eUvRi1e4RUyJXmBJ4SzemQfe1`, https://shipcheck-9uubjm1wu-hey-salad-inc.vercel.app . Deployment-scoped SHIPTESTED_PUBLIC_DEMO=1; protection unchanged.
+- `node scripts/smoke.mjs <preview> --vercel-preview`: all six applicable checks passed, including live API403 and nonce/security headers. www redirect is not applicable to the generated preview hostname.
+- Existing production smoke: six checks passed; replay-text assertion failed because the older report contains captured/lodash but not the new Replay wording (HTTP200). No release occurred and no rollback was necessary.
+- Final pre-push history scan through b9f75dc: zero findings. This handoff commit changes documentation only; tested application code remains identical.
+- Phase0 stops at the required main-merge handoff. This is a broad accumulated integration PR (653 files before this documentation update), not only the latest UI styling. Review the complete scope before merging.
+- After Peter merges: verify the actual production deployment/revision, rerun full live smoke and no-JS/responsive checks, and roll back on release failures. Phases1–5 follow only after this gate.
+
+Commits this task: 20099f9 deployment discovery; ae3e89d history scan; b9f75dc verification and preview smoke support; this documentation commit records the step4 handoff. Steps5/live-v2 and6/push status are reported by the PR and final response.
