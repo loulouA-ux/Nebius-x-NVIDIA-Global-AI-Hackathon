@@ -37,6 +37,10 @@
     "./osv": {
       "types": "./dist/osv.d.ts",
       "import": "./dist/osv.js"
+    },
+    "./ai": {
+      "types": "./dist/ai.d.ts",
+      "import": "./dist/ai.js"
     }
   },
   "scripts": {
