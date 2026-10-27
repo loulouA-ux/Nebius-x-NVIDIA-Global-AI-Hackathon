@@ -34,8 +34,22 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 
 ## Current evidence
 
-- Inventory: existing GitHub OAuth, actor-scoped stored scans, quotas and repair audit exist; they are not yet a complete customer workspace or billing system.
-- Pending: all ten end-to-end gates above. Nothing in this ledger is a completion claim or production activation.
+Latest acceptance audit: 28 October 2026, London. The checkpoint sections below are chronological; older statements such as "not deployed" describe that checkpoint, not the latest branch.
+
+| Gate | Current evidence | Still needed for completion |
+| --- | --- | --- |
+| 1. Identity/access | Local session and membership tests; protected hosted API isolation with synthetic identities | Actual GitHub browser login with two independently signed-in accounts |
+| 2. Repository ingestion | Actual GitHub/OSV public-repository scan, pinned commit and bounded manifests; private authorization implementation tested with fixtures | Real GitHub App owner/collaborator installation and revocation acceptance |
+| 3. Durable jobs | Database lease/idempotency/cancellation tests; actual hosted worker completed a queued job | Always-on hosted scheduling and supervised failure/recovery acceptance |
+| 4. Reports | Private report persisted and retrieved through deployed API; cross-account denial verified; sharing tests pass | Browser sign-out/sign-in persistence and actual shared-report lifecycle |
+| 5. Usage | Atomic reservation tests, actual hosted single-reservation check, eight live seat-race checks | Paid provider lifecycle and month-boundary hosted acceptance |
+| 6. Teams/audit | Database invitation, removal, revocation and audit tests; atomic credential issuance regression tests | Independent-account hosted team journey |
+| 7. Billing | Checkout/webhook/reconciliation implementation and database/SDK tests | US Stripe reconnection, private test configuration, checkout/portal/renewal/failure/cancellation acceptance |
+| 8. Metrics | Account-scoped dashboard and operational telemetry implemented/tested; actual worker telemetry recorded | Hosted account dashboard walkthrough and recurring worker monitoring; cost metering remains unavailable |
+| 9. Clients | Authenticated SDK/CLI/local MCP built and package-tested | Managed-client hosted acceptance, reviewed package release; published 0.1.0 does not include these additions |
+| 10. Release | 339 unit/database tests, typecheck/build, prior browser regression coverage; draft PR 18 and protected preview | Final browser acceptance, review/integration, persistent service/database provisioning, production migration and explicitly reviewed activation |
+
+External configuration audit: Preview lacks `GITHUB_CLIENT_SECRET`, `GITHUB_APP_CLIENT_SECRET`, `SHIPTESTED_CONNECTION_ENCRYPTION_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_TEAM_PRICE_ID` and `STRIPE_WEBHOOK_SECRET`. Only presence was inspected; no credential values were displayed. Stripe connector still requires reauthentication. The disposable Neon branch expires 28 October at 23:09 GMT. Production remains demo-only. Overall completion is not yet proven.
 
 ### Foundation checkpoint
 
