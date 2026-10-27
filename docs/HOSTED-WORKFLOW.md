@@ -118,3 +118,11 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Queued GitHub jobs now check account admission/disabled state as well as membership before fetching manifests and again before saving results. Tests prove a disabled owner triggers no fetch and disabling an owner during scanning prevents report persistence.
 - Verified: 318 unit/database tests and typecheck. Vercel project API confirms all previews require team sign-in; production branch is main.
 - Configured only `codex/hosted-workflow` Preview environment overrides for the isolated Neon branch, scheduler secret, closed registration, test/member admission and fixed branch origin. Production environment unchanged. No schedule activated; the temporary database expires on 28 October at 23:09 GMT.
+
+### Protected hosted HTTP acceptance
+
+- Deployment `shipcheck-238ntsi63-hey-salad-inc.vercel.app` is READY at commit `5b36c6d`; Vercel target is Preview, not Production. Stable branch alias: `shipcheck-git-codex-hosted-workflow-hey-salad-inc.vercel.app`.
+- `scripts/hosted-http-acceptance.ts` passed through the authenticated Vercel CLI into the actual deployed API, isolated Neon database and live GitHub/OSV pipeline. It verified unauthenticated API denial, queued/idempotent submission, cross-account job/report denial, scheduler authentication, deployed worker completion, report retrieval and exactly one allowance reservation. All temporary agent tokens were revoked in cleanup.
+- Evidence: `../outputs/hosted-acceptance/http-pipeline.json`. These are synthetic test identities; this is not browser OAuth acceptance. The worker was invoked explicitly once, not scheduled.
+- Actual browser check reached `/sign-in` on the protected branch alias. Clicking GitHub returned `GitHub sign-in is not configured.` Prepared a separate Hosted Preview OAuth registration with an exact callback and no wildcard; waiting for Peter's action-time approval and private client-secret generation. Existing local OAuth app unchanged.
+- The temporary database expires on 28 October at 23:09 GMT; this deployment is acceptance infrastructure, not a customer launch. Remaining: real browser OAuth, private GitHub App customer onboarding, recurring worker hosting, Stripe test lifecycle, broader browser/independent-account checks and reviewed production activation.
