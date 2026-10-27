@@ -1,4 +1,6 @@
-# ShipCheck
+# ShipTested
+
+Earlier working name: Agent Shielda.
 
 **Check before you ship.** A pre-deployment security assessment for small teams, built around evidence and explicit coverage.
 
@@ -69,4 +71,28 @@ Remaining: independent partner review, private member-key delivery, public judgi
 - [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search).
 - Lucide icons and Figtree font retain their upstream licences; Google Fonts is requested by the browser with a system-font fallback.
 
-MIT applies to original ShipCheck code. Third-party dependencies and advisory data retain their licences.
+MIT applies to original ShipTested code. Third-party dependencies and advisory data retain their licences.
+
+## Recorded live demo capture
+
+Run `node --env-file=.env.local --import tsx scripts/capture-recorded-run.ts` locally with both provider keys configured. This makes one pipeline scan using only the existing synthetic lockfile. It refuses incomplete provider evidence, checks that configured secret values are absent, and never overwrites a capture. Review the sanitized fixture before committing. `/api/demos?mode=recorded` returns an honest unavailable state if no fixture exists; `mode=offline` rebuilds the stable offline demo.
+
+### Read-only public demo mode
+
+Set `SHIPCHECK_PUBLIC_DEMO=1` on the server to allow only the landing page, reports index and fixture-backed report/finding replay. Live scans, sign-in, project/host management, repository and repair APIs return 403 before authentication, database or provider work. The health response exposes no configured-provider state in this mode. This flag does not deploy the app or change Vercel protection.
+
+Verify the running-server boundary with `npx playwright test -c playwright.public-demo.config.ts` after a production build. Normal member workflows require this flag to be unset. The npm library, CLI and MCP tools remain **IN DEVELOPMENT** and are not published.
+
+## Brand boilerplate
+
+ShipTested helps small teams check a release before it ships. Paste or drop a lockfile and it resolves exact versions, matches them against OSV advisories, looks for exposed credentials and, once you prove you own a staging host, runs passive checks against it. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds live research, but deterministic rules set the verdict, and no model can remove a finding. Every report says what was checked and what wasn't. For supported npm fixes, ShipTested tests the patch in an isolated sandbox and opens a draft pull request only after you approve it. ShipTested is open source under MIT, built by HeySalad.
+
+## Hackathon summary
+
+ShipTested is a pre-release security check for small teams. It matches exact dependency versions against OSV, masks secrets and checks verified staging hosts. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds dated research, while deterministic rules keep the verdict honest. Supported npm fixes are tested in a sandbox before a person approves the pull request.
+
+## Policy
+
+OSV database severity CRITICAL/HIGH maps to High, MODERATE to Medium and LOW to Low. Otherwise a valid CVSS v3 base vector maps scores ≥7 to High, ≥4 to Medium and lower scores to Low. Missing or invalid metadata stays Unrated. The highest valid v3 score is used; the vector and source are retained. CVSS is owned by FIRST and used by permission: https://www.first.org/cvss/v3.1/specification-document . Models never set severity. High findings keep the deterministic Blocked verdict.
+
+Fixed versions are advisory candidates from the matching npm package's affected interval, not tested repairs. Unsupported ecosystem range interpretation remains unknown. A grouped fix is shown only when every advisory in the group has a candidate; the highest candidate still requires a complete rescan and tests. Recorded reports retain their original captured verdict unless a separately dated metadata enrichment is explicitly supplied.

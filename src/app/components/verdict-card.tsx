@@ -1,0 +1,6 @@
+import MarkScene from './voyage/mark-scene';
+import type {ScanReport} from '@/lib/types';
+import CoverageMeter from './coverage-meter';
+import {plural,severityLabel,verdictLabel,verdictMessage} from './presentation';
+import styles from './report-summary.module.css';
+export default function VerdictCard({report}:{report:ScanReport}){const high=report.findings.filter(f=>f.severity==='high').length;return <section className={styles.summary} aria-label="Report summary"><div className={`${styles.card} ${styles.verdict} brand-verdict`} data-verdict={verdictLabel(report.status)}>{report.status==='Checks passed'&&<MarkScene variant="clear" tone="accent"/>}<span className={styles.label}>Verdict</span><h2 aria-label={`${verdictLabel(report.status)} · ${plural(high,'high-severity finding')}`}>{verdictLabel(report.status)}</h2><p>{verdictMessage(report)}</p><small>Verdict set by rules · advisory evidence</small><small>ShipTested does not block deployments.</small></div><div className={`${styles.card} ${styles.counts} brand-counts`}>{(['high','medium','low','review'] as const).map(s=><div key={s} data-severity={s} data-zero={!report.findings.some(f=>f.severity===s)}><span>{severityLabel(s)}</span><strong>{report.findings.filter(f=>f.severity===s).length}</strong></div>)}</div><div className={styles.card}><CoverageMeter report={report}/></div></section>}

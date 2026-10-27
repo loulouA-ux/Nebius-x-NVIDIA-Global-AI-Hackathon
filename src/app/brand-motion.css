@@ -1,0 +1,9 @@
+:root{--dur-instant:120ms;--dur-quick:160ms;--dur-base:200ms;--dur-slow:260ms;--dur-exit:120ms;--stagger:40ms;--ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);--ease-drawer:cubic-bezier(.32,.72,0,1);--ease-in:cubic-bezier(.4,0,1,1)}
+button,.button{transition:transform 120ms var(--ease-out),color 160ms,background-color 160ms}button:active:not(:disabled):not(:focus-visible),.button:active:not(:focus-visible){transform:scale(.97)}
+.page-transition,.brand-verdict,.brand-counts>div,.coverage-segments span{animation:none}
+.finding-drawer[open]{animation:brand-drawer 260ms var(--ease-drawer)}.finding-drawer[data-closing]{animation:brand-drawer-exit 180ms var(--ease-in)}
+.brand-toast{position:fixed;bottom:100px;right:24px;max-width:calc(100vw - 48px);z-index:60;padding:14px 18px;background:var(--raised);color:var(--ink);border:1px solid var(--card-line);border-radius:10px;opacity:0;transform:translateY(6px);transition:opacity 120ms,transform 120ms}.brand-toast[data-visible="true"]{opacity:1;transform:none;transition-duration:200ms}
+.scan-indicator{display:flex;gap:12px;align-items:center;margin:16px 0}
+::view-transition-old(root){animation:brand-fade-out 160ms var(--ease-out) both}::view-transition-new(root){animation:brand-fade 160ms var(--ease-out) both}
+@keyframes brand-fade{from{opacity:0}to{opacity:1}}@keyframes brand-fade-out{from{opacity:1}to{opacity:0}}@keyframes brand-drawer{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:none}}@keyframes brand-drawer-exit{to{opacity:0;transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}

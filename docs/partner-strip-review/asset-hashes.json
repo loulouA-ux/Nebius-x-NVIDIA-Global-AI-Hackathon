@@ -1,0 +1,20 @@
+[
+  {
+    "file": "nvidia-logo-horz.svg",
+    "sha256": "7b297f826422e9196268303b5946859ae59387e774250126d0b33cca3745ee41",
+    "handoff_sha256": "7b297f826422e9196268303b5946859ae59387e774250126d0b33cca3745ee41",
+    "match": true
+  },
+  {
+    "file": "nebius-color.svg",
+    "sha256": "8fb059e0f40b1470f66e49d0e3efd4bec2946f180c8202fb182a5c28f8b99e94",
+    "handoff_sha256": "8fb059e0f40b1470f66e49d0e3efd4bec2946f180c8202fb182a5c28f8b99e94",
+    "match": true
+  },
+  {
+    "file": "tavily-full.svg",
+    "sha256": "a482ea651b406945d488570ae195410aa70a41745e6b99b5fe4734ea394c296c",
+    "handoff_sha256": "a482ea651b406945d488570ae195410aa70a41745e6b99b5fe4734ea394c296c",
+    "match": true
+  }
+]

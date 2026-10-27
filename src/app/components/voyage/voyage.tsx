@@ -1,0 +1,39 @@
+'use client';
+import {useEffect,useId,useRef,useState} from 'react';
+import {Buoy,Lighthouse,Sea,SketchBoat,SketchDefs,Stamp} from './primitives';
+import {completedStage,stages,voyageOutcome,type VoyageEvent} from './events';
+import './voyage.css';
+import VoyageMoment,{visibleMoments} from './voyage-moment';
+const EMPTY_EVENTS:VoyageEvent[]=[];
+export default function Voyage({mode,events=EMPTY_EVENTS,verdict='Incomplete',detail='',stage}:{mode:'hero'|'scan';events?:VoyageEvent[];verdict?:string;detail?:string;stage?:string}){
+ const id=useId().replace(/:/g,''),root=useRef<HTMLDivElement>(null);const [settled,setSettled]=useState(5),[step,setStep]=useState(5),[playing,setPlaying]=useState(false),[visible,setVisible]=useState(false),[reduced,setReduced]=useState(false),[replay,setReplay]=useState(0),[moments,setMoments]=useState<VoyageEvent[]>([]);
+ useEffect(()=>{const mq=matchMedia('(prefers-reduced-motion: reduce)');const sync=()=>{setReduced(mq.matches);if(mq.matches){setPlaying(false);setStep(5);setSettled(5);}};sync();mq.addEventListener('change',sync);const observer=new IntersectionObserver(([e])=>setVisible(e.isIntersecting&&!document.hidden));if(root.current)observer.observe(root.current);const visibility=()=>{if(document.hidden)setVisible(false);else if(root.current){const r=root.current.getBoundingClientRect();setVisible(r.bottom>0&&r.top<innerHeight);}};document.addEventListener('visibilitychange',visibility);return()=>{observer.disconnect();mq.removeEventListener('change',sync);document.removeEventListener('visibilitychange',visibility);};},[]);
+ useEffect(()=>{
+  if(mode!=='hero'||!visible||reduced)return;
+  let seen=false;try{seen=sessionStorage.getItem('shiptested-voyage-v2')==='seen';}catch{}
+  if(seen&&!replay)return;
+  const timers:ReturnType<typeof setTimeout>[]=[];
+  setStep(-1);setSettled(-1);setPlaying(true);setMoments([]);
+  for(let n=0;n<=5;n++){
+   timers.push(setTimeout(()=>setStep(n),900+n*1050));
+   timers.push(setTimeout(()=>{
+    setSettled(n);
+    if(n===5){setPlaying(false);setMoments([]);try{sessionStorage.setItem('shiptested-voyage-v2','seen');}catch{}}
+   },1900+n*1050));
+   if(n<5&&events[n]){
+    timers.push(setTimeout(()=>setMoments(m=>visibleMoments([...m.filter(e=>e.stage!==events[n].stage),events[n]])),2520+n*1050));
+    timers.push(setTimeout(()=>setMoments(m=>m.filter(e=>e.stage!==events[n].stage)),4460+n*1050));
+   }
+  }
+  return()=>timers.forEach(clearTimeout);
+ },[mode,visible,reduced,replay,events]);
+ const current=mode==='hero'?step:completedStage(events),completed=mode==='hero'?settled:current,arrived=mode==='hero'?settled===5:current===4,outcome=mode==='hero'?verdict:voyageOutcome(events,verdict);
+ useEffect(()=>{if(mode==='scan')setMoments(visibleMoments(events));},[events,mode]);
+ const label=mode==='hero'?`Recorded voyage. ${verdict}. ${events.map(e=>`${e.stage}: ${e.detail||e.status}`).join('. ')}`:`${outcome}. ${stage?`${stage} running.`:'Waiting for confirmed stage results.'}`;
+ return <div ref={root} className="voyage" data-mode={mode} data-playing={playing} data-visible={visible} data-step={current} data-arrived={arrived} data-verdict={outcome}>
+ {[false,true].map(phone=><svg key={String(phone)} className={phone?'voyage-phone':'voyage-desktop'} viewBox={phone?'0 0 600 300':'0 0 1200 420'} role="img" aria-label={label}><SketchDefs id={`${id}-${phone}`} boil={mode==='hero'&&playing&&visible&&!reduced}/><g fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter={`url(#${id}-${phone})`}><Sea phone={phone}/>{stages.map((s,i)=><Buoy key={s} x={(phone?[90,170,250,330,410]:[230,380,530,680,830])[i]} label={s} done={mode==='hero'?completed>=i&&events[i]?.status==='done':events.some(e=>e.stage===s&&e.status==='done')} failed={events.some(e=>e.stage===s&&e.status==='failed')} running={mode==='scan'&&stage===s} phone={phone}/>)}<Lighthouse phone={phone} arrived={arrived}/><g className="voyage-boat" style={{transform:`translate(${phone?(current<0?10:current>=5?440:[30,110,190,270,350][current]):current<0?40:current>=5?960:[120,270,420,570,720][current]}px,${phone?157:214}px) scale(${phone?1.2:1.6})`}}><SketchBoat/></g></g>{mode==='hero'&&arrived&&<Stamp verdict={verdict} detail={detail} phone={phone}/>}</svg>)}
+ <div className="voyage-moments">{moments.map(e=><VoyageMoment autoDismiss={mode==='hero'} key={e.stage} event={e} index={stages.indexOf(e.stage)}/>)}</div>
+ <div className="voyage-stage-chips" aria-hidden="true">{stages.map((s,i)=><span key={s} data-done={completed>=i}>{s}</span>)}</div>
+ {mode==='hero'?<div className="voyage-caption"><span>Recorded run · illustration, no live scan</span><button className="button" disabled={reduced} onClick={()=>setReplay(v=>v+1)}>Replay voyage</button></div>:<ol className="voyage-log" aria-live="polite">{stages.map(s=>{const e=events.find(e=>e.stage===s);return <li key={s}><strong>{s}</strong><span>{e?e.status==='done'?'Complete':'Incomplete':stage===s?'Running':'Waiting'}</span><p>{e?.detail||'No stage result received.'}</p>{e?.durationMs!==undefined&&<small>{e.durationMs} ms</small>}</li>;})}</ol>}
+ </div>;
+}

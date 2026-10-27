@@ -1,12 +1,20 @@
 "use client";
+import {verdictLabel} from "./components/presentation";
+import {clearReportMemory} from "./report-memory";
+import Link from "next/link";
+import styles from "./account-ux.module.css";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
 import { notifySessionExpired, sessionExpiredEvent } from "./session-expired";
-type Saved = { id: string; created_at: string; status: string };
+export type Saved = { id: string; created_at: string; status: string };
 export default function MemberControls({
   refresh,
   onReport,
+  accountOnly=false,
+  onHistory,
 }: {
+  accountOnly?: boolean;
+  onHistory?:(value:{signedIn:boolean;scans:Saved[];error:string})=>void;
   refresh: string;
   onReport: (report: ScanReport) => void;
 }) {
@@ -15,6 +23,7 @@ export default function MemberControls({
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [loaded, setLoaded] = useState(false);
+  useEffect(()=>{onHistory?.({signedIn:!!member,scans,error});},[member,scans,error,onHistory]);
   useEffect(() => {
     function expire() {
       if (!member) return;
@@ -31,6 +40,7 @@ export default function MemberControls({
     async function load() {
       try {
         const r = await fetch("/api/session", { cache: "no-store" });
+        if (r.status === 403) {const data=await r.json();if(data.publicDemo){if(active){setMember("");setError(data.error);setScans([]);}return;}}
         if (r.status === 401) {
           if (active) {
             setMember("");
@@ -40,6 +50,8 @@ export default function MemberControls({
         }
         if (!r.ok) throw Error("Member access temporarily unavailable.");
         const d = await r.json();
+        if (active) setMember(d.login || d.actor.id);
+        if (accountOnly) return;
         const history = await fetch("/api/scans", { cache: "no-store" });
         if (history.status === 401) {
           if (active) {
@@ -52,7 +64,7 @@ export default function MemberControls({
         if (!history.ok) throw Error("Saved scans could not be loaded.");
         const h = await history.json();
         if (active) {
-          setMember(d.actor.id);
+          setMember(d.login || d.actor.id);
           setScans(h.scans);
           setError("");
         }
@@ -69,7 +81,7 @@ export default function MemberControls({
     return () => {
       active = false;
     };
-  }, [refresh]);
+  }, [refresh, accountOnly]);
   async function open(id: string) {
     if (!id) return;
     setBusy(true);
@@ -90,21 +102,12 @@ export default function MemberControls({
     }
   }
   return (
-    <section aria-label="Member access" style={{ marginBottom: 24 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
+    <section aria-label="Member access" className={`member-access ${styles.account}`}>
+      <div className={styles.row}>
         {member ? (
           <>
-            <span>
-              Signed in as <strong>{member}</strong>
-            </span>
-            <label htmlFor="saved-scan">Saved scans</label>
+            <span className={styles.identity}><strong>{member.startsWith("github:") ? "GitHub account" : "Team member"}</strong><small>Signed in as {member}</small></span>
+            {!accountOnly&&<div className={styles.history}><label htmlFor="saved-scan">Saved scans</label>
             <select
               id="saved-scan"
               aria-label="Saved scans"
@@ -116,10 +119,10 @@ export default function MemberControls({
               <option value="">Choose a report ({scans.length})</option>
               {scans.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {new Date(s.created_at).toLocaleString("en-GB")} · {s.status}
+                  {new Date(s.created_at).toLocaleString("en-GB")} · {verdictLabel(s.status as ScanReport["status"])||s.status}
                 </option>
               ))}
-            </select>
+            </select></div>}
             <button
               className="button"
               disabled={busy}
@@ -128,7 +131,8 @@ export default function MemberControls({
                 try {
                   const r = await fetch("/api/session", { method: "DELETE" });
                   if (!r.ok) throw Error("Sign-out failed.");
-                  location.assign("/");
+                  clearReportMemory();
+                  location.assign("/reports");
                 } catch {
                   setError("Sign-out failed. Please try again.");
                   setBusy(false);
@@ -139,7 +143,7 @@ export default function MemberControls({
             </button>
           </>
         ) : loaded ? (
-          <a href="/sign-in">Member sign in</a>
+          <><span className={styles.hint}>Demo workspace</span><Link className="text-button" href="/sign-in">Sign in with GitHub</Link></>
         ) : (
           <span>Checking member session…</span>
         )}

@@ -1,0 +1,4 @@
+import type {ScanReport} from '@/lib/types';
+import {Preview} from '../report-insights';
+import {stateLabel} from './presentation';
+export default function CoverageMeter({report}:{report:ScanReport}){const states=['complete','snapshot','incomplete','not-in-scope'] as const;return <section aria-label="Check coverage"><h3>Check coverage</h3><p>{report.checks.filter(c=>c.state==='complete').length} of {report.checks.length} checks ran</p><div className="coverage-segments" aria-hidden="true">{report.checks.map(c=><span key={c.name} data-state={c.state}/>)}</div><details className="coverage-details"><summary>All {report.checks.length} checks</summary><ul className="coverage-meter">{report.checks.map((c,i)=><li key={c.name} data-state={c.state}><Preview label={`${i+1}. ${c.name} · ${stateLabel(c.state)}`} title={c.name}><p>{stateLabel(c.state)}</p><p>{c.detail}</p></Preview></li>)}</ul></details></section>}

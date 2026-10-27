@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { z } from "zod";
 import { database } from "@/lib/server/db";
 import { ApiError, assertOrigin, body, failure, json } from "@/lib/server/http";
@@ -10,6 +11,8 @@ type Context = { params: Promise<{ id: string }> };
 const verifySchema = z.object({ method: z.enum(["dns", "file"]) }).strict();
 
 export async function POST(request: Request, { params }: Context) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     const id = validateProjectId((await params).id);

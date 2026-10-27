@@ -1,0 +1,72 @@
+[
+  {
+    "name": "landing",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "landing",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 390,
+    "fit": true
+  }
+]

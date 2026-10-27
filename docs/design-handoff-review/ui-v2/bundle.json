@@ -1,0 +1,20 @@
+{
+  "sceneFiles": [
+    {
+      "file": "shiptested-scene-bundle.css",
+      "bytes": 7025,
+      "gzip": 1963
+    },
+    {
+      "file": "shiptested-scene-bundle.js",
+      "bytes": 11501,
+      "gzip": 4784
+    }
+  ],
+  "sceneGzipBytes": 6747,
+  "sceneBudgetBytes": 15360,
+  "beforeAllChunksGzipBytes": 265607,
+  "afterAllChunksGzipBytes": 279601,
+  "allChunksDeltaGzipBytes": 13994,
+  "method": "Isolated minified scene bundle, React external; all production chunks independently gzipped, excludes fonts and optional Rive."
+}

@@ -2,36 +2,37 @@ import { test, expect } from "@playwright/test";
 test("demo runs real findings, exposes evidence and manual actions", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/scan");
   await expect(
-    page.getByRole("heading", { name: "Ready for your next release?" }),
+    page.getByRole("heading", { name: "New scan" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
+  await page.getByText("What this scan covers",{exact:true}).click();
   await expect(
     page.getByText("Single-advisory snapshot retrieved 23 Oct 2026.", {
       exact: false,
     }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: /Command Injection in lodash/ })
+    .getByRole("link", { name: /Command Injection in lodash/ })
     .click();
+  await page.getByRole("button", {name:"Preview source"}).click();
   await expect(
-    page.getByRole("link", { name: "Read source advisory" }),
+    page.getByRole("link", { name: "Open original source in a new tab" }),
   ).toHaveAttribute(
     "href",
     "https://osv.dev/vulnerability/GHSA-35jh-r3h4-6jhm",
   );
+  await page.getByRole("button", {name:"Close",exact:true}).click();
   await expect(
     page.getByText("No code has been changed.", { exact: false }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Recommended actions", exact: true })
-    .click();
+  await page.getByRole("button", {name:"Back to report"}).click();
   await expect(
-    page.getByRole("heading", { name: "Work through the findings" }),
+    page.getByRole("heading", { name: "Scan report" }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/actions-desktop.png",
@@ -41,14 +42,15 @@ test("demo runs real findings, exposes evidence and manual actions", async ({
 test("anonymous live scan is blocked before manifest processing", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/scan");
+  await page.getByText("Paste contents instead",{exact:true}).click();
+  const blocked=await page.request.post("/api/scans",{data:{mode:"live",filename:"package.json",content:"{bad json"}});
+  expect(blocked.status()).toBe(401);
+  expect(await blocked.json()).toMatchObject({error:"Sign in to run live scans."});
+  await page.getByLabel("File format").selectOption("package.json");
+  await page.getByLabel("Manifest content").fill(JSON.stringify({dependencies:{lodash:"4.17.20"}}));
   await page
-    .getByRole("button", { name: "New scan", exact: true })
-    .first()
-    .click();
-  await page.getByLabel("Manifest content").fill("{bad json");
-  await page
-    .getByRole("button", { name: "Scan manifest", exact: true })
+    .getByRole("button", { name: "Run scan", exact: true })
     .click();
   await expect(
     page.getByRole("alert").filter({ hasText: "Sign in to run live scans." }),
@@ -56,10 +58,10 @@ test("anonymous live scan is blocked before manifest processing", async ({
 });
 test("mobile flow has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-  await page.getByRole("button", { name: "Explore the demo" }).click();
+  await page.goto("/scan");
+  await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -75,14 +77,14 @@ test("desktop overview renders without client errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/");
+  await page.goto("/scan");
   await page.screenshot({
     path: "test-results/welcome-desktop.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Explore the demo" }).click();
+  await page.getByRole("button", { name: "Offline fixture" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/report-desktop.png",
@@ -94,6 +96,8 @@ test("desktop overview renders without client errors", async ({ page }) => {
 test("sign-in form rejects an invalid key without exposing it", async ({
   page,
 }) => {
+  // Isolate UI rejection behavior from database credentials; server auth has unit coverage.
+  await page.route("**/api/session", route => route.fulfill({status:401,contentType:"application/json",body:JSON.stringify({error:"Invalid access key."})}));
   await page.goto("/sign-in");
   await page.getByLabel("Individual access key").fill("invalid-test-key");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -155,14 +159,15 @@ test("member can reopen a saved report and record a decision without changing it
     decisions.push(item);
     await route.fulfill({ status: 201, json: item });
   });
-  await page.goto("/");
-  await expect(page.getByText("Signed in as")).toBeVisible();
+  await page.goto("/scan");
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator("main").getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await expect(
-    page.getByRole("heading", { name: "Manifest assessment" }),
+    page.getByRole("heading", { name: "Scan report" }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: /Potential credential in supplied content/ })
+    .getByRole("link", { name: /Potential credential in supplied content/ })
     .click();
   await page
     .getByLabel("Reason or review note")
@@ -178,11 +183,11 @@ test("member can reopen a saved report and record a decision without changing it
   });
   await page.getByRole("button", { name: "Back to report" }).click();
   await expect(
-    page.getByRole("heading", { name: "2 blockers need attention" }),
+    page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(
-    page.getByRole("link", { name: "Member sign in" }),
+    page.getByRole("link", { name: "Sign in with GitHub" }),
   ).toBeVisible();
 });
 
@@ -213,14 +218,15 @@ test("expired decision session clears stale member state and offers sign-in", as
   await page.route(`**/api/scans/${report.id}/decisions`, (route) =>
     route.fulfill({ status: 401, json: { error: "Session expired." } }),
   );
-  await page.goto("/");
-  await expect(page.getByText("Signed in as")).toBeVisible();
+  await page.goto("/scan");
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.locator("main").getByText("Signed in as")).toBeVisible();
   await page.getByLabel("Saved scans").selectOption(report.id);
   await page
-    .getByRole("button", { name: /Potential credential in supplied content/ })
+    .getByRole("link", { name: /Potential credential in supplied content/ })
     .click();
   await page.getByRole("button", { name: "Acknowledge", exact: true }).click();
-  await expect(page.getByRole("link", { name: "Member sign in" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in with GitHub" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Sign in again" })).toBeVisible();
   await expect(page.getByText("Signed in as")).toHaveCount(0);
   await expect(page.getByRole("list", { name: "Decision history" })).toHaveCount(0);

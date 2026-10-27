@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { z } from "zod";
 import { database } from "@/lib/server/db";
 import { ApiError, assertOrigin, body, failure, json } from "@/lib/server/http";
@@ -13,6 +14,8 @@ const createSchema = z.object({
 }).strict();
 
 export async function GET(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     const query = database();
     const actor = await requireActor(request, query);
@@ -24,6 +27,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     const parsed = createSchema.safeParse(await body(request, 4096));

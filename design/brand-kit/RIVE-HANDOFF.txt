@@ -1,0 +1,19 @@
+SHIPCHECK / RIVE PRODUCTION HANDOFF
+Status: art and motion specification prepared. No .riv file has been authored or exported in this kit. Working preview uses SVG/CSS.
+
+Use Rive for the code-window scanning sequence, isolated-test loop and one-shot verified check. Keep all essential text, buttons and evidence in HTML, outside the canvas, for accessibility and localisation.
+
+Editor recipe:
+1. Import brand/symbol.svg and needed icons/*.svg into a 240 x 240 artboard named ShipCheckStatus. Convert currentColor to #2563eb before importing outline icons if needed.
+2. Create separate groups: codeWindow, scanLine, sandbox, checkBadge, warningBadge, failureBadge, pullRequest. Keep the code window proportions unchanged.
+3. Author timelines: Idle (still); Scan (1.6 s slow vertical scan line); Testing (1.8 s gentle opacity pulse); Passed (0.45 s check draw, then hold); Attention (still); Failed (still); DraftReady (0.35 s reveal, then hold).
+4. Create state machine Workflow. Add numeric input status: 0 idle, 1 scanning, 2 testing, 3 passed, 4 attention, 5 failed, 6 draft-ready. Transition to each state on equality. No timer may advance a backend workflow state. Success can only be set by a confirmed backend event.
+5. Provide a static SVG fallback and respect prefers-reduced-motion. Stop animation when hidden or offscreen; clean up runtime on unmount. Keep pause control for looping animation.
+6. Export shipcheck-workflow.riv, pin a compatible runtime, then test every transition, load failure, resize, reduced motion and keyboard controls. Final file size and runtime performance must be measured, not assumed.
+
+Motion limits: no flashing; no endless success loops; no fake percentage; 150-250 ms UI transitions; one-shot success under 500 ms. Never show a success check merely because a request was sent.
+
+Official references checked 25 October 2026:
+https://rive.app/editor
+https://github.com/rive-app/help-center/blob/master/editor/exporting.md
+https://github.com/rive-app/help-center/blob/master/runtimes/state-machines.md

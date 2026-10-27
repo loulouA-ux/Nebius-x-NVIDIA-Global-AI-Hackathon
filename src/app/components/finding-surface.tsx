@@ -1,0 +1,3 @@
+'use client';
+import {useEffect,useRef,type ReactNode} from 'react';
+export default function FindingSurface({children,desktop,close}:{children:ReactNode;desktop:boolean;close:()=>void}){const ref=useRef<HTMLDialogElement>(null);useEffect(()=>{const before=document.activeElement as HTMLElement|null;if(desktop){ref.current?.showModal();ref.current?.querySelector<HTMLElement>('h1')?.focus();}return()=>{before?.focus();};},[desktop]);return desktop?<dialog ref={ref} className="finding-drawer" aria-label="Finding detail" onCancel={e=>{e.preventDefault();close();}}>{children}</dialog>:<div>{children}</div>}

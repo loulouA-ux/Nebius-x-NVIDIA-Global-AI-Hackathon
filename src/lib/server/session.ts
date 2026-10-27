@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Query } from "./db";
 import { ApiError } from "./http";
@@ -6,8 +7,8 @@ export const SESSION_COOKIE = "shipcheck_session";
 export const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 export function memberHashes() {
   return {
-    peter: process.env.SHIPCHECK_PETER_KEY_HASH,
-    louise: process.env.SHIPCHECK_LOUISE_KEY_HASH,
+    peter: brandEnv("PETER_KEY_HASH"),
+    louise: brandEnv("LOUISE_KEY_HASH"),
   };
 }
 export function actorForKey(key: string): Actor | null {
@@ -51,6 +52,14 @@ export async function requireActor(
     "SELECT actor_id,workspace_id,credential_hash FROM sc_sessions WHERE token_hash=$1 AND expires_at>now()",
     [hash(token)],
   );
+  if (r && /^github:[1-9][0-9]*$/.test(String(r.actor_id)) && r.credential_hash === "github-oauth") {
+    const id = String(r.actor_id).slice(7);
+    const allowed = (brandEnv("GITHUB_MEMBER_IDS") || "").split(",").map(v => v.trim()).includes(id);
+    const [account] = await query("SELECT disabled FROM sc_github_accounts WHERE github_id=$1", [id]);
+    if (!allowed || !account || account.disabled || r.workspace_id !== r.actor_id)
+      throw new ApiError(401, "Session expired or revoked.");
+    return { id: String(r.actor_id), workspaceId: String(r.workspace_id), role: "member" };
+  }
   const expected =
     r && memberHashes()[String(r.actor_id) as "peter" | "louise"];
   if (!r || !expected || r.credential_hash !== expected)

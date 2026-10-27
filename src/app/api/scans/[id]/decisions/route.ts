@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { z } from "zod";
 import { database } from "@/lib/server/db";
 import { requireActor } from "@/lib/server/session";
@@ -24,6 +25,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     const id = validateScanId((await params).id);

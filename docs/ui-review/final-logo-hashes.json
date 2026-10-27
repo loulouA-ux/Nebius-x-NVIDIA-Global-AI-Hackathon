@@ -1,0 +1,17 @@
+[
+  {
+    "file": "nvidia-logo-dark.svg",
+    "sha256": "7893fdda83e95ab283313b597c9765cbea33a3876a83121b62a0b1ea786cdb62",
+    "matchesHandoff": true
+  },
+  {
+    "file": "nebius-white.svg",
+    "sha256": "17a24835af7cb3640d908efd4a2268360f3c1c83249a8654f8a813ae4c647f37",
+    "matchesHandoff": true
+  },
+  {
+    "file": "tavily-full-offwhite.svg",
+    "sha256": "4d3bacb8e49563f37e9dcfeab4042759ad39df517f63b7a921750cf9be017d39",
+    "matchesHandoff": true
+  }
+]

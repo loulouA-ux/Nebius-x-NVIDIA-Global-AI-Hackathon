@@ -1,0 +1,4 @@
+import {ImageResponse} from 'next/og';
+export const alt='ShipTested — Check before you ship.';
+export const size={width:1200,height:630};export const contentType='image/png';
+export default function Image(){return new ImageResponse(<div style={{background:'#0B1016',color:'#E8EDF2',width:'100%',height:'100%',display:'flex',flexDirection:'column',justifyContent:'center',padding:90}}><div style={{display:'flex',alignItems:'center',gap:24}}><svg width="96" height="96" viewBox="0 0 64 64" fill="none" stroke="#E8EDF2" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M8 44h48l-6 10H14z"/><path d="M23 20l-8 8 8 8M41 20l8 8-8 8"/><path d="M26 33l3.5 5.5L36 14" stroke="#5EEAD4"/></svg><span style={{fontSize:64}}>ShipTested</span></div><div style={{fontSize:54,marginTop:45}}>Check before you ship.</div><div style={{fontSize:26,color:'#9AA6B6',marginTop:24}}>Evidence for every finding. Tests for every fix.</div></div>,size);}

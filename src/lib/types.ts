@@ -15,7 +15,11 @@ export type Evidence = {
 export type Finding = {
   id: string;
   title: string;
-  severity: "high" | "medium" | "review";
+  severity: "high" | "medium" | "low" | "review";
+  severitySource?: string;
+  cvss?: number;
+  cvssVector?: string;
+  fixedVersion?: string;
   description: string;
   action: string;
   evidence: Evidence[];
@@ -40,6 +44,7 @@ export type Source = {
 };
 export type Explanation = { findingId: string; explanation: string; basis?: "validated-selection" | "scanner-fallback" };
 export type ScanReport = {
+  recording?: {recordedAt:string;model:string;region:string;commit:string;advisoryMetadataRetrievedAt?:string};
   id: string;
   mode: "demo" | "live";
   createdAt: string;

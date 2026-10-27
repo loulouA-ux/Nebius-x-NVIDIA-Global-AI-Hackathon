@@ -146,7 +146,7 @@ export class Store {
   }
   async listScans(actor: Actor) {
     return this.query(
-      "SELECT id,project_id,created_at,report->>'status' AS status FROM sc_scans WHERE workspace_id=$1 AND owner_id=$2 ORDER BY created_at DESC LIMIT 50",
+      "SELECT id,project_id,created_at,report->>'status' AS status, jsonb_array_length(report->'findings') AS finding_count, jsonb_array_length(report->'checks') AS check_count, (SELECT count(*) FROM jsonb_array_elements(report->'checks') AS c WHERE c->>'state'='complete') AS complete_count FROM sc_scans WHERE workspace_id=$1 AND owner_id=$2 ORDER BY created_at DESC LIMIT 50",
       [actor.workspaceId, actor.id],
     );
   }

@@ -1,0 +1,6 @@
+import {expect,it} from "vitest";
+import {triageMatches,type MatchRecord} from "../src/lib/benchmark-triage";
+const row:MatchRecord={repository:"example/repo",commit:"a".repeat(40),path:"package-lock.json",findings:[{id:"GHSA-aaaa-bbbb-cccc:pkg@1.0.0",dependencies:[{ecosystem:"npm",name:"pkg",version:"1.0.0",path:"node_modules/pkg"}],urls:["https://osv.dev/vulnerability/GHSA-aaaa-bbbb-cccc"]}]};
+it("deduplicates repeated runs without erasing provenance",()=>{const r=triageMatches([row,row,{...row,repository:"example/other"}]);expect(r.rawMatches).toBe(3);expect(r.queue).toHaveLength(1);expect(r.queue[0].occurrences).toHaveLength(2);expect(r.queue[0].repositories).toBe(2);expect(r.queue[0].exploitability).toBe("not-assessed");});
+it("keeps versions and distinct commits separate in provenance",()=>{const next=structuredClone(row);next.findings[0].dependencies[0].version="2.0.0";const r=triageMatches([row,next,{...row,commit:"b".repeat(40)}]);expect(r.queue).toHaveLength(2);expect(r.queue.find(q=>q.version==="1.0.0")?.occurrences).toHaveLength(2);});
+it("counts unsupported advisory identities instead of silently losing them",()=>{const next=structuredClone(row);next.findings[0].id="unknown";expect(triageMatches([next]).unmappedMatches).toBe(1);});

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {usePathname} from "next/navigation";
 import { notifySessionExpired } from "./session-expired";
 
 type ProjectData = {
@@ -57,6 +58,7 @@ function stagingHostname(input: string): string | null {
 }
 
 export default function ProjectSetup() {
+  const pathname=usePathname();
   const [projectName, setProjectName] = useState("");
   const [stagingUrl, setStagingUrl] = useState("");
   const [method, setMethod] = useState<"dns" | "file">("dns");
@@ -125,14 +127,14 @@ export default function ProjectSetup() {
 
   return (
     <>
-      <h1>Set up a project.</h1>
+      <h1>{pathname==='/hosts'?'Staging hosts':'Set up a project.'}</h1>
       <p className="intro">
-        Name the release candidate and prove control of the exact staging host.
+        Optional staging checks: name the release candidate and prove control of its exact host. You can scan a dependency manifest without creating a project.
       </p>
       {needsSignIn && (
         <p className="quiet-note">
           Project setup requires a member session.{" "}
-          <a href="/sign-in">Sign in with your individual access key</a>.
+          <a href="/sign-in">Sign in to manage staging checks</a>.
         </p>
       )}
       {error && (
@@ -145,7 +147,7 @@ export default function ProjectSetup() {
           {message}
         </p>
       )}
-      <section className="panel scan-form">
+      <section className="panel scan-form project-form">
         <h2>Project details</h2>
         <label htmlFor="project-name">Project name</label>
         <input
@@ -169,7 +171,7 @@ export default function ProjectSetup() {
         </p>
         {stagingUrl && !host && (
           <p role="alert" className="error">
-            Enter a public HTTPS origin, such as https://staging.example.com/.
+            Use a public HTTPS origin, such as https://staging.example.com/.
           </p>
         )}
         {host && (
@@ -178,7 +180,7 @@ export default function ProjectSetup() {
           </p>
         )}
         <button
-          className="button primary"
+          className={selected ? "button" : "button primary"}
           type="button"
           disabled={busy || !projectName.trim() || !host}
           onClick={() =>
@@ -200,7 +202,7 @@ export default function ProjectSetup() {
         </button>
       </section>
       {projects.length > 0 && (
-        <section className="panel scan-form">
+        <section className="panel scan-form project-form">
           <h2>Your projects</h2>
           <label htmlFor="saved-project">Choose a project</label>
           <select
@@ -221,7 +223,7 @@ export default function ProjectSetup() {
         </section>
       )}
       {selected && (
-        <section className="panel scan-form">
+        <section className="panel scan-form project-form">
           <h2>Prove control of {selected.hostname}</h2>
           <p>
             Publish the current value at the exact hostname. The challenge
@@ -231,27 +233,17 @@ export default function ProjectSetup() {
             )}
             .
           </p>
-          <label htmlFor="proof-method">Verification method</label>
-          <select
-            id="proof-method"
-            value={method}
-            onChange={(event) =>
-              setMethod(event.target.value as "dns" | "file")
-            }
-          >
-            <option value="dns">DNS TXT record</option>
-            <option value="file">Well-known file</option>
-          </select>
+          <div role="group" aria-label="Verification method" className="proof-methods">{(['dns','file'] as const).map(value=><button type="button" className="button" key={value} aria-pressed={method===value} onClick={()=>setMethod(value)}>{value==='dns'?'DNS TXT record':'Well-known file'}</button>)}</div>
           <p className="quiet-note">
             {method === "dns" ? "TXT name" : "File URL"}:{" "}
             <code>
               {method === "dns"
                 ? selected.verification.challenge.txtName
                 : selected.verification.challenge.fileUrl}
-            </code>
+            </code><button className="button" type="button" onClick={()=>navigator.clipboard.writeText(method==='dns'?selected.verification.challenge.txtName:selected.verification.challenge.fileUrl).then(()=>setMessage('Name copied.')).catch(()=>setMessage('Copy unavailable. Select and copy the displayed name.'))}>Copy name</button>
           </p>
           <p className="quiet-note">
-            Exact content: <code>{selected.verification.challenge.value}</code>
+            Exact content: <code>{selected.verification.challenge.value}</code><button className="button" type="button" onClick={()=>navigator.clipboard.writeText(selected.verification.challenge.value).then(()=>setMessage("Value copied.")).catch(()=>setMessage("Copy unavailable. Select and copy the displayed value."))}>Copy value</button>
           </p>
           <p className="fineprint">
             Status: {selected.verification.status}
@@ -277,7 +269,7 @@ export default function ProjectSetup() {
                         body: JSON.stringify({ method }),
                       },
                     ),
-                  "Control of this exact host was verified.",
+                  `${selected.hostname} is verified. Proof is rechecked before every host scan.`,
                 )
               }
             >

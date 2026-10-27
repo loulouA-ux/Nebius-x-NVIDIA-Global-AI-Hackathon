@@ -1,0 +1,17 @@
+:root {
+  --sc-navy: #142b45;
+  --sc-blue: #2563eb;
+  --sc-teal: #0f766e;
+  --sc-mint: #5eead4;
+  --sc-white: #ffffff;
+  --sc-canvas: #f8fafc;
+  --sc-text: #142b45;
+  --sc-muted: #475569;
+  --sc-border: #cbd5e1;
+  --sc-danger: #b91c1c;
+  --sc-warning: #92400e;
+  --sc-success: #0f766e;
+  --sc-font: Figtree, Arial, sans-serif;
+  --sc-radius: 8px;
+}
+:focus-visible { outline: 3px solid var(--sc-blue); outline-offset: 3px; }

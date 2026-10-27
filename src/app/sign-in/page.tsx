@@ -1,16 +1,24 @@
 "use client";
-import { useState } from "react";
+import MarkScene from '../components/voyage/mark-scene';
+import Link from "next/link";
+import styles from "../account-ux.module.css";
+import { useEffect, useState } from "react";
+import BrandHeader from "../brand-header";
 export default function SignIn() {
+  const [demoId, setDemoId] = useState("demo-offline");
+  useEffect(() => { fetch('/api/demos?mode=availability').then(r => r.json()).then(d => { if(d.recorded) setDemoId('demo-recorded'); }).catch(() => {}); }, []);
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
-    <main style={{ maxWidth: 520, margin: "80px auto", padding: 24 }}>
-      <h1>Sign in to ShipCheck</h1>
+    <><BrandHeader /><main id="main-content" tabIndex={-1} className="auth-layout">
+      <section className="auth-panel">
+      <MarkScene variant="gated" tone="accent"/><h1>Sign in to ShipTested</h1>
+      <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
+      <p>Save reports, record review decisions and verify staging hosts. Sign-in is limited to invited preview members.</p><h2>What ShipTested can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
       <p>
-        Use your individual team access key for live scans. The offline demo is
-        available without signing in.
+        Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
       </p>
-      <form
+      <details className={styles.key} open><summary>Use a team access key instead</summary><p id="access-key-hint" className={styles.hint}>Ask your workspace owner for your individual key. This is not your GitHub password.</p><form className="auth-key-form"
         onSubmit={async (event) => {
           event.preventDefault();
           setBusy(true);
@@ -28,7 +36,7 @@ export default function SignIn() {
               throw Error(d.error || "Sign-in failed.");
             }
             form.reset();
-            location.assign("/");
+            location.assign("/reports");
           } catch (e) {
             setError(e instanceof Error ? e.message : "Sign-in failed.");
           } finally {
@@ -42,6 +50,8 @@ export default function SignIn() {
           name="key"
           type="password"
           autoComplete="off"
+          aria-describedby="access-key-hint"
+          aria-invalid={Boolean(error)}
           required
           maxLength={100}
           style={{
@@ -51,12 +61,12 @@ export default function SignIn() {
             margin: "12px 0",
           }}
         />
-        <button className="button primary" disabled={busy}>
+        <button className="button" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
-      </form>
-      <p role="alert">{error}</p>
-      <a href="/">Return to demo</a>
-    </main>
+      </form></details>
+      <p role="alert" className={error ? "error" : undefined}>{error}</p>
+      <Link href={`/reports/${demoId}`}>Run the demo</Link> · <Link href="/repairs">Dependency repairs</Link>
+    </section></main></>
   );
 }

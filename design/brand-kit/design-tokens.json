@@ -1,0 +1,37 @@
+{
+  "brand": {
+    "navy": "#142b45",
+    "blue": "#2563eb",
+    "teal": "#0f766e",
+    "mint": "#5eead4",
+    "white": "#ffffff",
+    "canvas": "#f8fafc"
+  },
+  "semantic": {
+    "text": "#142b45",
+    "muted": "#475569",
+    "border": "#cbd5e1",
+    "danger": "#b91c1c",
+    "warning": "#92400e",
+    "success": "#0f766e"
+  },
+  "typography": {
+    "ui": "Figtree, Arial, sans-serif",
+    "wordmark": "Arial Bold, Helvetica, sans-serif",
+    "code": "ui-monospace, SFMono-Regular, monospace"
+  },
+  "radius": {
+    "control": "8px",
+    "card": "16px"
+  },
+  "spacing": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32,
+    48,
+    64
+  ]
+}

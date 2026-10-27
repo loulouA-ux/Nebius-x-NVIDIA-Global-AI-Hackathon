@@ -1,3 +1,4 @@
+import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
 import { assertOrigin, body, json, failure, ApiError } from "@/lib/server/http";
 import {
@@ -9,13 +10,20 @@ import {
 import { Store } from "@/lib/server/store";
 export const runtime = "nodejs";
 export async function GET(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
-    return json({ actor: await requireActor(request, database()) });
+    const query=database();
+    const actor=await requireActor(request,query);
+    const account=actor.id.startsWith('github:') ? (await query('SELECT login FROM sc_github_accounts WHERE github_id=$1',[actor.id.slice(7)]))[0] : undefined;
+    return json({actor, ...(account?.login ? {login:account.login}: {})});
   } catch (e) {
     return failure(e);
   }
 }
 export async function POST(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     const data = (await body(request, 2000)) as { key?: unknown };
@@ -32,6 +40,8 @@ export async function POST(request: Request) {
   }
 }
 export async function DELETE(request: Request) {
+  const denied=refusePublicDemo();if(denied)return denied;
+
   try {
     assertOrigin(request);
     await revokeSession(request, database());

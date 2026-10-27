@@ -1,4 +1,5 @@
 "use client";
+import Toast from "./components/toast";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
 import { notifySessionExpired } from "./session-expired";
@@ -16,14 +17,20 @@ export default function DecisionLog({
   report: ScanReport;
   findingId: string;
 }) {
+  const [success,setSuccess]=useState(0);
   const [events, setEvents] = useState<Decision[]>([]),
     [reason, setReason] = useState(""),
     [error, setError] = useState(""),
     [expired, setExpired] = useState(false),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [loading, setLoading] = useState(report.mode !== "demo"),
+    [historyError, setHistoryError] = useState(""),
+    [reload, setReload] = useState(0);
   useEffect(() => {
     let active = true;
-    if (report.mode === "demo") return;
+    setEvents([]); setExpired(false); setError(""); setHistoryError("");
+    if (report.mode === "demo") { setLoading(false); return; }
+    setLoading(true);
     fetch(`/api/scans/${report.id}`, { cache: "no-store" })
       .then(async (r) => {
         if (r.status === 401) {
@@ -36,12 +43,12 @@ export default function DecisionLog({
         if (active) setEvents(d.decisions);
       })
       .catch((cause) => {
-        if (active) setError(cause instanceof Error ? cause.message : "Decision history unavailable.");
-      });
+        if (active) setHistoryError(cause instanceof Error ? cause.message : "Decision history unavailable.");
+      }).finally(() => { if(active) setLoading(false); });
     return () => {
       active = false;
     };
-  }, [report.id, report.mode]);
+  }, [report.id, report.mode, reload]);
   async function record(action: "acknowledge" | "dismiss") {
     setBusy(true);
     setError("");
@@ -59,7 +66,8 @@ export default function DecisionLog({
       const d = await r.json();
       if (!r.ok) throw Error(d.error || "Decision could not be saved.");
       setEvents((current) => [...current, d]);
-      setReason("");
+      setReason("");setSuccess(n=>n+1);
+      window.dispatchEvent(new CustomEvent("shipcheck:decision-recorded", { detail: { reportId: report.id } }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Decision could not be saved.");
     } finally {
@@ -68,16 +76,13 @@ export default function DecisionLog({
   }
   return (
     <section className="panel">
-      <h2>Review decision</h2>
+      <h2>Review decision</h2>{success>0&&<Toast key={success} message="Decision recorded. The finding and verdict are unchanged."/>}
       <p>
         Record your assessment. This does not resolve the finding or change the
         scan verdict.
       </p>
       {report.mode === "demo" ? (
-        <p>
-          Decision history is available for saved member scans. This offline
-          demo is temporary.
-        </p>
+        <div><p>Sign in to record a decision. Demo decisions are not saved.</p><button className="button" disabled>Acknowledge</button> <button className="button" disabled>Dismiss with reason</button> <a href="/sign-in">Sign in</a></div>
       ) : expired ? (
         <p role="alert" className="error">
           Session expired. <a href="/sign-in">Sign in again</a> to review or save decisions.
@@ -100,7 +105,7 @@ export default function DecisionLog({
           />
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <button
-              className="button primary"
+              className="button"
               disabled={busy}
               onClick={() => void record("acknowledge")}
             >
@@ -119,6 +124,9 @@ export default function DecisionLog({
               {error}
             </p>
           )}
+          {loading && <p role="status">Loading decision history…</p>}
+          {historyError && <p role="alert">{historyError} <button className="button" onClick={() => setReload(n => n + 1)}>Reload history</button></p>}
+          {!loading && !historyError && !events.some(d => d.finding_id === findingId) && <p className="quiet-note">No decisions recorded for this finding.</p>}
           <ol aria-label="Decision history">
             {events
               .filter((d) => d.finding_id === findingId)

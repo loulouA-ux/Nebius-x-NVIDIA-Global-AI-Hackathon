@@ -1,0 +1,146 @@
+[
+  {
+    "theme": "light",
+    "width": 1440,
+    "name": "landing",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "name": "report",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "name": "finding",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "name": "404",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "name": "privacy",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "name": "security",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "name": "landing",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "name": "report",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "name": "finding",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "name": "404",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "name": "privacy",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "name": "security",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "name": "landing",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "name": "report",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "name": "finding",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "name": "404",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "name": "privacy",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "name": "security",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "name": "landing",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "name": "report",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "name": "finding",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "name": "404",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "name": "privacy",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "name": "security",
+    "violations": []
+  }
+]

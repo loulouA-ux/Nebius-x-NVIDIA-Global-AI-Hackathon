@@ -1,0 +1,74 @@
+{
+  "url": "https://shipcheck-c61v7w5bm-hey-salad-inc.vercel.app",
+  "results": [
+    {
+      "path": "/",
+      "method": "GET",
+      "status": 200,
+      "expected": 200,
+      "checks": {
+        "title": true,
+        "nonce": true,
+        "voyage": true
+      },
+      "passed": true,
+      "exitCode": 0
+    },
+    {
+      "path": "/reports/demo-recorded",
+      "method": "GET",
+      "status": 200,
+      "expected": 200,
+      "checks": {
+        "replay": true,
+        "findings": true
+      },
+      "passed": true,
+      "exitCode": 0
+    },
+    {
+      "path": "/api/scans",
+      "method": "POST",
+      "status": 403,
+      "expected": 403,
+      "checks": {},
+      "passed": true,
+      "exitCode": 0
+    },
+    {
+      "path": "/sign-in",
+      "method": "GET",
+      "status": 403,
+      "expected": 403,
+      "checks": {},
+      "passed": true,
+      "exitCode": 0
+    },
+    {
+      "path": "/missing-ui-v2",
+      "method": "GET",
+      "status": 404,
+      "expected": 404,
+      "checks": {},
+      "passed": true,
+      "exitCode": 0
+    },
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "status": 200,
+      "expected": 200,
+      "checks": {
+        "demo": true
+      },
+      "passed": true,
+      "exitCode": 0
+    },
+    {
+      "path": "/",
+      "method": "unauthenticated GET",
+      "status": 302,
+      "protected": true
+    }
+  ]
+}

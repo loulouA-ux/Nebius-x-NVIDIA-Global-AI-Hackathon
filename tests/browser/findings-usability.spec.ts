@@ -1,0 +1,63 @@
+import {test,expect} from '@playwright/test';
+import type {ScanReport} from '../../src/lib/types';
+const report:ScanReport={id:'11111111-1111-4111-8111-111111111111',mode:'demo',createdAt:'2026-10-26T10:00:00Z',status:'Blocked',durationMs:12,policy:'Synthetic UI test',dependencies:[{name:'lodash',version:'4.17.20',ecosystem:'npm',path:'node_modules/lodash'}],checks:[],sources:[],explanations:[],findings:[{id:'advisory',title:'Affected lodash dependency',severity:'high',description:'Synthetic advisory',action:'Review supported upgrade.',evidence:[{kind:'advisory',location:'lodash@4.17.20',excerpt:'Synthetic test evidence',dependency:{name:'lodash',version:'4.17.20',ecosystem:'npm',path:'node_modules/lodash'}}]},{id:'code',title:'Potential credential in supplied content',severity:'medium',description:'Review supplied content.',action:'Remove exposed credential.',evidence:[{kind:'code',location:'package.json:2',excerpt:'redacted'}]},{id:'http',title:'Response header needs review',severity:'review',description:'One response.',action:'Review host configuration.',evidence:[{kind:'http',location:'https://example.test/',excerpt:'Synthetic response'}]}]};
+for(let i=0;i<6;i++)report.findings.push({...report.findings[2],id:'extra-'+i,title:'Additional fixture '+i});
+test.beforeEach(async({page})=>{
+ await page.route('**/api/session',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
+ await page.route('**/api/scans',r=>r.fulfill({json:report}));
+ await page.route('**/api/repairs',r=>r.fulfill({json:{repairs:[]}}));
+ await page.route('**/api/repositories',r=>r.fulfill({json:{repositories:[]}}));
+});
+for(const width of [390,1440])test(`filter findings and retain report through repairs at ${width}px`,async({page})=>{
+ await page.setViewportSize({width,height:900});
+ await page.goto('/scan');await page.getByRole('button',{name:'Offline fixture'}).click();
+
+ await expect(page.getByRole('heading',{name:'Scan report'})).toBeFocused();
+ await page.getByLabel('Search findings').fill('lodash');
+ await expect(page.getByLabel('Search findings')).toBeFocused();
+ await expect(page.getByRole('status').filter({hasText:'1 of 9 findings'})).toBeVisible();
+ await page.getByRole('button',{name:'Medium',exact:true}).click();
+ await expect(page.getByText('No findings match these filters.',{exact:false})).toBeVisible();
+ await page.getByRole('button',{name:'Clear filters'}).click();
+ await page.getByLabel('Evidence type').selectOption('advisory');
+ await page.getByLabel('Package',{exact:true}).selectOption('lodash');
+ await page.getByRole('link',{name:/Affected lodash dependency/}).click();
+ await expect(page.getByRole('heading',{name:'Affected lodash dependency'})).toBeFocused();
+ await expect(page.getByRole('link',{name:'Prepare tested repair'})).toHaveAttribute('href','/repairs?package=lodash');
+ await page.getByRole('button',{name:'Back to report'}).click();
+ await expect(page.getByLabel('Evidence type')).toHaveValue('advisory');
+ await expect(page.getByLabel('Package',{exact:true})).toHaveValue('lodash');
+ await page.getByRole('link',{name:'Repairs',exact:true}).click();
+ await page.getByRole('link',{name:'Report',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'Scan report'})).toBeVisible();
+ await expect(page.getByLabel('Package',{exact:true})).toHaveValue('lodash');
+ await expect(page.getByRole('link',{name:/Affected lodash dependency/})).toBeVisible();
+ await expect(page).toHaveURL(/reports\/11111111/);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+});
+test('browser back and forward preserve active report without scanning again',async({page})=>{
+ let scans=0;page.on('request',r=>{if(r.url().endsWith('/api/scans')&&r.method()==='POST')scans++;});
+ await page.goto('/scan');await page.getByRole('button',{name:'Offline fixture'}).click();
+
+ await page.getByRole('link',{name:/Affected lodash dependency/}).click();
+ await page.goBack();await expect(page.getByRole('heading',{name:'Scan report'})).toBeVisible();
+ await page.goForward();await expect(page.getByRole('heading',{name:'Affected lodash dependency'})).toBeVisible();
+ expect(scans).toBe(1);
+});
+test('live triage uses recorded decisions and retains findings when history fails',async({page})=>{
+ const live={...report,mode:'live'};
+ await page.route('**/api/scans',r=>r.fulfill({json:live}));
+ let fail=false;
+ await page.route(`**/api/scans/${report.id}`,r=>r.fulfill(fail?{status:503,json:{error:'Unavailable'}}:{json:{report:live,decisions:[{finding_id:'advisory',action:'acknowledge',created_at:'2026-10-26T10:01:00Z'}]}}));
+ await page.goto('/scan');await page.getByRole('button',{name:'Offline fixture'}).click();
+
+ await expect(page.getByLabel('Review decision',{exact:true})).toBeEnabled();
+ await page.getByLabel('Review decision',{exact:true}).selectOption('acknowledge');
+ await expect(page.getByRole('status').filter({hasText:'1 of 9 findings'})).toBeVisible();
+ await expect(page.getByRole('link',{name:/Affected lodash dependency/})).toBeVisible();
+ fail=true;
+ await page.evaluate(id=>window.dispatchEvent(new CustomEvent('shipcheck:decision-recorded',{detail:{reportId:id}})),report.id);
+ await expect(page.getByText('Decision history unavailable. Findings are still shown.')).toBeVisible();
+ await expect(page.getByLabel('Review decision',{exact:true})).toHaveCount(0);
+ await expect(page.getByRole('status').filter({hasText:'9 of 9 findings'})).toBeVisible();
+});

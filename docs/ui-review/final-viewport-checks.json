@@ -1,0 +1,252 @@
+[
+  {
+    "name": "landing",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "finding",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "repair-unavailable",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "report-unavailable",
+    "width": 1440,
+    "fit": true
+  },
+  {
+    "name": "landing",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "finding",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "repair-unavailable",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "report-unavailable",
+    "width": 1024,
+    "fit": true
+  },
+  {
+    "name": "landing",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "finding",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "repair-unavailable",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "report-unavailable",
+    "width": 768,
+    "fit": true
+  },
+  {
+    "name": "landing",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "finding",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "repair-unavailable",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "report-unavailable",
+    "width": 390,
+    "fit": true
+  },
+  {
+    "name": "landing",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "reports",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "report",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "finding",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "scan",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "hosts",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "repairs",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "repair-unavailable",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "sign-in",
+    "width": 360,
+    "fit": true
+  },
+  {
+    "name": "report-unavailable",
+    "width": 360,
+    "fit": true
+  }
+]

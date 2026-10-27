@@ -1,3 +1,4 @@
+import { brandEnv } from "../brand-env";
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -29,7 +30,7 @@ export function assertOrigin(request: Request) {
   const origin = request.headers.get("origin");
   const url = new URL(request.url);
   const expected =
-    process.env.SHIPCHECK_APP_ORIGIN ||
+    brandEnv("APP_ORIGIN") ||
     `${url.protocol}//${request.headers.get("host") || url.host}`;
   if (origin && origin !== expected)
     throw new ApiError(403, "Cross-origin requests are not allowed.");

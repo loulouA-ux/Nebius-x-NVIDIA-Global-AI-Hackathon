@@ -4,9 +4,12 @@ import type { Dependency } from "./types";
 export function parseManifest(
   filename: string,
   content: string,
+  limits: { maxBytes: number; maxDependencies: number } = { maxBytes: 200_000, maxDependencies: 50 },
 ): { dependencies: Dependency[]; warnings: string[] } {
-  if (content.length > 200_000)
-    throw new Error("Manifest exceeds the 200 KB limit.");
+  if (!Number.isSafeInteger(limits.maxBytes) || limits.maxBytes < 1 || limits.maxBytes > 5_000_000 || !Number.isSafeInteger(limits.maxDependencies) || limits.maxDependencies < 1 || limits.maxDependencies > 5000)
+    throw new Error("Invalid parser limits.");
+  if (new TextEncoder().encode(content).length > limits.maxBytes)
+    throw new Error(`Manifest exceeds the ${limits.maxBytes / 1000} KB byte limit.`);
   const dependencies: Dependency[] = [];
   const warnings: string[] = [];
   const add = (
@@ -127,9 +130,9 @@ export function parseManifest(
       dependencies.map((d) => [`${d.ecosystem}:${d.name}@${d.version}`, d]),
     ).values(),
   ];
-  if (unique.length > 50)
+  if (unique.length > limits.maxDependencies)
     throw new Error(
-      "This milestone supports at most 50 unique resolved dependencies per scan.",
+      `This milestone supports at most ${limits.maxDependencies} unique resolved dependencies per scan.`,
     );
   if (!unique.length)
     warnings.push("No supported exact dependency versions were found.");

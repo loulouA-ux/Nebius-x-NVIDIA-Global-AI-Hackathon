@@ -9,10 +9,10 @@ import type { Check, ScanInput, ScanReport } from "./types";
 export const demoFiles = {
   "package-lock.json": JSON.stringify(
     {
-      name: "salad-storefront",
+      name: "shiptested-demo",
       lockfileVersion: 3,
       packages: {
-        "": { name: "salad-storefront" },
+        "": { name: "shiptested-demo" },
         "node_modules/lodash": { version: "4.17.20" },
       },
     },
@@ -20,9 +20,9 @@ export const demoFiles = {
     2,
   ),
   "next.config.ts": "export default { productionBrowserSourceMaps: true };",
-  "demo.env.fixture": "PAYMENT_KEY=sk_live_SHIPCHECK_SYNTHETIC_000000000000"
+  "demo.env.fixture": "PAYMENT_KEY=sk_live_SHIPTESTED_SYNTHETIC_000000000000"
     .replaceAll("_SYNTHETIC_", "SYNTHETIC")
-    .replace("SHIPCHECK_", "SHIPCHECK"),
+    .replace("SHIPTESTED_", "SHIPTESTED"),
 };
 export async function runScan(
   input: ScanInput,
@@ -163,23 +163,23 @@ export async function runScan(
       detail:
         "No verified staging project was selected. No target site was contacted.",
     });
-  const severityOrder = { high: 0, medium: 1, review: 2 };
+  const severityOrder = { high: 0, medium: 1, low: 2, review: 3 };
   findings.sort(
     (a, b) => severityOrder[a.severity] - severityOrder[b.severity],
   );
   const result: ScanReport = {
-    id: randomUUID(),
+    id: demo ? "demo-offline" : randomUUID(),
     mode: input.mode,
-    createdAt: new Date().toISOString(),
+    createdAt: demo ? "2026-10-23T00:00:00Z" : new Date().toISOString(),
     status: verdict(findings, checks),
     dependencies: parsed.dependencies,
     findings,
     checks,
     sources,
     explanations,
-    durationMs: Date.now() - start,
+    durationMs: demo ? 0 : Date.now() - start,
     policy:
-      "shipcheck-v0.1: high findings block; incomplete coverage cannot pass; other findings require review.",
+      "shiptested-v0.1: high findings block; incomplete coverage cannot pass; other findings require review.",
   };
   return JSON.parse(maskSecrets(JSON.stringify(result))) as ScanReport;
 }

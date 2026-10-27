@@ -2,12 +2,14 @@ import { spawnSync } from "node:child_process";
 import { readFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import assert from "node:assert/strict";
+import { isDeepStrictEqual } from "node:util";
 const deployment = process.argv[2];
 if (!deployment || !/^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(deployment))
   throw new Error("Pass the exact preview deployment URL.");
 const dir = ".private/acceptance-" + randomUUID();
 mkdirSync(dir, { mode: 0o700, recursive: true });
 let sequence = 0;
+let stage = "initial checks";
 const loggedIn = new Set<string>();
 function request(
   path: string,
@@ -176,6 +178,7 @@ try {
     },
     "peter",
   );
+  stage = "live response status";
   assert.equal(live.status, 200);
   if (targetProject) {
     const checks = live.body.checks.filter((c: any) =>
@@ -187,6 +190,7 @@ try {
     assert.ok(!JSON.stringify(live.body).includes("demo_preference=example"));
     console.log("PASS: four real passive host checks; cookie values omitted.");
   }
+  stage = "provider coverage";
   for (const name of [
     "OSV advisories",
     "Live threat research",
@@ -198,6 +202,7 @@ try {
       "complete",
     );
   }
+  stage = "dependency and model evidence";
   assert.equal(live.body.dependencies.length, 2);
   for (const note of live.body.explanations) {
     const finding = live.body.findings.find((f: any) => f.id === note.findingId);
@@ -205,6 +210,7 @@ try {
     assert.ok([finding.description, finding.action].includes(note.explanation));
     assert.equal(note.basis, "validated-selection");
   }
+  stage = "advisory attribution";
   const matched = live.body.sources.filter((s: any) => s.classification === "matched-advisory");
   assert.ok(matched.length);
   for (const source of matched) {
@@ -212,10 +218,11 @@ try {
     assert.equal(source.version, undefined);
     const expected = live.body.findings.flatMap((f: any) => f.evidence.filter((e: any) => e.url === source.url && e.dependency).map((e: any) => e.dependency));
     assert.ok(expected.length);
-    for (const dependency of source.matchedDependencies) assert.ok(expected.some((d: any) => JSON.stringify(d) === JSON.stringify(dependency)));
-    assert.equal(source.matchedDependencies.length, new Set(expected.map((d: any) => JSON.stringify(d))).size);
+    for (const dependency of source.matchedDependencies) assert.ok(expected.some((d: any) => isDeepStrictEqual(d, dependency)));
+    assert.equal(source.matchedDependencies.length, expected.filter((d: any, i: number) => expected.findIndex((other: any) => isDeepStrictEqual(d, other)) === i).length);
   }
   console.log("PASS: two-package attribution matches OSV evidence; all model notes are exact approved scanner text.");
+  stage = "persistence and cross-member isolation";
   const rid = live.body.id;
   assert.ok(live.body.findings.length);
   const persisted = request(`/api/scans/${rid}`, "GET", undefined, "peter");
@@ -270,6 +277,7 @@ try {
     JSON.stringify({
       status: "FAIL",
       requestNumber: sequence,
+      stage,
       detail: "Acceptance assertion failed; credentials/responses suppressed.",
     }),
   );

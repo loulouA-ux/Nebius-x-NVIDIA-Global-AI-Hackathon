@@ -1,0 +1,1 @@
+.logo{flex-shrink:0;color:var(--strong);overflow:visible}.tick{stroke:var(--accent);stroke-dashoffset:0;opacity:1}.left,.right{opacity:1;transform:none}.intro .left,.intro .right,.intro .tick{animation:none;opacity:1;stroke-dashoffset:0}.loading{animation:none}

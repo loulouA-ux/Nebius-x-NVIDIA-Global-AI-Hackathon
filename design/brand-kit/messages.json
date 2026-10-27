@@ -1,0 +1,146 @@
+[
+  {
+    "id": "welcome",
+    "icon": "code",
+    "title": "Start with a repository.",
+    "body": "Connect a repository to choose what ShipCheck can inspect.",
+    "cta": "Connect repository",
+    "tone": "info"
+  },
+  {
+    "id": "scope",
+    "icon": "lock",
+    "title": "Your scope. Your control.",
+    "body": "Choose the repository and branch before starting a scan.",
+    "cta": "Review scope",
+    "tone": "info"
+  },
+  {
+    "id": "queued",
+    "icon": "clock",
+    "title": "Your scan is queued.",
+    "body": "We will show progress when the worker starts.",
+    "cta": "View queue",
+    "tone": "info"
+  },
+  {
+    "id": "scanning",
+    "icon": "scan",
+    "title": "Checking the selected scope.",
+    "body": "Collecting dependency and configuration evidence. Results will show what was checked.",
+    "cta": "View scan",
+    "tone": "info"
+  },
+  {
+    "id": "findings",
+    "icon": "warning",
+    "title": "Findings ready for review.",
+    "body": "Open each finding to see its source, affected component and available next step.",
+    "cta": "Review findings",
+    "tone": "warning"
+  },
+  {
+    "id": "no-findings",
+    "icon": "search",
+    "title": "No findings in this scan.",
+    "body": "This result covers the selected checks and scope. It is not a guarantee that the project is secure.",
+    "cta": "View coverage",
+    "tone": "info"
+  },
+  {
+    "id": "proposal",
+    "icon": "fix",
+    "title": "A fix to inspect.",
+    "body": "Review the proposed changes before running them in an isolated test environment.",
+    "cta": "Review patch",
+    "tone": "info"
+  },
+  {
+    "id": "sandbox",
+    "icon": "sandbox",
+    "title": "Testing in isolation.",
+    "body": "The selected test commands are running against the proposed patch.",
+    "cta": "View test log",
+    "tone": "info"
+  },
+  {
+    "id": "passed",
+    "icon": "verify",
+    "title": "Configured tests passed.",
+    "body": "Compare the before-and-after evidence, then decide whether to approve a draft pull request.",
+    "cta": "Review evidence",
+    "tone": "success"
+  },
+  {
+    "id": "failed",
+    "icon": "error",
+    "title": "Verification needs attention.",
+    "body": "At least one configured check did not pass. Inspect the log before retrying or changing the patch.",
+    "cta": "Inspect failure",
+    "tone": "danger"
+  },
+  {
+    "id": "approval",
+    "icon": "approval",
+    "title": "Ready for your review.",
+    "body": "Check the diff, test scope and evidence. Approval allows a draft PR; it does not merge or deploy.",
+    "cta": "Review approval",
+    "tone": "info"
+  },
+  {
+    "id": "pr",
+    "icon": "pull-request",
+    "title": "Draft pull request created.",
+    "body": "The patch and verification evidence are ready for repository review.",
+    "cta": "Open draft PR",
+    "tone": "success"
+  },
+  {
+    "id": "session",
+    "icon": "key",
+    "title": "Sign in to continue.",
+    "body": "Your session has expired. Sign in again before requesting another action.",
+    "cta": "Sign in",
+    "tone": "warning"
+  },
+  {
+    "id": "permission",
+    "icon": "lock",
+    "title": "Repository access is missing.",
+    "body": "Check the app installation and repository selection with an owner.",
+    "cta": "Review access",
+    "tone": "warning"
+  },
+  {
+    "id": "provider",
+    "icon": "cloud",
+    "title": "One check is unavailable.",
+    "body": "A provider did not return a usable result. Available evidence is shown separately; this scan is incomplete.",
+    "cta": "Review partial results",
+    "tone": "warning"
+  },
+  {
+    "id": "budget",
+    "icon": "pause",
+    "title": "Testing paused at the spending limit.",
+    "body": "Review usage and remaining budget before authorising another run.",
+    "cta": "Review usage",
+    "tone": "warning"
+  },
+  {
+    "id": "saved",
+    "icon": "audit",
+    "title": "Decision recorded.",
+    "body": "Your review decision has been added to the audit trail.",
+    "cta": "View audit trail",
+    "tone": "success"
+  },
+  {
+    "id": "export",
+    "icon": "export",
+    "title": "Evidence export ready.",
+    "body": "Review the export for sensitive information before sharing it outside your team.",
+    "cta": "Download evidence",
+    "tone": "info"
+  }
+]
