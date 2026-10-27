@@ -1,6 +1,6 @@
 import {describe,it,expect,afterEach,vi,beforeAll} from "vitest";
 import {generateKeyPairSync,createHash} from "node:crypto";
-import {installationFor,repositorySnapshot} from "../src/lib/server/github-repositories";
+import {installationFor,repositorySnapshot,listRepositories} from "../src/lib/server/github-repositories";
 let key:string;
 beforeAll(()=>{key=generateKeyPairSync("rsa",{modulusLength:2048,privateKeyEncoding:{type:"pkcs8",format:"pem"},publicKeyEncoding:{type:"spki",format:"pem"}}).privateKey;});
 afterEach(()=>vi.unstubAllEnvs());
@@ -22,4 +22,36 @@ describe("repository access and snapshot integrity",()=>{
  it("rejects repository IDs outside the installation",async()=>{setup();await expect(repositorySnapshot(actor,1,mock({unauthorised:true}))).rejects.toMatchObject({status:404});});
  it("rejects truncated trees and symbolic links",async()=>{setup();await expect(repositorySnapshot(actor,1,mock({truncated:true}))).rejects.toThrow("snapshot limits");await expect(repositorySnapshot(actor,1,mock({mode:"120000"}))).rejects.toThrow("symlinks");});
  it("rejects corrupted blob responses",async()=>{setup();await expect(repositorySnapshot(actor,1,mock({corrupt:true}))).rejects.toThrow("integrity");});
+});
+
+describe('bounded installation pagination',()=>{
+ const repo=(n:number)=>({id:n,name:'repo'+n,full_name:'owner/repo'+n,default_branch:'main',private:true});
+ it('lists 200 authorized repositories with two fixed-path requests and read-only permissions',async()=>{
+  setup();const pages:number[]=[];
+  const fetcher:typeof fetch=async(input,init)=>{
+   const url=new URL(String(input));expect(url.hostname).toBe('api.github.com');
+   if(url.pathname.endsWith('access_tokens')){expect(JSON.parse(String(init?.body)).permissions).toEqual({contents:'read'});return Response.json({token:'test-token'});}
+   expect(url.pathname).toBe('/installation/repositories');expect(url.searchParams.get('per_page')).toBe('100');
+   const page=Number(url.searchParams.get('page'));pages.push(page);
+   return Response.json({total_count:200,repositories:Array.from({length:100},(_,i)=>repo((page-1)*100+i+1))});
+  };
+  const repos=await listRepositories(actor,fetcher);expect(repos).toHaveLength(200);expect(repos[199].id).toBe(200);expect(pages).toEqual([1,2]);
+ });
+ it('refuses over-limit installations before requesting additional pages',async()=>{
+  setup();let calls=0;
+  const fetcher:typeof fetch=async(input)=>{calls++;return String(input).includes('access_tokens')?Response.json({token:'test-token'}):Response.json({total_count:201,repositories:Array.from({length:100},(_,i)=>repo(i+1))});};
+  await expect(listRepositories(actor,fetcher)).rejects.toMatchObject({status:422});expect(calls).toBe(2);
+ });
+ it.each(['duplicate','changed-total','short-page'])('rejects inconsistent %s pagination without silently dropping repositories',async(kind)=>{
+  setup();const fetcher:typeof fetch=async(input)=>{
+   const url=new URL(String(input));if(url.pathname.endsWith('access_tokens'))return Response.json({token:'test-token'});
+   const second=url.searchParams.get('page')==='2';
+   return Response.json({total_count:second&&kind==='changed-total'?199:200,repositories:Array.from({length:kind==='short-page'?99:100},(_,i)=>repo(i+1+(second&&kind!=='duplicate'?100:0)))});
+  };
+  await expect(listRepositories(actor,fetcher)).rejects.toMatchObject({status:409});
+ });
+ it('accepts an empty authorized installation',async()=>{
+  setup();const fetcher:typeof fetch=async input=>Response.json(String(input).includes('access_tokens')?{token:'test-token'}:{total_count:0,repositories:[]});
+  expect(await listRepositories(actor,fetcher)).toEqual([]);
+ });
 });

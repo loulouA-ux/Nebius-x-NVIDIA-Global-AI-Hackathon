@@ -29,11 +29,25 @@ export async function installationToken(actor:Actor,repositoryId?:number,write=f
  const result=z.object({token:z.string().min(1)}).parse(await githubRequest(`/app/installations/${installationFor(actor)}/access_tokens`,appJwt(),{method:"POST",body:JSON.stringify({...(repositoryId?{repository_ids:[repositoryId]}:{}),permissions:write?{contents:"write",pull_requests:"write"}:{contents:"read",...(readPullRequests?{pull_requests:"read"}:{})}})},fetcher));
  return result.token;
 }
+export const MAX_CONNECTED_REPOSITORIES=200;
 export async function listRepositories(actor:Actor,fetcher:typeof fetch=fetch){
  const token=await installationToken(actor,undefined,false,fetcher);
- const result=z.object({total_count:z.number().int(),repositories:z.array(repoSchema)}).parse(await githubRequest("/installation/repositories?per_page=100",token,{},fetcher));
- if(result.total_count>result.repositories.length)throw new ApiError(422,"Select a smaller GitHub App repository installation (at most 100 repositories).");
- return result.repositories;
+ const schema=z.object({total_count:z.number().int().min(0),repositories:z.array(repoSchema).max(100)});
+ const repositories:GitHubRepository[]=[],seen=new Set<number>();
+ let expected:number|undefined;
+ for(let page=1;page<=2;page++){
+  const result=schema.parse(await githubRequest(`/installation/repositories?per_page=100&page=${page}`,token,{},fetcher));
+  if(result.total_count>MAX_CONNECTED_REPOSITORIES)throw new ApiError(422,'Select at most 200 repositories in the GitHub App installation.');
+  if(expected!==undefined&&result.total_count!==expected)throw new ApiError(409,'Repository access changed during listing. Try again.');
+  expected=result.total_count;
+  for(const repo of result.repositories){
+   if(seen.has(repo.id))throw new ApiError(409,'Repository access changed during listing. Try again.');
+   seen.add(repo.id);repositories.push(repo);
+  }
+  if(repositories.length===expected)return repositories;
+  if(repositories.length>expected||result.repositories.length<100)throw new ApiError(409,'Repository access changed during listing. Try again.');
+ }
+ throw new ApiError(422,'Repository listing exceeds the supported limit.');
 }
 export type RepositorySnapshot={repository:GitHubRepository;commit:string;tree:string;files:Record<string,string>};
 export async function repositorySnapshot(actor:Actor,repositoryId:number,fetcher:typeof fetch=fetch):Promise<RepositorySnapshot>{

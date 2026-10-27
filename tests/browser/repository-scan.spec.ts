@@ -30,3 +30,15 @@ test('zero allowance disables submission and signed-out users get a sign-in link
   await page.unroute('**/api/usage');await page.route('**/api/usage',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
   await page.reload();await expect(page.getByRole('form',{name:'Scan a GitHub repository'}).getByRole('link',{name:'Sign in with GitHub'})).toHaveAttribute('href','/sign-in');
 });
+
+test('repository API session expiry clears the account controls',async({page})=>{
+ await page.route('**/api/session',r=>r.fulfill({json:{actor:{id:'github:123',role:'member'}}}));
+ await page.route('**/api/scans',r=>r.fulfill({json:{scans:[]}}));
+ await page.route('**/api/usage',r=>r.fulfill({json:{configured:true,remaining:5,limit:5,reserved:0}}));
+ await page.route('**/api/repository-scans',r=>r.fulfill({status:401,json:{error:'Session expired.'}}));
+ await page.goto('/scan');await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
+ await page.getByLabel('GitHub repository URL').fill('https://github.com/owner/repository');
+ await page.getByRole('button',{name:'Scan repository',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Sign out',exact:true})).toHaveCount(0);
+ await expect(page.getByRole('link',{name:'Sign in with GitHub',exact:true}).first()).toBeVisible();
+});

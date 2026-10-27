@@ -3,6 +3,7 @@ import { useEffect,useState,useRef } from 'react';
 import Link from 'next/link';
 import { Github,ArrowRight,Square } from 'lucide-react';
 import styles from './repository-scan-form.module.css';
+import {notifySessionExpired} from '../session-expired';
 type Job={id:string;state:string;repository?:string;commit?:string;reportUrl?:string|null;failureCode?:string};
 type Usage={configured:boolean;remaining:number;limit:number;reserved:number};
 export default function RepositoryScanForm() {
@@ -13,14 +14,14 @@ export default function RepositoryScanForm() {
   useEffect(()=>{const id=new URLSearchParams(location.search).get('job');if(id&&/^[a-f0-9-]{36}$/.test(id))setJob({id,state:'loading'});},[]);
   useEffect(()=>{
     const controller=new AbortController();
-    fetch('/api/usage',{cache:'no-store',signal:controller.signal}).then(async r=>{if(r.status===401){setSignedOut(true);return;}if(!r.ok)throw Error('Usage is unavailable. Retry before starting a scan.');setUsage(await r.json());}).catch(e=>{if(!controller.signal.aborted)setError(e.message);});
+    fetch('/api/usage',{cache:'no-store',signal:controller.signal}).then(async r=>{if(r.status===401){setSignedOut(true);notifySessionExpired();return;}if(!r.ok)throw Error('Usage is unavailable. Retry before starting a scan.');setSignedOut(false);setUsage(await r.json());}).catch(e=>{if(!controller.signal.aborted)setError(e.message);});
     return()=>controller.abort();
   },[job?.id,retry]);
   useEffect(()=>{
     if(!job||['completed','failed','cancelled'].includes(job.state))return;
     const controller=new AbortController();let timer:ReturnType<typeof setTimeout>;
     async function poll(){
-      try {const r=await fetch(`/api/repository-scans/${job!.id}`,{cache:'no-store',signal:controller.signal});const data=await r.json();if(!r.ok){if(r.status===401)setSignedOut(true);throw Error(data.error||'Scan status is unavailable.');}setJob(data);setError('');if(!['completed','failed','cancelled'].includes(data.state))timer=setTimeout(poll,2500);}
+      try {const r=await fetch(`/api/repository-scans/${job!.id}`,{cache:'no-store',signal:controller.signal});const data=await r.json();if(!r.ok){if(r.status===401){setSignedOut(true);notifySessionExpired();}throw Error(data.error||'Scan status is unavailable.');}setJob(data);setError('');if(!['completed','failed','cancelled'].includes(data.state))timer=setTimeout(poll,2500);}
       catch(e){if(!controller.signal.aborted)setError(e instanceof Error?e.message:'Unable to check scan.');}
     }
     void poll();return()=>{controller.abort();clearTimeout(timer);};
@@ -32,7 +33,7 @@ export default function RepositoryScanForm() {
       const input=JSON.stringify({repository,privateAccess});
       if(pending.current?.input!==input)pending.current={input,key:crypto.randomUUID()};
       const r=await fetch('/api/repository-scans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repository,privateAccess,requestKey:pending.current!.key})});
-      const data=await r.json();if(!r.ok){if(r.status===401)setSignedOut(true);throw Error(data.error||'Could not queue this scan.');}
+      const data=await r.json();if(!r.ok){if(r.status===401){setSignedOut(true);notifySessionExpired();}throw Error(data.error||'Could not queue this scan.');}
       pending.current=null;setJob(data);const url=new URL(location.href);url.searchParams.set('job',data.id);history.replaceState(history.state,'',url);
     }catch(e){setError(e instanceof Error?e.message:'Could not start scan.');}finally{setBusy(false);}
   }

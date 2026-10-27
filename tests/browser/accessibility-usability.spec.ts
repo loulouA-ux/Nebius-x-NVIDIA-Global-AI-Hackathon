@@ -17,6 +17,7 @@ test('mobile tabs are direct, keyboard accessible and omit duplicate visible sig
 test('identity survives history failure and can still sign out',async({page})=>{
  await page.route('**/api/session',r=>r.fulfill({json:{actor:{id:'github:123',role:'member'}}}));
  await page.route('**/api/scans',r=>r.fulfill({status:503,json:{error:'Unavailable'}}));
+ await page.route('**/api/usage',r=>r.fulfill({status:503,json:{error:'Usage unavailable'}}));
  await page.setViewportSize({width:390,height:844});await page.goto('/scan');
  await expect(page.locator('main').getByText('GitHub account',{exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();
