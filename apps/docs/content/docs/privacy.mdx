@@ -1,0 +1,19 @@
+---
+title: Security and privacy
+---
+
+## What leaves your machine
+
+Core and CLI send exact dependency names, versions and ecosystems to OSV. They do not upload the full lockfile to OSV. When you choose remote MCP, the supplied lockfile is sent to that endpoint and processed in memory.
+
+Optional local AI sends the documented evidence to the provider whose key you supply. Supported credential values are masked, but pattern matching is not a complete data-loss prevention system.
+
+## Remote boundaries
+
+2 MB request body; 5,000 packages; 20-second timeout; OSV-only outbound requests; no redirects. Remote tools accept content only, never filesystem paths. No lockfile content is logged or stored. The advisory cache contains OSV source data, not uploaded files.
+
+The code rate limit is per instance, not a global distributed quota. A Vercel Firewall rule is recommended before public traffic. Authentication and per-tenant quotas are planned.
+
+## Human control
+
+These tools are read-only. They do not apply fixes, open pull requests, merge, deploy or execute repository scripts. Review the evidence before taking action.

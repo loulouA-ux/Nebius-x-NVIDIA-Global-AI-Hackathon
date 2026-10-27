@@ -1,0 +1,32 @@
+{
+  "name": "@heysalad/shiptested-cli",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "shiptested": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@heysalad/shiptested": "0.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://shiptested.com/developers",
+  "publishConfig": {
+    "access": "public"
+  }
+}

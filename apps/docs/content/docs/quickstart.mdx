@@ -1,0 +1,33 @@
+---
+title: Quickstart
+---
+
+## Website
+
+Visit [ShipTested](https://shiptested.com) to review the recorded synthetic scan. The public demo does not accept live credentials or execute live repair operations.
+
+## CLI from source
+
+Use Node 22 for the monorepo. The published packages target Node 20+.
+
+```sh
+npm ci
+npm run build:packages
+node packages/cli/dist/index.js scan package-lock.json --json
+```
+
+These commands run in a checked-out ShipTested repository. To check another project, supply its lockfile path. Only input text is read; repository code is not executed.
+
+## Local MCP from source
+
+```sh
+node packages/mcp/dist/stdio.js
+```
+
+An MCP client launches this process. Its stdout is reserved for JSON-RPC. Launch it with the target project as its working directory for local path scans, or pass lockfile content.
+
+## Library
+
+The workspace exports `scan` from `@heysalad/shiptested`. Build workspaces before importing it. npm install commands become usable only after Peter publishes the packages.
+
+[Library types](/docs/library) · [Agent configuration](/docs/agents)
