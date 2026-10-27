@@ -33,6 +33,14 @@ export class BillingStore {
     ), removed AS (
       DELETE FROM sc_workspace_members WHERE workspace_id=$1 AND actor_id IN(SELECT actor_id FROM excess) AND role<>'owner' RETURNING actor_id
     ), sessions AS (DELETE FROM sc_sessions WHERE workspace_id=$1 AND actor_id IN(SELECT actor_id FROM removed)),
+    tokens AS (UPDATE sc_api_tokens SET revoked_at=now() WHERE workspace_id=$1 AND actor_id IN(SELECT actor_id FROM removed) AND revoked_at IS NULL),
+    shares AS (UPDATE sc_report_shares SET revoked_at=now() WHERE workspace_id=$1 AND owner_id IN(SELECT actor_id FROM removed) AND revoked_at IS NULL),
+    connections AS (DELETE FROM sc_repository_connections WHERE workspace_id=$1 AND actor_id IN(SELECT actor_id FROM removed)),
+    flows AS (DELETE FROM sc_repository_connect_flows WHERE workspace_id=$1 AND actor_id IN(SELECT actor_id FROM removed)),
+    jobs AS (UPDATE sc_scan_jobs SET state='cancelled',lease_token=NULL,lease_expires_at=NULL,updated_at=now()
+      WHERE workspace_id=$1 AND owner_id IN(SELECT actor_id FROM removed) AND state IN('queued','running') RETURNING id),
+    job_events AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+      SELECT $1,'billing','scan_cancelled_for_seat_limit',id::text FROM jobs),
     events AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
       SELECT $1,'billing','member_removed_for_seat_limit',actor_id FROM removed),
     workspace AS (
@@ -42,7 +50,7 @@ export class BillingStore {
       INSERT INTO sc_scan_allowances(workspace_id,period_start,scan_limit)
       SELECT id,date_trunc('month',now() AT TIME ZONE 'UTC')::date,$8 FROM workspace
       ON CONFLICT(workspace_id,period_start) DO UPDATE SET scan_limit=GREATEST(sc_scan_allowances.reserved,$8)
-    ) SELECT id FROM workspace`,[workspaceId,token,revision,snapshot.subscriptionId,snapshot.status,seats,paid?'team':'free',limit]);
+    ) SELECT id FROM workspace`,[workspaceId,token,revision,snapshot.subscriptionId,snapshot.status,seats,paid?'team':'free',limit],{serializable:true});
     if(!rows.length)throw new ApiError(409,'Billing reconciliation lease expired.');
   }
 }

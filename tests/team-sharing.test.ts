@@ -6,6 +6,9 @@ import type {Query} from '../src/lib/server/db';
 import {TeamAccess} from '../src/lib/server/team-access';
 import {ReportSharing} from '../src/lib/server/report-sharing';
 import {Store} from '../src/lib/server/store';
+import {BillingStore} from '../src/lib/server/billing-store';
+import {createApiToken,requireApiActor} from '../src/lib/server/api-tokens';
+import {ScanJobs} from '../src/lib/server/scan-jobs';
 import {createGitHubSession} from '../src/lib/server/github-session';
 import {switchWorkspace,requireActor} from '../src/lib/server/session';
 import {scanRepository} from '../src/lib/server/repository-scan';
@@ -13,9 +16,9 @@ const db=new PGlite();
 const query:Query=async(sql,params=[])=>(await db.query(sql,params)).rows as Record<string,unknown>[];
 const teams=new TeamAccess(query),shares=new ReportSharing(query);
 const owner={id:'github:1',workspaceId:'github:1',role:'member' as const};
-beforeAll(async()=>{for(const file of ['001_core','002_hosted_jobs','003_workspaces','004_team_sharing'])await db.exec(readFileSync(`migrations/${file}.sql`,'utf8'));});
+beforeAll(async()=>{for(const file of ['001_core','002_hosted_jobs','003_workspaces','004_team_sharing','005_billing','007_api_tokens','008_repository_connections'])await db.exec(readFileSync(`migrations/${file}.sql`,'utf8'));});
 beforeEach(async()=>{
-  await db.exec('TRUNCATE sc_workspaces CASCADE; DELETE FROM sc_report_shares; DELETE FROM sc_scans; DELETE FROM sc_sessions; DELETE FROM sc_scan_allowances; DELETE FROM sc_github_accounts;');
+  await db.exec('TRUNCATE sc_workspaces CASCADE; DELETE FROM sc_report_shares; DELETE FROM sc_scan_jobs; DELETE FROM sc_scans; DELETE FROM sc_sessions; DELETE FROM sc_scan_allowances; DELETE FROM sc_github_accounts;');
   vi.stubEnv('SHIPTESTED_OPEN_REGISTRATION','1');
   await createGitHubSession(query,{githubId:'1',login:'owner'});
   await query("UPDATE sc_workspaces SET plan='team',seat_limit=2 WHERE id=$1",[owner.workspaceId]);
@@ -88,4 +91,30 @@ it('disables shared links when their owner is disabled or loses an entitled seat
   await expect(shares.read(share.token)).rejects.toMatchObject({status:404});
   await query("UPDATE sc_workspaces SET seat_limit=2,plan='free' WHERE id=$1",[owner.workspaceId]);
   await expect(shares.read(share.token)).rejects.toMatchObject({status:404});
+});
+
+it.each(['owner','billing'])('%s removal permanently revokes old credentials and jobs even after rejoining',async(mode)=>{
+ const member=await createGitHubSession(query,{githubId:'2',login:'member'});
+ const invite=await teams.invite(owner,'2');await teams.accept(member.actor,invite.token);
+ const actor={...member.actor,workspaceId:owner.workspaceId},jobs=new ScanJobs(query);
+ const api=await createApiToken(query,actor,'Old agent',true);
+ const personal=await createApiToken(query,member.actor,'Personal agent',true);
+ const report=await scanRepository({repository:'owner/repo',commit:'a'.repeat(40),tree:'b'.repeat(40),private:true,files:{},omitted:[]});report.id=randomUUID();await new Store(query).saveScan(actor,report);
+ const share=await shares.create(actor,report.id);
+ const job=await jobs.enqueue(actor,{repository:'owner/repo',commit:'a'.repeat(40),tree:'b'.repeat(40),private:false,requestKey:randomUUID()});
+ const lease=await jobs.claim();
+ await query("INSERT INTO sc_repository_connections(workspace_id,actor_id,encrypted_token,expires_at) VALUES($1,$2,'synthetic-ciphertext',now()+interval '1 hour')",[actor.workspaceId,actor.id]);
+ await query("INSERT INTO sc_repository_connect_flows(state_hash,workspace_id,actor_id,verifier,browser_hash,expires_at) VALUES('synthetic-state',$1,$2,'synthetic-verifier','synthetic-browser',now()+interval '1 hour')",[actor.workspaceId,actor.id]);
+ if(mode==='owner')await teams.remove(owner,actor.id);
+ else{const billing=new BillingStore(query);await billing.account(owner);await query("UPDATE sc_billing_accounts SET customer_id='cus_test' WHERE workspace_id=$1",[owner.workspaceId]);const claim=(await billing.claim())!;await billing.reconcile(owner.workspaceId,String(claim.lease_token),Number(claim.revision),{subscriptionId:null,status:'canceled',seats:0,scansPerSeat:5});}
+ expect((await jobs.get(actor,String(job.id))).state).toBe('cancelled');
+ await expect(jobs.finish(String(job.id),String(lease!.lease_token),{failureCode:'scan_failed'})).rejects.toMatchObject({status:409});
+ expect(await query('SELECT * FROM sc_repository_connections WHERE actor_id=$1',[actor.id])).toHaveLength(0);
+ expect(await query('SELECT * FROM sc_repository_connect_flows WHERE actor_id=$1',[actor.id])).toHaveLength(0);
+ await query("UPDATE sc_workspaces SET plan='team',seat_limit=2 WHERE id=$1",[owner.workspaceId]);
+ const again=await teams.invite(owner,'2');await teams.accept(member.actor,again.token);
+ await expect(shares.read(share.token)).rejects.toMatchObject({status:404});
+ await expect(requireApiActor(new Request('https://example.test',{headers:{Authorization:`Bearer ${api.token}`}}),query)).rejects.toMatchObject({status:401});
+ expect((await requireApiActor(new Request('https://example.test',{headers:{Authorization:`Bearer ${personal.token}`}}),query)).workspaceId).toBe(member.actor.workspaceId);
+ expect((await query('SELECT reserved FROM sc_scan_allowances WHERE workspace_id=$1',[actor.workspaceId]))[0].reserved).toBe(1);
 });

@@ -48,7 +48,7 @@ export class TeamAccess {
     ), event AS (
       INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
       SELECT workspace_id,$2,'member_joined',$2 FROM member
-    ) SELECT workspace_id FROM member`,[digest(token),actor.id]);
+    ) SELECT workspace_id FROM member`,[digest(token),actor.id],{serializable:true});
     if(!rows.length)throw new ApiError(409,'Invitation is expired, revoked, used, or the team has no available seat. Ask the owner for a new invitation.');
     return String(rows[0].workspace_id);
   }
@@ -65,9 +65,17 @@ export class TeamAccess {
       DELETE FROM sc_workspace_members WHERE workspace_id=$1 AND actor_id=$2 AND role<>'owner' RETURNING actor_id
     ), seats AS (UPDATE sc_workspaces SET seats_used=seats_used-1 WHERE id=$1 AND EXISTS(SELECT 1 FROM member)),
     sessions AS (DELETE FROM sc_sessions WHERE workspace_id=$1 AND actor_id=$2 AND EXISTS(SELECT 1 FROM member)),
+    tokens AS (UPDATE sc_api_tokens SET revoked_at=now() WHERE workspace_id=$1 AND actor_id=$2 AND revoked_at IS NULL AND EXISTS(SELECT 1 FROM member)),
+    shares AS (UPDATE sc_report_shares SET revoked_at=now() WHERE workspace_id=$1 AND owner_id=$2 AND revoked_at IS NULL AND EXISTS(SELECT 1 FROM member)),
+    connections AS (DELETE FROM sc_repository_connections WHERE workspace_id=$1 AND actor_id=$2 AND EXISTS(SELECT 1 FROM member)),
+    flows AS (DELETE FROM sc_repository_connect_flows WHERE workspace_id=$1 AND actor_id=$2 AND EXISTS(SELECT 1 FROM member)),
+    jobs AS (UPDATE sc_scan_jobs SET state='cancelled',lease_token=NULL,lease_expires_at=NULL,updated_at=now()
+      WHERE workspace_id=$1 AND owner_id=$2 AND state IN('queued','running') AND EXISTS(SELECT 1 FROM member) RETURNING id),
+    job_events AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
+      SELECT $1,$3,'scan_cancelled_for_member_removal',id::text FROM jobs),
     event AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
       SELECT $1,$3,'member_removed',actor_id FROM member)
-    SELECT actor_id FROM member`,[actor.workspaceId,target,actor.id]);
+    SELECT actor_id FROM member`,[actor.workspaceId,target,actor.id],{serializable:true});
     if(!removed.length)throw new ApiError(404,'Removable member not found.');
   }
   async history(actor:Actor) {await this.role(actor);return this.query('SELECT sequence,actor_id,event_type,subject_id,created_at FROM sc_workspace_events WHERE workspace_id=$1 ORDER BY sequence DESC LIMIT 100',[actor.workspaceId]);}
