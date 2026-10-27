@@ -12,7 +12,9 @@ if(!deployment||!/^shipcheck-[a-z0-9]+-hey-salad-inc\.vercel\.app$/.test(deploym
 const q=database(),cli=process.env.VERCEL_CLI||'vercel';
 const actors=['900000001','900000002'].map(id=>({id:`github:${id}`,workspaceId:`github:${id}`,role:'member' as const}));
 const issued:{id:string;actor:typeof actors[number]}[]=[];
+let stage='initialization';
 function call(path:string,token?:string,method='GET',data?:unknown){
+ stage=`${method} ${path}`;
  const config=['silent','show-error','max-time = 280',`request = "${method}"`,'write-out = "\\nSTATUS:%{http_code}"'];
  if(token)config.push(`header = ${JSON.stringify('Authorization: Bearer '+token)}`);
  if(data!==undefined){config.push('header = "Content-Type: application/json"');config.push(`data = ${JSON.stringify(JSON.stringify(data))}`);}
@@ -43,4 +45,8 @@ async function main(){
   writeFileSync('../outputs/hosted-acceptance/http-pipeline.json',JSON.stringify(evidence,null,2)+'\n');console.log(JSON.stringify(evidence));
  }finally{for(const t of issued)await revokeApiToken(q,t.actor,t.id);}
 }
-main().catch(()=>{console.error('Hosted HTTP acceptance failed; raw responses and credentials suppressed.');process.exitCode=1;});
+main().catch((error:unknown)=>{
+ const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';
+ const category=code==='ETIMEDOUT'?'transport_timeout':code==='ERR_ASSERTION'?'assertion_failed':'request_failed';
+ console.error(JSON.stringify({event:'hosted_acceptance_failed',stage,category}));process.exitCode=1;
+});
