@@ -3,6 +3,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Query } from "./db";
 import { ApiError } from "./http";
 import type { Actor } from "./store";
+import {activeMembership} from './team-access';
 export const SESSION_COOKIE = "shipcheck_session";
 export const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 export function memberHashes() {
@@ -56,7 +57,7 @@ export async function requireActor(
     const id = String(r.actor_id).slice(7);
     const allowed = brandEnv('OPEN_REGISTRATION')==='1' || (brandEnv("GITHUB_MEMBER_IDS") || "").split(",").map(v => v.trim()).includes(id);
     const [account] = await query("SELECT disabled FROM sc_github_accounts WHERE github_id=$1", [id]);
-    const [membership]=await query('SELECT role FROM sc_workspace_members WHERE workspace_id=$1 AND actor_id=$2',[r.workspace_id,r.actor_id]);
+    const membership=await activeMembership(query,String(r.workspace_id),String(r.actor_id));
     if (!allowed || !account || account.disabled || !membership)
       throw new ApiError(401, "Session expired or revoked.");
     return { id: String(r.actor_id), workspaceId: String(r.workspace_id), role: "member" };
@@ -73,7 +74,7 @@ export async function requireActor(
 }
 export async function switchWorkspace(request:Request,query:Query,workspaceId:string) {
   const actor=await requireActor(request,query);
-  const [membership]=await query('SELECT role FROM sc_workspace_members WHERE workspace_id=$1 AND actor_id=$2',[workspaceId,actor.id]);
+  const membership=await activeMembership(query,workspaceId,actor.id);
   if(!membership)throw new ApiError(403,'Workspace membership is required.');
   await query('UPDATE sc_sessions SET workspace_id=$1 WHERE token_hash=$2 AND actor_id=$3',[workspaceId,hash(cookieToken(request)!),actor.id]);
   return {...actor,workspaceId};

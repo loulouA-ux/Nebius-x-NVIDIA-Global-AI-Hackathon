@@ -3,10 +3,18 @@ import type {Query} from './db';
 import type {Actor} from './store';
 import {ApiError} from './http';
 const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
+export async function activeMembership(query:Query,workspaceId:string,actorId:string) {
+  const [row]=await query(`WITH ranked AS (
+    SELECT m.actor_id,m.role,w.plan,w.seat_limit,
+    row_number() OVER(ORDER BY CASE WHEN m.role='owner' THEN 0 ELSE 1 END,m.created_at,m.actor_id) AS seat
+    FROM sc_workspace_members m JOIN sc_workspaces w ON w.id=m.workspace_id WHERE m.workspace_id=$1
+  ) SELECT role FROM ranked WHERE actor_id=$2 AND seat<=seat_limit AND (plan='team' OR role='owner')`,[workspaceId,actorId]);
+  return row;
+}
 export class TeamAccess {
   constructor(private query:Query) {}
   async role(actor:Actor) {
-    const [row]=await this.query('SELECT role FROM sc_workspace_members WHERE workspace_id=$1 AND actor_id=$2',[actor.workspaceId,actor.id]);
+    const row=await activeMembership(this.query,actor.workspaceId,actor.id);
     if(!row)throw new ApiError(403,'Workspace membership is required.');
     return String(row.role);
   }
