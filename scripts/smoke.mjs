@@ -5,7 +5,7 @@ const origin=new URL(base);let failed=0;
 async function check(label,fn){try{if(!await fn())throw Error();console.log(`PASS ${label}`);}catch{failed++;console.error(`FAIL ${label}`);}}
 const get=(path,init={})=>fetch(new URL(path,origin),{signal:AbortSignal.timeout(15000),...init});
 await check('landing and title',async()=>{const r=await get('/');return r.status===200&&(await r.text()).includes('ShipTested — Check before you ship');});
-await check('server-rendered replay',async()=>{const r=await get('/reports/demo-recorded');const body=await r.text();return r.status===200&&body.includes('Recorded live run')&&body.includes('lodash');});
+await check('server-rendered replay',async()=>{const r=await get('/reports/demo-recorded');const body=await r.text();return r.status===200&&body.includes('Replay')&&body.includes('captured')&&body.includes('lodash');});
 await check('security headers',async()=>{const r=await get('/');return ['Content-Security-Policy','Strict-Transport-Security','X-Content-Type-Options','Referrer-Policy','Permissions-Policy'].every(h=>r.headers.has(h))&&r.headers.get('Content-Security-Policy').includes("frame-ancestors 'none'");});
 await check('live scan denied',async()=>(await get('/api/scans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'live'})})).status===403);
 await check('robots',async()=>{const r=await get('/robots.txt');return r.ok&&(await r.text()).includes('Disallow: /api');});

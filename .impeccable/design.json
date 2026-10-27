@@ -1,0 +1,375 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T03:40:47.613331+00:00",
+  "title": "Design System: ShipTested UI v2",
+  "extensions": {
+    "colorMeta": {
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Dark Bg"
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark Surface"
+      },
+      "dark-raised": {
+        "role": "neutral",
+        "displayName": "Dark Raised"
+      },
+      "dark-line": {
+        "role": "neutral",
+        "displayName": "Dark Line"
+      },
+      "dark-card": {
+        "role": "neutral",
+        "displayName": "Dark Card"
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "Dark Text"
+      },
+      "dark-body2": {
+        "role": "neutral",
+        "displayName": "Dark Body2"
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Dark Muted"
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Dark Accent"
+      },
+      "dark-accent-soft": {
+        "role": "primary",
+        "displayName": "Dark Accent Soft"
+      },
+      "dark-accent-line": {
+        "role": "primary",
+        "displayName": "Dark Accent Line"
+      },
+      "dark-p-bg": {
+        "role": "neutral",
+        "displayName": "Dark P Bg"
+      },
+      "dark-p-fg": {
+        "role": "neutral",
+        "displayName": "Dark P Fg"
+      },
+      "dark-hi-fg": {
+        "role": "secondary",
+        "displayName": "Dark Hi Fg"
+      },
+      "dark-md-fg": {
+        "role": "secondary",
+        "displayName": "Dark Md Fg"
+      },
+      "dark-low": {
+        "role": "secondary",
+        "displayName": "Dark Low"
+      },
+      "dark-water": {
+        "role": "neutral",
+        "displayName": "Dark Water"
+      },
+      "dark-primary-hover": {
+        "role": "neutral",
+        "displayName": "Dark Primary Hover"
+      },
+      "dark-backdrop": {
+        "role": "neutral",
+        "displayName": "Dark Backdrop"
+      },
+      "dark-shadow-soft": {
+        "role": "neutral",
+        "displayName": "Dark Shadow Soft"
+      },
+      "light-bg": {
+        "role": "neutral",
+        "displayName": "Light Bg"
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Light Surface"
+      },
+      "light-raised": {
+        "role": "neutral",
+        "displayName": "Light Raised"
+      },
+      "light-line": {
+        "role": "neutral",
+        "displayName": "Light Line"
+      },
+      "light-card": {
+        "role": "neutral",
+        "displayName": "Light Card"
+      },
+      "light-text": {
+        "role": "neutral",
+        "displayName": "Light Text"
+      },
+      "light-body2": {
+        "role": "neutral",
+        "displayName": "Light Body2"
+      },
+      "light-muted": {
+        "role": "neutral",
+        "displayName": "Light Muted"
+      },
+      "light-accent": {
+        "role": "primary",
+        "displayName": "Light Accent"
+      },
+      "light-accent-soft": {
+        "role": "primary",
+        "displayName": "Light Accent Soft"
+      },
+      "light-accent-line": {
+        "role": "primary",
+        "displayName": "Light Accent Line"
+      },
+      "light-p-bg": {
+        "role": "neutral",
+        "displayName": "Light P Bg"
+      },
+      "light-p-fg": {
+        "role": "neutral",
+        "displayName": "Light P Fg"
+      },
+      "light-hi-fg": {
+        "role": "secondary",
+        "displayName": "Light Hi Fg"
+      },
+      "light-md-fg": {
+        "role": "secondary",
+        "displayName": "Light Md Fg"
+      },
+      "light-low": {
+        "role": "secondary",
+        "displayName": "Light Low"
+      },
+      "light-water": {
+        "role": "neutral",
+        "displayName": "Light Water"
+      },
+      "light-primary-hover": {
+        "role": "neutral",
+        "displayName": "Light Primary Hover"
+      },
+      "light-backdrop": {
+        "role": "neutral",
+        "displayName": "Light Backdrop"
+      },
+      "light-shadow-soft": {
+        "role": "neutral",
+        "displayName": "Light Shadow Soft"
+      }
+    },
+    "typographyMeta": {
+      "annotation": {
+        "displayName": "Drawing notes",
+        "purpose": "Caveat only inside drawings; never controls or data."
+      },
+      "mono": {
+        "displayName": "Evidence metadata",
+        "purpose": "IDs, packages, paths and commands."
+      }
+    },
+    "shadows": [
+      {
+        "name": "selected-filter",
+        "value": "0 2px 4px var(--shadow-soft)",
+        "purpose": "Selected segmented control."
+      },
+      {
+        "name": "moment",
+        "value": "0 4px 16px var(--shadow-soft)",
+        "purpose": "Transient event pill."
+      }
+    ],
+    "motion": [
+      {
+        "name": "dur-instant",
+        "value": "120ms",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "dur-quick",
+        "value": "160ms",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "dur-base",
+        "value": "200ms",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "dur-slow",
+        "value": "260ms",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "dur-exit",
+        "value": "120ms",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "stagger",
+        "value": "40ms",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(.23,1,.32,1)",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(.77,0,.175,1)",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "ease-drawer",
+        "value": "cubic-bezier(.32,.72,0,1)",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "ease-in",
+        "value": "cubic-bezier(.4,0,1,1)",
+        "purpose": "Observed shared motion token in brand-motion.css."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none !important; transition: none !important",
+        "purpose": "Global static current-state fallback, including pseudo-elements."
+      },
+      {
+        "name": "voyage-travel",
+        "value": "1000ms var(--ease-in-out)",
+        "purpose": "Recorded hero movement; never synthesize live stage completion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-voyage-max",
+        "value": "479px"
+      },
+      {
+        "name": "landing-small-max",
+        "value": "600px"
+      },
+      {
+        "name": "phone-app-max",
+        "value": "767px"
+      },
+      {
+        "name": "desktop-app-min",
+        "value": "768px"
+      },
+      {
+        "name": "landing-mid-max",
+        "value": "900px"
+      },
+      {
+        "name": "report-narrow-max",
+        "value": "1023px"
+      },
+      {
+        "name": "report-wide-min",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "description": "Ink-on-paper action; theme custom properties supply both variants.",
+      "html": "<button class=\"ds-button ds-primary\">Open the report</button>",
+      "css": ".ds-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 15px;border:1px solid var(--card,rgb(255 255 255 / .16));border-radius:8px;font:500 14px var(--font-body,Inter),Arial,sans-serif;cursor:pointer;transition:transform 120ms var(--ease-out,cubic-bezier(.23,1,.32,1)),color 160ms,background-color 160ms}.ds-button:focus-visible{outline:2px solid var(--accent,#34D3B4);outline-offset:2px}.ds-button:active:not(:focus-visible){transform:scale(.97)}.ds-button:disabled{opacity:.65;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}.ds-button:active{transform:none}}.ds-primary{background:var(--p-bg,#EDF0F5);color:var(--p-fg,#0B0E13);border-color:var(--p-bg,#EDF0F5)}.ds-primary:hover{background:var(--primary-hover,#FFFFFF)}",
+      "refersTo": "button-primary-dark"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "description": "Surface control for secondary actions.",
+      "html": "<button class=\"ds-button ds-secondary\">Export CSV</button>",
+      "css": ".ds-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 15px;border:1px solid var(--card,rgb(255 255 255 / .16));border-radius:8px;font:500 14px var(--font-body,Inter),Arial,sans-serif;cursor:pointer;transition:transform 120ms var(--ease-out,cubic-bezier(.23,1,.32,1)),color 160ms,background-color 160ms}.ds-button:focus-visible{outline:2px solid var(--accent,#34D3B4);outline-offset:2px}.ds-button:active:not(:focus-visible){transform:scale(.97)}.ds-button:disabled{opacity:.65;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}.ds-button:active{transform:none}}.ds-secondary{background:var(--surface,#11151B);color:var(--text,#EDF0F5)}.ds-secondary:hover{background:var(--raised,#171C24)}",
+      "refersTo": "button-secondary-dark"
+    },
+    {
+      "name": "Scan input",
+      "kind": "input",
+      "description": "Labeled surface-backed field.",
+      "html": "<label class=\"ds-label\" for=\"ds-project\">Project name</label><input class=\"ds-input\" id=\"ds-project\" placeholder=\"Your project\"/>",
+      "css": ".ds-label{display:block;margin:18px 0 7px;font:500 13px var(--font-body,Inter),Arial,sans-serif;color:var(--text,#EDF0F5)}.ds-input{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--card,rgb(255 255 255 / .16));border-radius:8px;background:var(--surface,#11151B);color:var(--text,#EDF0F5);font:16px var(--font-body,Inter),Arial,sans-serif;caret-color:var(--accent,#34D3B4)}.ds-input:focus-visible{outline:2px solid var(--accent,#34D3B4);outline-offset:2px}.ds-input:disabled{background:var(--bg,#0B0E13)}",
+      "refersTo": "input-dark"
+    },
+    {
+      "name": "Sidebar navigation",
+      "kind": "nav",
+      "description": "Active destination and quiet secondary destination.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Workspace\"><a href=\"#reports\" aria-current=\"page\">Reports</a><a href=\"#scan\">New scan</a></nav>",
+      "css": ".ds-nav{padding:16px;background:var(--surface,#11151B);font:14px var(--font-body,Inter),Arial,sans-serif}.ds-nav a{display:flex;align-items:center;min-height:44px;padding:12px;border-radius:9px;color:var(--muted,#8E98A6);text-decoration:none}.ds-nav a[aria-current]{background:var(--raised,#171C24);color:var(--accent,#34D3B4)}.ds-nav a:hover{background:var(--raised,#171C24)}.ds-nav a:focus-visible{outline:2px solid var(--accent,#34D3B4);outline-offset:2px}"
+    },
+    {
+      "name": "Severity chip",
+      "kind": "chip",
+      "description": "High severity with dot and text; static status, not a button.",
+      "html": "<span class=\"ds-severity\">High</span>",
+      "css": ".ds-severity{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:5px;font:500 13px/1.4 var(--font-body,Inter),Arial,sans-serif;color:var(--hi-fg,#FF7B7B);background:color-mix(in srgb,var(--hi-fg,#FF7B7B) 12%,var(--surface,#11151B))}.ds-severity:before{content:\"\";width:5px;height:5px;border-radius:50%;background:currentColor}"
+    },
+    {
+      "name": "Repair evidence card",
+      "kind": "card",
+      "description": "Waiting state avoids invented runner evidence.",
+      "html": "<div class=\"ds-card\"><strong>Tests before</strong><p>Not yet recorded</p></div>",
+      "css": ".ds-card{padding:16px;border:1px solid var(--line,rgb(255 255 255 / .08));border-radius:12px;background:var(--bg,#0B0E13);color:var(--text,#EDF0F5);font:16px/1.5 var(--font-body,Inter),Arial,sans-serif}.ds-card strong{font-weight:600}.ds-card p{margin:0}"
+    },
+    {
+      "name": "Voyage moment",
+      "kind": "custom",
+      "description": "Scene-local event summary; illustrative preview text is not run evidence.",
+      "html": "<div class=\"ds-moment\" aria-hidden=\"true\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m3 8 3 3 7-8\"/></svg><strong>Lockfile</strong><span>\u00b7 Complete</span></div>",
+      "css": ".ds-moment{display:inline-flex;align-items:center;gap:5px;height:32px;padding:6px 10px;border-radius:999px;border:1px solid var(--line,rgb(255 255 255 / .08));background:var(--surface,#11151B);color:var(--text,#EDF0F5);box-shadow:0 4px 16px var(--shadow-soft,rgb(0 0 0 / .16));font:13px/1.4 var(--font-body,Inter),Arial,sans-serif}.ds-moment strong{font-weight:600}.ds-moment span{color:var(--body2,#B4BCC8)}.ds-moment svg{color:var(--accent,#34D3B4)}",
+      "refersTo": "moment-dark"
+    }
+  ],
+  "narrative": {
+    "northStar": "The sailing journey",
+    "overview": "A release is a boat, checks are buoys, and the verdict waits at the lighthouse. The landing page gives the voyage room to lead. Reports remain calm, specific and readable, with evidence and next actions first. The clean mark handles quiet states without the voyage sketch treatment.",
+    "keyCharacteristics": [
+      "Recorded sailing hero",
+      "Ink-and-paper controls",
+      "Theme-aware semantic severity",
+      "Static reduced-motion frames"
+    ],
+    "rules": [
+      {
+        "name": "The Evidence Color Rule",
+        "body": "Verdict and severity colors reflect recorded data and accompany a label or shape.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reading First Rule",
+        "body": "Reserve Caveat for drawing annotations; keep evidence readable.",
+        "section": "typography"
+      },
+      {
+        "name": "The State Change Rule",
+        "body": "Motion explains change; initial report elements and header marks are static.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do derive metrics and versions from real evidence.",
+      "Do preserve both themes and accessible logs.",
+      "Do keep queued scans honest while the API is nonstreaming."
+    ],
+    "donts": [
+      "Don't invent progress or individual test counts.",
+      "Don't claim a Rive runtime or file exists.",
+      "Don't treat the documentation as deployment or approval evidence."
+    ]
+  }
+}

@@ -6,7 +6,8 @@ for(const [width,height] of [[390,844],[1280,720],[1440,900]])test(`scan data an
  await expect(page.getByRole('heading',{name:'Check coverage'})).toBeVisible();
  await expect(page.getByRole('status').filter({hasText:'3 of 3 findings'})).toBeVisible();
  await page.getByRole('heading',{name:'Check coverage'}).scrollIntoViewIfNeeded();await page.screenshot({path:`../outputs/shipcheck-data-previews/${width}-charts.png`});
- const csv=page.getByRole('button',{name:'Export CSV'});await csv.click();
+ if(width<768)await page.locator('.phone-report-tools summary').click();
+ const csv=page.getByRole('button',{name:'Export CSV'}).filter({visible:true});await csv.click();
  const dialog=page.getByRole('dialog',{name:'Findings CSV'});await expect(dialog).toBeVisible();
  expect(await dialog.evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;})).toBe(true);
  await expect(dialog.getByRole('row')).toHaveCount(4);

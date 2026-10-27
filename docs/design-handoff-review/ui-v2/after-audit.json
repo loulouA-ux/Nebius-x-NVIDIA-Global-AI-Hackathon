@@ -1,0 +1,418 @@
+[
+  {
+    "name": "landing",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-landing-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-report-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "finding",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-finding-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "reports",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-reports-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "sign-in",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-sign-in-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "scan",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-scan-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "repair",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-repair-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "dark",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-404-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "landing",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-landing-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-report-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "finding",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-finding-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "reports",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-reports-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "sign-in",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-sign-in-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "scan",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-scan-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "repair",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-repair-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "dark",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-dark-404-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "landing",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-landing-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-report-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "finding",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-finding-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "reports",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-reports-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "sign-in",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-sign-in-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "scan",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-scan-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "repair",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-repair-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "light",
+    "width": 1440,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-404-1440.png",
+    "geometry": {
+      "width": 1440,
+      "scroll": 1440,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "landing",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-landing-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-report-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "finding",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-finding-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "reports",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-reports-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "sign-in",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-sign-in-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "scan",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-scan-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "repair",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-repair-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  },
+  {
+    "name": "404",
+    "theme": "light",
+    "width": 390,
+    "path": "/Users/peter-machona/Documents/ChatGPT/Windows_Device_Mgmt/shipcheck-integration/docs/design-handoff-review/ui-v2/after-light-404-390.png",
+    "geometry": {
+      "width": 390,
+      "scroll": 390,
+      "h1": 1,
+      "animations": 0
+    },
+    "violations": []
+  }
+]

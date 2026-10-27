@@ -5,7 +5,7 @@ for(const theme of ['dark','light'] as const)test(`tick-only accent and brand co
  await page.emulateMedia({colorScheme:theme,reducedMotion:'reduce'});await page.goto('/');
  const mark=page.locator('header [data-shiptested-logo]').first();const colors=await mark.evaluate(el=>{const root=getComputedStyle(document.documentElement);return {accent:root.getPropertyValue('--accent').trim(),paths:[...el.querySelectorAll('path')].map(p=>({tick:p.hasAttribute('data-logo-tick'),stroke:getComputedStyle(p).stroke}))};});
  expect(new Set(colors.paths.filter(p=>!p.tick).map(p=>p.stroke)).size).toBe(1);expect(colors.paths.find(p=>p.tick)!.stroke).not.toBe(colors.paths.find(p=>!p.tick)!.stroke);
- await expect(mark.locator('[data-logo-tick]')).toHaveCSS('stroke',theme==='dark'?'rgb(94, 234, 212)':'rgb(15, 118, 110)');
+ await expect(mark.locator('[data-logo-tick]')).toHaveCSS('stroke',theme==='dark'?'rgb(52, 211, 180)':'rgb(14, 122, 107)');
  for(const path of ['/brand/favicon.svg','/brand/app-icon.svg','/manifest.webmanifest'])expect((await request.get(path)).ok()).toBe(true);
  const manifest=await (await request.get('/manifest.webmanifest')).json();expect(manifest.icons[0].src).toBe('/brand/app-icon.svg');
  await page.goto('/reports/demo-recorded');await expect(page.getByText('2 high-severity findings need a decision.',{exact:true})).toBeVisible();

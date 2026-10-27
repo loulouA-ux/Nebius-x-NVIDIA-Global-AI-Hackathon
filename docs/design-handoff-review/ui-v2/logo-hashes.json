@@ -1,0 +1,67 @@
+[
+  {
+    "file": "public/partners/nebius-white.svg",
+    "sha256": "17a24835af7cb3640d908efd4a2268360f3c1c83249a8654f8a813ae4c647f37",
+    "referenceMatches": [
+      "nebius-white.svg",
+      "original/NEBIUS-outline-white.svg"
+    ]
+  },
+  {
+    "file": "public/partners/nvidia-logo-dark.svg",
+    "sha256": "7893fdda83e95ab283313b597c9765cbea33a3876a83121b62a0b1ea786cdb62",
+    "referenceMatches": [
+      "nvidia-logo-dark.svg"
+    ]
+  },
+  {
+    "file": "public/partners/nvidia-logo-light.svg",
+    "sha256": "307f334828c94148a2f0ebe60616521c4d52162c653e94039a62d4e657d34570",
+    "referenceMatches": [
+      "nvidia-logo-light.svg"
+    ]
+  },
+  {
+    "file": "public/partners/nebius-color.svg",
+    "sha256": "8fb059e0f40b1470f66e49d0e3efd4bec2946f180c8202fb182a5c28f8b99e94",
+    "referenceMatches": [
+      "nebius-color.svg"
+    ]
+  },
+  {
+    "file": "public/partners/tavily-full.svg",
+    "sha256": "a482ea651b406945d488570ae195410aa70a41745e6b99b5fe4734ea394c296c",
+    "referenceMatches": [
+      "tavily-full.svg",
+      "original/tavily-full.svg"
+    ]
+  },
+  {
+    "file": "public/partners/tavily-full-offwhite.svg",
+    "sha256": "4d3bacb8e49563f37e9dcfeab4042759ad39df517f63b7a921750cf9be017d39",
+    "referenceMatches": [
+      "tavily-full-offwhite.svg",
+      "original/tavily-full-offwhite.svg"
+    ]
+  },
+  {
+    "file": "public/partners/README.md",
+    "sha256": "7ccedf82bface215604af77b8cd501c9c33fc56bc827ee9445247bc5fddd6879",
+    "referenceMatches": []
+  },
+  {
+    "file": "public/partners/nebius-black.svg",
+    "sha256": "87f3a405c3cb200541a90ea582c96fbf472299ec9f00dbaf81b4de379b849d1a",
+    "referenceMatches": [
+      "nebius-black.svg",
+      "original/NEBIUS-outline-black.svg"
+    ]
+  },
+  {
+    "file": "public/partners/nvidia-logo-horz.svg",
+    "sha256": "7b297f826422e9196268303b5946859ae59387e774250126d0b33cca3745ee41",
+    "referenceMatches": [
+      "nvidia-logo-horz.svg"
+    ]
+  }
+]

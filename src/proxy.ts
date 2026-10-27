@@ -17,7 +17,7 @@ export function proxy(request:NextRequest){
   const allowed=read&&(p==='/'||p==='/reports'||/^\/reports\/demo-(recorded|offline)(\/findings\/[^/]+)?$/.test(p)||['/privacy','/security','/robots.txt','/sitemap.xml','/.well-known/security.txt','/opengraph-image','/twitter-image','/api/demos','/api/health','/favicon.ico','/manifest.webmanifest'].includes(p)||p.startsWith('/_next/')||p.startsWith('/brand/')||p.startsWith('/partners/'));
   if(allowed)response=next();
   else if(!read||p.startsWith('/api/'))response=NextResponse.json({error:demoMessage,publicDemo:true},{status:403,headers:{'Cache-Control':'no-store'}});
-  else if(['/scan','/hosts','/repairs','/sign-in'].some(path=>p===path||p.startsWith(path+'/'))||p.startsWith('/reports/'))response=new NextResponse(`<!doctype html><html lang="en"><title>ShipTested demo</title><body><main><h1>${demoMessage}</h1><p>Sign-in, live scans, hosts and repairs are disabled on this deployment.</p><a href="/reports">View demo reports</a></main></body></html>`,{status:403,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
+  else if(['/scan','/hosts','/repairs','/sign-in'].some(path=>p===path||p.startsWith(path+'/'))||p.startsWith('/reports/'))response=NextResponse.rewrite(new URL('/demo-access',request.url),{status:403,request:{headers:incoming},headers:{'Cache-Control':'no-store'}});
   else response=next(); // Unknown pages use the branded 404, never a live capability.
  }
  for(const [key,value] of Object.entries(headers))response.headers.set(key,value);
