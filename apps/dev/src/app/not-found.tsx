@@ -1,0 +1,1 @@
+export default function Missing(){return <main id="main"><img src="/brand/shiptested-mark-light-bg.svg" width="64" height="64" alt="ShipTested"/><h1>Here be no pages.</h1><p>Return to developer tools to find the CLI, MCP and library.</p><a href="/">Back to developer tools</a></main>;}

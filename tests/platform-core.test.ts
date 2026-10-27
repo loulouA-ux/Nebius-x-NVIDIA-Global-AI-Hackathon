@@ -26,7 +26,7 @@ it('successful deterministic coverage remains clear even when optional AI is not
 });
 it('outage emits failed stage and cannot become clear or leak exception details',async()=>{
  const events:StageEvent[]=[];const report=await scan({lockfile:lock},{fetcher:vi.fn().mockRejectedValue(Error('private sentinel')),onStage:e=>events.push(e)});
- expect(report.status).toBe('Incomplete');expect(events.at(-1).status).toBe('failed');expect(JSON.stringify(report)).not.toContain('private sentinel');
+ expect(report.status).toBe('Incomplete');expect(events.at(-1)?.status).toBe('failed');expect(JSON.stringify(report)).not.toContain('private sentinel');
 });
 it('enforces cancellation and OSV-only endpoints',async()=>{
  const c=new AbortController();c.abort();await expect(scan({lockfile:lock},{signal:c.signal})).rejects.toThrow();

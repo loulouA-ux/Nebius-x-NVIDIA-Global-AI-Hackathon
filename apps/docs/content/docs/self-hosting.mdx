@@ -1,0 +1,13 @@
+---
+title: Self-hosting and contributing
+---
+
+The repository is MIT licensed. Use Node 22, install with `npm ci`, then run `npm run build:packages`, `npm run typecheck` and `npm test`.
+
+The website stays at the repository root. The remote MCP app is in `apps/mcp`, documentation in `apps/docs`, and developer portal in `apps/dev`.
+
+Build the remote app with `npm run build -w @shiptested/mcp-app`. Configure the expected host before deployment; unrecognised hosts and cross-origin browser requests are refused. Do not relax the OSV allowlist or input limits.
+
+No production credentials are needed for deterministic tools. Deploy a preview, test with an official MCP client, then review DNS and protection settings separately. Never expose a private preview bypass secret in a client snippet.
+
+Contributions should keep every claim tied to evidence, preserve incomplete states, include tests and use a pull request. npm publication and DNS changes require the maintainer's release step.
