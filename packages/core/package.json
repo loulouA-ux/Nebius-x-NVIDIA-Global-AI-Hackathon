@@ -1,0 +1,50 @@
+{
+  "name": "@heysalad/shiptested",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Evidence-led deterministic dependency checks for ShipTested",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./parser": {
+      "types": "./dist/parser.d.ts",
+      "import": "./dist/parser.js"
+    },
+    "./scanner": {
+      "types": "./dist/scanner.d.ts",
+      "import": "./dist/scanner.js"
+    },
+    "./advisory-metadata": {
+      "types": "./dist/advisory-metadata.d.ts",
+      "import": "./dist/advisory-metadata.js"
+    },
+    "./osv": {
+      "types": "./dist/osv.d.ts",
+      "import": "./dist/osv.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.0.0",
+    "semver": "^7.7.0",
+    "zod": "^4.0.0"
+  }
+}

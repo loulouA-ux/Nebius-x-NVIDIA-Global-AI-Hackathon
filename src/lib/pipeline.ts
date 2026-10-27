@@ -80,6 +80,8 @@ export async function runScan(
     findings.push(...hostResult.findings);
     checks.push(...hostResult.checks);
   }
+  // Optional enrichment may add notes/coverage details, never change the deterministic verdict.
+  const deterministicStatus = verdict(findings, checks);
   let sources: ScanReport["sources"] = [];
   let explanations: ScanReport["explanations"] = [];
   if (!demo && input.research && process.env.TAVILY_API_KEY) {
@@ -171,7 +173,7 @@ export async function runScan(
     id: demo ? "demo-offline" : randomUUID(),
     mode: input.mode,
     createdAt: demo ? "2026-10-23T00:00:00Z" : new Date().toISOString(),
-    status: verdict(findings, checks),
+    status: deterministicStatus,
     dependencies: parsed.dependencies,
     findings,
     checks,

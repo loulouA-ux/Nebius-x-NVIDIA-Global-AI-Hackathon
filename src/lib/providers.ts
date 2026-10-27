@@ -1,4 +1,3 @@
-import {advisoryMetadata} from "./advisory-metadata";
 import { brandEnv } from "./brand-env";
 import { z } from "zod";
 import { maskSecrets } from "./scanner";
@@ -34,103 +33,7 @@ export async function boundedJson(
   }
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
-const advisorySchema = z.object({
-  id: z.string().regex(/^[A-Za-z0-9._-]+$/),
-  summary: z.string().optional(),
-  details: z.string().optional(),
-  withdrawn: z.string().optional(),
-  database_specific:z.object({severity:z.string().optional()}).optional(),
-  severity:z.array(z.object({type:z.string(),score:z.string()})).optional(),
-  affected:z.array(z.object({package:z.object({name:z.string(),ecosystem:z.string()}).optional(),ranges:z.array(z.object({type:z.string(),events:z.array(z.object({introduced:z.string().optional(),fixed:z.string().optional(),last_affected:z.string().optional(),limit:z.string().optional()}))})).optional()})).optional(),
-});
-export async function queryOsv(
-  dependencies: Dependency[],
-  fetcher: typeof fetch = fetch,
-): Promise<Finding[]> {
-  if (!dependencies.length) return [];
-  const batch = z
-    .object({
-      results: z.array(
-        z.object({
-          vulns: z
-            .array(z.object({ id: z.string().regex(/^[A-Za-z0-9._-]+$/) }))
-            .optional(),
-          next_page_token: z.string().optional(),
-        }),
-      ),
-    })
-    .parse(
-      await boundedJson(
-        "https://api.osv.dev/v1/querybatch",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            queries: dependencies.map((d) => ({
-              package: { name: d.name, ecosystem: d.ecosystem },
-              version: d.version,
-            })),
-          }),
-        },
-        fetcher,
-      ),
-    );
-  if (
-    batch.results.length !== dependencies.length ||
-    batch.results.some((r) => r.next_page_token)
-  )
-    throw new Error("OSV returned partial results.");
-  const ids = [
-    ...new Set(batch.results.flatMap((r) => r.vulns?.map((v) => v.id) ?? [])),
-  ];
-  if (ids.length > 12)
-    throw new Error("OSV advisory budget exceeded; narrow the manifest.");
-  const details = new Map<string, z.infer<typeof advisorySchema>>();
-  // OSV performs ecosystem-aware matching for the exact version. Do not reinterpret PyPI ranges with semver.
-  for (let i = 0; i < ids.length; i += 3)
-    await Promise.all(
-      ids.slice(i, i + 3).map(async (id) => {
-        const a = advisorySchema.parse(
-          await boundedJson(
-            `https://api.osv.dev/v1/vulns/${encodeURIComponent(id)}`,
-            {},
-            fetcher,
-          ),
-        );
-        if (a.id !== id) throw new Error("Advisory identity mismatch.");
-        details.set(id, a);
-      }),
-    );
-  return batch.results.flatMap((r, i) =>
-    (r.vulns ?? []).flatMap((v) => {
-      const a = details.get(v.id)!;
-      if (a.withdrawn) return [];
-      const d = dependencies[i];
-      return [
-        {
-          id: `${a.id}:${d.name}@${d.version}`,
-          title: maskSecrets(a.summary ?? a.id),
-          ...advisoryMetadata(a,d),
-          description: `OSV reports ${d.name}@${d.version} as affected. Application-level exploitability has not been checked; severity comes only from advisory metadata.`,
-          action:
-            "Read the advisory, identify a supported fixed version, update the lockfile and test the application. No changes have been applied.",
-          evidence: [
-            {
-              kind: "advisory" as const,
-              dependency: { ...d },
-              location: `${d.path} · ${d.name}@${d.version}`,
-              excerpt: maskSecrets(
-                (a.details ?? "See the linked advisory.").slice(0, 1800),
-              ),
-              url: `https://osv.dev/vulnerability/${a.id}`,
-              retrievedAt: new Date().toISOString(),
-            },
-          ],
-        },
-      ];
-    }),
-  );
-}
+export {queryOsv} from "@heysalad/shiptested/osv";
 const searchSchema = z.object({
   results: z
     .array(

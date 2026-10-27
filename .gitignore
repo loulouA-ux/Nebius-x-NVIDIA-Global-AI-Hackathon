@@ -10,3 +10,7 @@ playwright-report/
 .vercel
 
 .private/
+
+packages/*/dist/
+apps/*/dist/
+*.tgz
