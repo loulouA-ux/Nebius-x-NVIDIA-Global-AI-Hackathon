@@ -53,3 +53,11 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Verified: 293 unit/database tests; typecheck; production build. Public-demo API guard now exercises 22 handlers, including all three new handlers, with no external calls.
 - Live GitHub + OSV evidence: nicedeck at `2bb5203218e88f2993ec0d96dcd997d3ba86e96e`, two requirements files, four direct dependencies, zero returned findings. Local report: `../outputs/nicedeck-hosted-pipeline-2026-10-27/report.json`. This is not a hosted customer report or a whole-repository security audit.
 - Still required: UI integration, scheduled worker hosting, provisioning, team lifecycle, sharing, metrics, paid entitlements and full hosted acceptance. Production remains demo-only.
+
+### Customer scan UI and personal workspace checkpoint
+
+- GitHub URL input, private installation option, remaining allowance, queued cancellation, polling and report links are connected to the new API routes. A job ID in the URL restores status after reload; a lost submission response reuses its request key in the mounted form.
+- Reports display repository/commit provenance and scanned/omitted files. GitHub OAuth provisions a personal workspace, owner membership and five free scans without resetting usage at sign-in. Open registration requires `SHIPTESTED_OPEN_REGISTRATION=1`; this flag has not been activated on a hosted deployment.
+- Verified: 294 unit/database tests, typecheck and production build; eight focused browser checks, then the strengthened two-test repository flow (including private report navigation and reload) passed. Browser APIs are fixtures; this proves UI behavior, not hosted account integration. Mobile screenshot inspected; captures retained in `../outputs/hosted-workflow-ui/`.
+- Peter selected **GBP 3 per seat per month** for Team. Working allowance assumption: five repository scans per seat per month, configurable, overages disabled, AI and sandbox execution excluded. Payments remain unconfigured/test-only until verified.
+- Remaining: actual scheduled worker and hosted migration, team invitations/roles and shared access, revocable report sharing, billing lifecycle, metrics dashboard, authenticated hosted CLI/MCP, and end-to-end hosted acceptance. Public production is unchanged.

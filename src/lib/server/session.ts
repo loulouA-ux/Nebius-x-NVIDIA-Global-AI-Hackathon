@@ -54,7 +54,7 @@ export async function requireActor(
   );
   if (r && /^github:[1-9][0-9]*$/.test(String(r.actor_id)) && r.credential_hash === "github-oauth") {
     const id = String(r.actor_id).slice(7);
-    const allowed = (brandEnv("GITHUB_MEMBER_IDS") || "").split(",").map(v => v.trim()).includes(id);
+    const allowed = brandEnv('OPEN_REGISTRATION')==='1' || (brandEnv("GITHUB_MEMBER_IDS") || "").split(",").map(v => v.trim()).includes(id);
     const [account] = await query("SELECT disabled FROM sc_github_accounts WHERE github_id=$1", [id]);
     if (!allowed || !account || account.disabled || r.workspace_id !== r.actor_id)
       throw new ApiError(401, "Session expired or revoked.");

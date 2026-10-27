@@ -1,0 +1,32 @@
+import {test,expect} from '@playwright/test';
+const id='11111111-1111-4111-8111-111111111111',reportId='22222222-2222-4222-8222-222222222222';
+test('repository scan queues, survives reload and opens its private report',async({page})=>{
+  await page.route('**/api/session',r=>r.fulfill({json:{actor:{id:'github:1'},login:'developer'}}));
+  await page.route('**/api/scans',r=>r.fulfill({json:{scans:[]}}));
+  await page.route('**/api/usage',r=>r.fulfill({json:{configured:true,remaining:3,limit:5,reserved:2}}));
+  await page.route(`**/api/scans/${reportId}`,r=>r.fulfill({json:{report:{id:reportId,mode:'live',createdAt:'2026-10-27T22:00:00Z',durationMs:100,status:'Checks passed',dependencies:[],findings:[],checks:[],sources:[],explanations:[],policy:'Fixture for report navigation only.',repositoryScan:{repository:'heysalad-ai/nicedeck',commit:'a'.repeat(40),scannerVersion:'0.1.0',manifests:['requirements.txt'],omitted:[]}},decisions:[]}}));
+  let complete=false;
+  await page.route('**/api/repository-scans',r=>{expect(r.request().postDataJSON().repository).toBe('https://github.com/heysalad-ai/nicedeck');return r.fulfill({status:202,json:{id,state:'queued'}});});
+  await page.route('**/api/repository-scans/*',r=>r.fulfill({json:{id,state:complete?'completed':'queued',repository:'heysalad-ai/nicedeck',commit:'a'.repeat(40),reportUrl:complete?`/reports/${reportId}`:null}}));
+  await page.goto('/scan');await page.getByLabel('GitHub repository URL').fill('https://github.com/heysalad-ai/nicedeck');
+  await page.getByRole('button',{name:'Scan repository',exact:true}).click();
+  await expect(page.getByRole('region',{name:'Repository scan status'})).toContainText('Queued');
+  await expect(page).toHaveURL(new RegExp(`job=${id}`));complete=true;await page.reload();
+  await expect(page.getByRole('link',{name:'Open private report'})).toHaveAttribute('href',`/reports/${reportId}`);
+  await page.screenshot({path:'test-results/repository-scan-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.getByRole('link',{name:'Open private report'})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:'test-results/repository-scan-mobile.png',fullPage:true});
+  await page.getByRole('link',{name:'Open private report'}).click();
+  await expect(page).toHaveURL(new RegExp(`/reports/${reportId}`));
+  await expect(page.getByRole('region',{name:'Repository provenance'})).toContainText('commit aaaaaaa');
+  await page.reload();await expect(page.getByRole('region',{name:'Repository provenance'})).toContainText('1 manifests scanned');
+});
+test('zero allowance disables submission and signed-out users get a sign-in link',async({page})=>{
+  await page.route('**/api/usage',r=>r.fulfill({json:{configured:true,remaining:0,limit:5,reserved:5}}));
+  await page.goto('/scan');await expect(page.getByRole('button',{name:'Scan repository',exact:true})).toBeDisabled();
+  await expect(page.getByText('0 of 5 repository scans remaining this month.',{exact:false})).toBeVisible();
+  await page.unroute('**/api/usage');await page.route('**/api/usage',r=>r.fulfill({status:401,json:{error:'Sign in'}}));
+  await page.reload();await expect(page.getByRole('form',{name:'Scan a GitHub repository'}).getByRole('link',{name:'Sign in with GitHub'})).toHaveAttribute('href','/sign-in');
+});
