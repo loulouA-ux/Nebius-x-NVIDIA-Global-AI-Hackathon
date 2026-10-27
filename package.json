@@ -12,7 +12,7 @@
     "test:e2e": "playwright test",
     "db:migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
     "db:smoke": "node --env-file=.env.local --import tsx scripts/db-smoke.ts",
-    "build:packages": "npm run build -w @heysalad/shiptested && npm run build -w @heysalad/shiptested-cli",
+    "build:packages": "npm run build -w @heysalad/shiptested && npm run build -w @heysalad/shiptested-cli && npm run build -w @heysalad/shiptested-mcp",
     "prebuild": "npm run build:packages",
     "pretypecheck": "npm run build:packages",
     "pretest": "npm run build:packages"
