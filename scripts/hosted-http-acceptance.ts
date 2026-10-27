@@ -3,7 +3,9 @@
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
-import {writeFileSync} from 'node:fs';
+import {writeFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {database} from '../src/lib/server/db';
 import {createApiToken,revokeApiToken} from '../src/lib/server/api-tokens';
 const deployment=process.env.SHIPTESTED_ACCEPTANCE_DEPLOYMENT;
@@ -18,7 +20,14 @@ function call(path:string,token?:string,method='GET',data?:unknown){
  const config=['silent','show-error','max-time = 280',`request = "${method}"`,'write-out = "\\nSTATUS:%{http_code}"'];
  if(token)config.push(`header = ${JSON.stringify('Authorization: Bearer '+token)}`);
  if(data!==undefined){config.push('header = "Content-Type: application/json"');config.push(`data = ${JSON.stringify(JSON.stringify(data))}`);}
- const raw=execFileSync(cli,['curl',path,'--deployment',deployment!,'--scope','hey-salad-inc','--','--config','-'],{input:config.join('\n')+'\n',encoding:'utf8',stdio:['pipe','pipe','pipe'],timeout:300000});
+ // Vercel CLI consumes stdin before spawning curl; a private temporary config
+ // keeps credentials out of process arguments without hanging curl on stdin.
+ const directory=mkdtempSync(join(tmpdir(),'shiptested-http-'));
+ let raw:string;
+ try{
+  const file=join(directory,'request.conf');writeFileSync(file,config.join('\n')+'\n',{mode:0o600});
+  raw=execFileSync(cli,['curl',path,'--deployment',`https://${deployment}`,'--scope','hey-salad-inc','--','--config',file],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:300000});
+ }finally{rmSync(directory,{recursive:true,force:true});}
  const marker=raw.lastIndexOf('\nSTATUS:');assert.ok(marker>=0,'Missing HTTP status');
  return {status:Number(raw.slice(marker+8)),body:JSON.parse(raw.slice(0,marker)) as Record<string,unknown>};
 }
