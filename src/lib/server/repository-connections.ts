@@ -39,9 +39,15 @@ export async function completeRepositoryConnection(q:Query,actor:Actor,state:str
  const identity=z.object({id:z.number().int().positive().safe()}).parse(await githubRequest('/user',result.access_token,{},fetcher));
  if(actor.id!==`github:${identity.id}`)throw new ApiError(403,'Authorize the same GitHub account you used to sign in.');
  const expiresAt=new Date(Date.now()+Math.min(result.expires_in??3600,3600)*1000).toISOString();
- await q(`WITH connection AS (INSERT INTO sc_repository_connections(workspace_id,actor_id,encrypted_token,expires_at) VALUES($1,$2,$3,$4)
+ const saved=await q(`WITH ranked AS (
+ SELECT m.actor_id,m.role,w.plan,w.seat_limit,
+ row_number() OVER(ORDER BY CASE WHEN m.role='owner' THEN 0 ELSE 1 END,m.created_at,m.actor_id) AS seat
+ FROM sc_workspace_members m JOIN sc_workspaces w ON w.id=m.workspace_id WHERE m.workspace_id=$1
+ ), connection AS (INSERT INTO sc_repository_connections(workspace_id,actor_id,encrypted_token,expires_at)
+ SELECT $1,$2,$3,$4 FROM ranked WHERE actor_id=$2 AND seat<=seat_limit AND (plan='team' OR role='owner')
  ON CONFLICT(workspace_id,actor_id) DO UPDATE SET encrypted_token=excluded.encrypted_token,expires_at=excluded.expires_at,installation_id=NULL RETURNING actor_id)
- INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id) SELECT $1,$2,'repository_access_authorized',actor_id FROM connection`,[actor.workspaceId,actor.id,encrypt(result.access_token,actor),expiresAt]);
+ INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id) SELECT $1,$2,'repository_access_authorized',actor_id FROM connection RETURNING sequence`,[actor.workspaceId,actor.id,encrypt(result.access_token,actor),expiresAt],{serializable:true});
+ if(!saved.length)throw new ApiError(403,'Workspace membership is required.');
 }
 async function connection(q:Query,actor:Actor){
  githubActor(actor);await new TeamAccess(q).role(actor);

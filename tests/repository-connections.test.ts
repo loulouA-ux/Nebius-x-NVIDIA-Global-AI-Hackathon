@@ -71,3 +71,12 @@ it('mints an installation token restricted to the intersection of user and app r
  await expect(installationToken(actor,123,true,provider)).rejects.toMatchObject({status:403});expect(minted).toBe(1);
  removed=true;await expect(installationToken(actor,123,false,provider)).rejects.toMatchObject({status:403});expect(minted).toBe(1);
 });
+it('does not save a provider token when membership is removed during OAuth exchange',async()=>{
+ const flow=await beginRepositoryConnection(q,actor),state=new URL(flow.url).searchParams.get('state')!;
+ const revokeDuringExchange:typeof fetch=async(input,init)=>{
+  if(new URL(String(input)).pathname==='/user')await q('DELETE FROM sc_workspace_members WHERE workspace_id=$1',[actor.workspaceId]);
+  return fetcher(input,init);
+ };
+ await expect(completeRepositoryConnection(q,actor,state,flow.browserToken,'code',revokeDuringExchange)).rejects.toMatchObject({status:403});
+ expect(await q('SELECT actor_id FROM sc_repository_connections')).toEqual([]);
+});

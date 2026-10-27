@@ -118,3 +118,15 @@ it.each(['owner','billing'])('%s removal permanently revokes old credentials and
  expect((await requireApiActor(new Request('https://example.test',{headers:{Authorization:`Bearer ${personal.token}`}}),query)).workspaceId).toBe(member.actor.workspaceId);
  expect((await query('SELECT reserved FROM sc_scan_allowances WHERE workspace_id=$1',[actor.workspaceId]))[0].reserved).toBe(1);
 });
+it('does not mint a report share after membership is removed during preflight',async()=>{
+ const report=await scanRepository({repository:'owner/repo',commit:'a'.repeat(40),tree:'b'.repeat(40),private:true,files:{},omitted:[]});
+ report.id=randomUUID();await new Store(query).saveScan(owner,report);
+ let checked=false;
+ const interrupted:Query=async(sql,params,options)=>{
+  const rows=await query(sql,params,options);
+  if(!checked){checked=true;await query('DELETE FROM sc_workspace_members WHERE workspace_id=$1',[owner.workspaceId]);}
+  return rows;
+ };
+ await expect(new ReportSharing(interrupted).create(owner,report.id)).rejects.toMatchObject({status:403});
+ expect(await query('SELECT id FROM sc_report_shares')).toEqual([]);
+});

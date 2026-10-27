@@ -10,12 +10,17 @@ export class ReportSharing {
   async create(actor:Actor,scanId:string) {
     await new Store(this.query).getScan(actor,scanId);
     const id=randomUUID(),token=randomBytes(32).toString('hex');
-    const [result]=await this.query(`WITH share AS (
+    const [result]=await this.query(`WITH ranked AS (
+      SELECT m.actor_id,m.role,w.plan,w.seat_limit,
+        row_number() OVER(ORDER BY CASE WHEN m.role='owner' THEN 0 ELSE 1 END,m.created_at,m.actor_id) AS seat
+      FROM sc_workspace_members m JOIN sc_workspaces w ON w.id=m.workspace_id WHERE m.workspace_id=$3
+    ), share AS (
       INSERT INTO sc_report_shares(id,scan_id,workspace_id,owner_id,token_hash,expires_at)
-      VALUES($1,$2,$3,$4,$5,now()+interval '7 days') RETURNING id,expires_at
+      SELECT $1,$2,$3,$4,$5,now()+interval '7 days' FROM ranked WHERE actor_id=$4 AND seat<=seat_limit AND (plan='team' OR role='owner') RETURNING id,expires_at
     ), event AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
       SELECT $3,$4,'report_shared',id::text FROM share)
-    SELECT id,expires_at FROM share`,[id,scanId,actor.workspaceId,actor.id,shareTokenHash(token)]);
+    SELECT id,expires_at FROM share`,[id,scanId,actor.workspaceId,actor.id,shareTokenHash(token)],{serializable:true});
+    if(!result)throw new ApiError(403,'Workspace membership is required.');
     return {id,token,expiresAt:result.expires_at};
   }
   async list(actor:Actor,scanId:string) {

@@ -156,3 +156,9 @@ References: https://opensource.org/license/mit and https://www.gnu.org/licenses/
 - Added a sequential scan/billing supervisor with explicit database host pin, demo-mode refusal, a stop deadline within 24 hours, graceful SIGTERM/SIGINT handling, sanitized failures and no overlapping cycles. Billing work can continue when scan processing fails; billing must be explicitly enabled and configured.
 - A live acceptance run against the disposable Neon branch completed one cycle with zero failures and stopped at its deadline. This verifies the runner and database telemetry path, not an always-on cloud scheduler.
 - Verification: 336 unit/database tests and TypeScript pass. Focused supervisor tests cover failure recovery, sequential execution, deadline and shutdown boundaries. Hosted runtime selection and persistent scheduling remain open.
+
+### Atomic access issuance
+
+- Closed a membership-removal race in agent token creation, report-share creation and GitHub App authorization callback persistence. Each now checks active seat/plan membership inside its Serializable write transaction, not only during request preflight. If removal completes first, no credential/share is saved; if issuance completes first, the existing removal transaction revokes it.
+- Regression tests remove membership between preflight and persistence (and during the provider exchange) and prove no token/share/connection survives that gap. Verification: 339 unit/database tests, typecheck and production build pass.
+- Preview `shipcheck-bykntci46-hey-salad-inc.vercel.app` at `8ac70f6` was confirmed READY. This precedes the atomic-issuance fix; hosted acceptance of the new fix is separate from local tests. OAuth secret and Stripe authentication remain external activation gates.

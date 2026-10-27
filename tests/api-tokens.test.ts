@@ -37,3 +37,14 @@ it('revokes access when account disabled or workspace membership removed',async(
   await query('DELETE FROM sc_workspace_members WHERE workspace_id=$1',[owner.workspaceId]);
   await expect(requireApiActor(request(token.token),query)).rejects.toMatchObject({status:401});
 });
+it('cannot create a token after membership disappears between preflight and insert',async()=>{
+ let checked=false;
+ const interrupted:Query=async(sql,params,options)=>{
+  const rows=await query(sql,params,options);
+  if(!checked){checked=true;await query('DELETE FROM sc_workspace_members WHERE workspace_id=$1',[owner.workspaceId]);}
+  return rows;
+ };
+ await expect(createApiToken(interrupted,owner,'Racing request',true)).rejects.toMatchObject({status:403});
+ expect(await query('SELECT id FROM sc_api_tokens')).toEqual([]);
+ expect(await query("SELECT sequence FROM sc_workspace_events WHERE event_type='api_token_created'")).toEqual([]);
+});

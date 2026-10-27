@@ -11,12 +11,18 @@ export async function createApiToken(query:Query,actor:Actor,name:string,canScan
   if(!/^github:[1-9][0-9]*$/.test(actor.id))throw new ApiError(403,'Sign in with GitHub to create an agent token.');
   if(!name.trim()||name.length>80)throw new ApiError(400,'Choose a token name of 1–80 characters.');
   const token='st_'+randomBytes(32).toString('hex'),id=randomUUID();
-  const [result]=await query(`WITH token AS (
+  const [result]=await query(`WITH ranked AS (
+    SELECT m.actor_id,m.role,w.plan,w.seat_limit,
+      row_number() OVER(ORDER BY CASE WHEN m.role='owner' THEN 0 ELSE 1 END,m.created_at,m.actor_id) AS seat
+    FROM sc_workspace_members m JOIN sc_workspaces w ON w.id=m.workspace_id WHERE m.workspace_id=$3
+  ), token AS (
     INSERT INTO sc_api_tokens(id,token_hash,workspace_id,actor_id,name,can_scan,expires_at)
-    VALUES($1,$2,$3,$4,$5,$6,now()+interval '30 days') RETURNING expires_at
+    SELECT $1,$2,$3,$4,$5,$6,now()+interval '30 days' FROM ranked
+    WHERE actor_id=$4 AND seat<=seat_limit AND (plan='team' OR role='owner') RETURNING expires_at
   ), event AS (INSERT INTO sc_workspace_events(workspace_id,actor_id,event_type,subject_id)
     SELECT $3,$4,'api_token_created',$1 FROM token)
-  SELECT expires_at FROM token`,[id,digest(token),actor.workspaceId,actor.id,name.trim(),canScan]);
+  SELECT expires_at FROM token`,[id,digest(token),actor.workspaceId,actor.id,name.trim(),canScan],{serializable:true});
+  if(!result)throw new ApiError(403,'Workspace membership is required.');
   return {id,token,expiresAt:result.expires_at};
 }
 export async function listApiTokens(query:Query,actor:Actor){
