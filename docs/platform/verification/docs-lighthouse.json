@@ -1,0 +1,20 @@
+{
+  "lighthouse-docs-cli": {
+    "url": "http://localhost:3181/docs/cli",
+    "fetchTime": "2026-10-27T16:15:29.921Z",
+    "scores": {
+      "performance": 93,
+      "accessibility": 100,
+      "best-practices": 100
+    }
+  },
+  "lighthouse-docs-home": {
+    "url": "http://localhost:3181/",
+    "fetchTime": "2026-10-27T16:15:20.143Z",
+    "scores": {
+      "performance": 97,
+      "accessibility": 100,
+      "best-practices": 100
+    }
+  }
+}

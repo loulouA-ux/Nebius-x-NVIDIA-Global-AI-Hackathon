@@ -1,0 +1,123 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Untrusted OSV advisory GHSA-35jh-r3h4-6jhm; retrieved 2026-10-27T16:47:50.863Z."
+    }
+  ],
+  "structuredContent": {
+    "advisory": {
+      "id": "GHSA-35jh-r3h4-6jhm",
+      "summary": "Command Injection in lodash",
+      "details": "`lodash` versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+      "database_specific": {
+        "severity": "HIGH"
+      },
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "lodash",
+            "ecosystem": "npm"
+          },
+          "ranges": [
+            {
+              "type": "SEMVER",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.17.21"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "package": {
+            "name": "lodash-es",
+            "ecosystem": "npm"
+          },
+          "ranges": [
+            {
+              "type": "SEMVER",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.17.21"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "package": {
+            "name": "lodash.template",
+            "ecosystem": "npm"
+          },
+          "ranges": [
+            {
+              "type": "SEMVER",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "last_affected": "4.5.0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "package": {
+            "name": "lodash-template",
+            "ecosystem": "npm"
+          },
+          "ranges": [
+            {
+              "type": "SEMVER",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "last_affected": "1.0.0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "package": {
+            "name": "lodash-rails",
+            "ecosystem": "RubyGems"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.17.21"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "retrievedAt": "2026-10-27T16:47:50.863Z",
+    "untrusted": true
+  }
+}

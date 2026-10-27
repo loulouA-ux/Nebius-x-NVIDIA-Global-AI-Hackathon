@@ -1,0 +1,65 @@
+---
+title: CLI reference
+---
+
+Generated from the CLI command definitions. Packages are not published yet. Build from source first.
+
+## scan [path]
+
+Scan a lockfile (default package-lock.json). Only supplied text and exact dependency advisories are checked.
+
+- `--json`
+- `--sarif <file>`
+- `--fail-on <high|medium|low|any>`
+- `--ai`
+- `--quiet`
+- `--no-color`
+
+## explain &lt;advisory-id&gt;
+
+Read the original untrusted OSV advisory, retrieval date and published fixes.
+
+
+
+## mcp
+
+Start the separately installed ShipTested stdio MCP server.
+
+
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | Checks passed |
+| 1 | Blocked or fail-on threshold reached |
+| 2 | Review required |
+| 3 | Incomplete |
+| 64 | Usage error |
+| 70 | Internal error |
+
+Incomplete coverage takes precedence over finding thresholds. SARIF output refuses to overwrite an existing file. Stage events go to stderr; JSON goes to stdout. No ANSI colour is emitted, so NO_COLOR and --no-color are always respected.
+
+## GitHub Actions
+
+After npm publication, pin the reviewed package version in your workflow. Before publication use a checked-out build and the Node entry point.
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+    with:
+      node-version: 22
+  - run: npm ci
+  - run: npm run build:packages
+  - run: node packages/cli/dist/index.js scan package-lock.json --sarif shiptested.sarif
+  - uses: github/codeql-action/upload-sarif@v3
+    if: always() && hashFiles('shiptested.sarif') != ''
+    with:
+      sarif_file: shiptested.sarif
+```
+
+This source-build workflow assumes the ShipTested monorepo. In another repository, install the published version after release. GitHub code scanning availability depends on the repository and plan.
