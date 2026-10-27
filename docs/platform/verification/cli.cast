@@ -1,0 +1,7 @@
+{"version":2,"width":100,"height":28,"timestamp":1793118849,"title":"Actual ShipTested CLI run against live OSV"}
+[0.088,"o","· Lockfile · Resolving supplied exact versions · 0.0s\n"]
+[0.088,"o","✓ Lockfile · 1 exact packages resolved · 0.0s\n· Secrets · Checking supported patterns · 0.0s\n"]
+[0.088,"o","✓ Secrets · Supported patterns checked; values masked · 0.0s\n· OSV · Querying exact package versions · 0.0s\n"]
+[1.13,"o","✓ OSV · 5 matched advisory findings · 1.0s\n"]
+[1.13,"o","BLOCKED · 1 packages · 5 findings\nHIGH Command Injection in lodash · published fix → 4.17.21\nHIGH lodash vulnerable to Code Injection via `_.template` imports key names · published fix → 4.18.0\nMEDIUM Regular Expression Denial of Service (ReDoS) in lodash · published fix → 4.17.21\nMEDIUM lodash vulnerable to Prototype Pollution via array path bypass in `_.unset` and `_.omit` · published fix → 4.18.0\nMEDIUM Lodash has Prototype Pollution Vulnerability in `_.unset` and `_.omit` functions · published fix → 4.17.23\nUse --json for the evidence report.\n"]
+[1.134,"o","\nProcess exit code: 1\n"]
