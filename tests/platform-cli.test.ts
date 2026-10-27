@@ -24,7 +24,7 @@ describe('CLI contract',()=>{
 it('actual CLI emits only JSON on stdout with quiet and no-color flags',async()=>{
  const {mkdtemp,writeFile,rm}=await import('node:fs/promises');const {tmpdir}=await import('node:os');const {join}=await import('node:path');const dir=await mkdtemp(join(tmpdir(),'shiptested-cli-json-'));
  try{await writeFile(join(dir,'package-lock.json'),JSON.stringify({lockfileVersion:3,packages:{'node_modules/example':{version:'1.0.0'}}}));await writeFile(join(dir,'transport.mjs'),"globalThis.fetch=async()=>Response.json({results:[{}]});");
- const run=spawnSync(process.execPath,['packages/cli/dist/index.js','scan',join(dir,'package-lock.json'),'--json','--quiet','--no-color'],{encoding:'utf8',env:{PATH:process.env.PATH||'',NO_COLOR:'1',NODE_OPTIONS:`--import=${join(dir,'transport.mjs')}`}});
+ const run=spawnSync(process.execPath,['packages/cli/dist/index.js','scan',join(dir,'package-lock.json'),'--json','--quiet','--no-color'],{encoding:'utf8',env:{NODE_ENV:'test',PATH:process.env.PATH||'',NO_COLOR:'1',NODE_OPTIONS:`--import=${join(dir,'transport.mjs')}`}});
  expect(run.status).toBe(0);expect(run.stderr).toBe('');const value=JSON.parse(run.stdout);expect({status:value.status,dependencies:value.dependencies,findings:value.findings}).toMatchInlineSnapshot(`
    {
      "dependencies": [
