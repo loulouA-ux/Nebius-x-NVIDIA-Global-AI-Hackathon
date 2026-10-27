@@ -1,0 +1,3 @@
+import type {VoyageEvent} from './events';
+export function visibleMoments(events:VoyageEvent[],phone=false){return events.slice(phone?-1:-2);}
+export default function VoyageMoment({event,index}:{event:VoyageEvent;index:number}){return <div className="voyage-moment" data-tone={event.tone} style={{left:`${[19.2,31.7,44.2,56.7,69.2][index]??50}%`}} aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16">{event.tone==='ok'?<path d="M3 8l3 4 7-9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>:<circle cx="8" cy="8" r="3" fill="currentColor"/>}</svg><strong>{event.stage}</strong>{event.detail&&<span> · {event.detail}</span>}</div>}
