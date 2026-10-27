@@ -2,14 +2,14 @@ import Link from 'next/link';
 import CsvExport from '../report-insights';
 import type {Finding,ScanReport} from '@/lib/types';
 import type {FindingFilters} from '../report-memory';
-import {SourcePreview} from '../report-insights';
+import {Preview,SourcePreview} from '../report-insights';
 import VerdictCard from '../components/verdict-card';
 import FindingsTable from '../components/findings-table';
 import {plural,stateLabel} from '../components/presentation';
 type Props={report:ScanReport;filtered:Finding[];filters:FindingFilters;update:(v:Partial<FindingFilters>)=>void;open:(f:Finding)=>void;scan:()=>void;decisions:Record<string,string>;decisionState:string};
 export default function ReportView({report,filtered,filters,update,open,scan,decisions,decisionState}:Props){return <>
- <p className="demo-banner">{report.recording?`Recorded live run · captured ${new Date(report.recording.recordedAt).toLocaleString('en-GB')} · Nemotron ${report.recording.model} on Nebius · replayed, no live requests`:report.mode==='demo'?'Offline fixture · synthetic inputs · no live requests':'Live scan'}{report.recording?.advisoryMetadataRetrievedAt?` · Advisory metadata retrieved ${report.recording.advisoryMetadataRetrievedAt.slice(0,10)} (OSV snapshot)`:''}{report.mode==='demo'?' · Demo decisions are not saved.':''}</p>
- <nav className="report-breadcrumb" aria-label="Breadcrumb"><Link href="/reports">Reports</Link><span>/</span><span>{report.id}</span></nav><div className="page-heading"><h1>Scan report</h1><div className="report-tools"><CsvExport report={report}/><button className="button" onClick={scan}>Rescan</button></div></div>
+ <nav className="report-breadcrumb" aria-label="Breadcrumb"><Link href="/reports">Reports</Link><span>/</span><span>{report.id}</span></nav><div className="page-heading"><div><h1>Scan report</h1><p className="report-meta"><code>{report.id}</code> · {new Date(report.createdAt).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'UTC'})} UTC</p></div><div className="report-tools desktop-report-tools"><CsvExport report={report}/>{report.mode==='demo'?<Link href="/scan">Scan your own lockfile →</Link>:<button className="button" onClick={scan}>Rescan</button>}</div><details className="phone-report-tools"><summary aria-label="Report actions">•••</summary><CsvExport report={report}/>{report.mode==='demo'?<Link href="/scan">Scan your own lockfile →</Link>:<button className="button" onClick={scan}>Rescan</button>}</details></div>
+ <div className="replay-chip">{report.recording?<Preview label={`Replay · captured ${new Date(report.recording.recordedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'})}`} title="Replay provenance"><p>Recorded live run on synthetic inputs. No live requests.</p><p>Nemotron {report.recording.model} on Nebius.</p><p>Advisory metadata retrieved {report.recording.advisoryMetadataRetrievedAt?.slice(0,10)||'at capture'} (OSV snapshot).</p><p>Decisions you make here are not saved.</p></Preview>:<p>{report.mode==='demo'?'Offline fixture · synthetic inputs · decisions are not saved.':'Live scan'}</p>}</div>
 
  <VerdictCard report={report}/>
  <FindingsTable report={report} filtered={filtered} filters={filters} update={update} open={open} decisions={decisions} decisionState={decisionState}/>
