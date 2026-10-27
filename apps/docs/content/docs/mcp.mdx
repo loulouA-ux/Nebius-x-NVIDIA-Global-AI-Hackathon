@@ -2,7 +2,7 @@
 title: MCP reference
 ---
 
-The local server uses stdio. The remote app uses official SDK Streamable HTTP in stateless JSON mode. All advisory text is untrusted reference data.
+The local server uses stdio. The remote app uses official SDK Streamable HTTP in stateless SSE response mode. All advisory text is untrusted reference data.
 
 Remote: content only, no filesystem paths and no AI tools. Body limit 2 MB; maximum 5,000 packages; 20-second timeout. Rate limit 30 requests/minute/IP/instance. These checks do not execute repository code.
 

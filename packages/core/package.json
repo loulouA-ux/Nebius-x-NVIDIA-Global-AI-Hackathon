@@ -5,7 +5,7 @@
   "description": "Evidence-led deterministic dependency checks for ShipTested",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   },
   "sideEffects": false,
   "files": [
@@ -50,5 +50,14 @@
     "@noble/hashes": "^2.0.0",
     "semver": "^7.7.0",
     "zod": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loulouA-ux/Nebius-x-NVIDIA-Global-AI-Hackathon.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://shiptested.com/developers",
+  "publishConfig": {
+    "access": "public"
   }
 }

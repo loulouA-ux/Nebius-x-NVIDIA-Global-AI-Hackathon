@@ -1,0 +1,116 @@
+[
+  {
+    "name": "docs",
+    "width": 1440,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "docs",
+    "width": 1440,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "docs",
+    "width": 390,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "docs",
+    "width": 390,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "dev",
+    "width": 1440,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "dev",
+    "width": 1440,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "dev",
+    "width": 390,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "dev",
+    "width": 390,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 1440,
+    "theme": "light",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 1440,
+    "theme": "dark",
+    "status": 200,
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 390,
+    "theme": "light",
+    "status": 200,
+    "overflow": true,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "name": "mcp",
+    "width": 390,
+    "theme": "dark",
+    "status": 200,
+    "overflow": true,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "playground": {
+      "status": "Blocked",
+      "findings": 5
+    }
+  }
+]

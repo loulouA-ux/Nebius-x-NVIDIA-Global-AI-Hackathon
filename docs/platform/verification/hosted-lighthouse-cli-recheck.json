@@ -1,0 +1,44 @@
+[
+  {
+    "warnings": [],
+    "url": "https://shiptested-docs.vercel.app/docs/cli",
+    "checkedAt": "2026-10-27T16:49:34.455Z",
+    "scores": {
+      "performance": 97,
+      "accessibility": 100,
+      "best-practices": 100
+    },
+    "failures": [
+      {
+        "id": "largest-contentful-paint",
+        "title": "Largest Contentful Paint",
+        "score": 0.86
+      },
+      {
+        "id": "max-potential-fid",
+        "title": "Max Potential First Input Delay",
+        "score": 0.97
+      },
+      {
+        "id": "interactive",
+        "title": "Time to Interactive",
+        "score": 0.97
+      },
+      {
+        "id": "legacy-javascript-insight",
+        "title": "Legacy JavaScript",
+        "score": 0.5
+      },
+      {
+        "id": "network-dependency-tree-insight",
+        "title": "Network dependency tree",
+        "score": 0
+      },
+      {
+        "id": "render-blocking-insight",
+        "title": "Render-blocking requests",
+        "score": 0
+      }
+    ]
+  }
+]
