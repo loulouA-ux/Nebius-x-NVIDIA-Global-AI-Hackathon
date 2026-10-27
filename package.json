@@ -13,7 +13,7 @@
     "db:migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
     "db:smoke": "node --env-file=.env.local --import tsx scripts/db-smoke.ts",
     "build:packages": "npm run build -w @heysalad/shiptested && npm run build -w @heysalad/shiptested-cli && npm run build -w @heysalad/shiptested-mcp",
-    "prebuild": "npm run build:packages",
+    "prebuild": "npm run build:packages && npm exec -w @shiptested/docs -- fumadocs-mdx",
     "pretypecheck": "npm run build:packages && npm exec -w @shiptested/docs -- fumadocs-mdx",
     "pretest": "npm run build:packages"
   },

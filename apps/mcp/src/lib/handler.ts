@@ -16,7 +16,7 @@ const limiter=new RateLimiter();
 function failure(status:number,message:string){return Response.json({jsonrpc:'2.0',id:null,error:{code:status===429?-32029:-32600,message}},{status,headers:{'Cache-Control':'no-store',...(status===429?{'Retry-After':'60'}:{})}});}
 export type HandlerOptions={hosts?:string[];limiter?:RateLimiter;fetcher?:typeof fetch;trustedVercelProxy?:boolean};
 export async function handleMcp(request:Request,options:HandlerOptions={}){
- const url=new URL(request.url),hosts=options.hosts||['mcp.shiptested.com',...(process.env.VERCEL_URL?[process.env.VERCEL_URL]:[]),...(process.env.NODE_ENV==='development'?['localhost:3180','127.0.0.1:3180']:[])];
+ const url=new URL(request.url),hosts=options.hosts||['mcp.shiptested.com','shiptested-mcp.vercel.app',...(process.env.VERCEL_URL?[process.env.VERCEL_URL]:[]),...(process.env.NODE_ENV==='development'?['localhost:3180','127.0.0.1:3180']:[])];
  if(!hosts.includes(url.host))return failure(403,'Unrecognised host.');
  const origin=request.headers.get('origin');if(origin&&origin!==url.origin)return failure(403,'Origin is not allowed.');
  if(request.method!=='POST')return new Response(null,{status:405,headers:{Allow:'POST'}});

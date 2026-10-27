@@ -4,12 +4,12 @@ title: Connect your agent
 
 Connection syntax checked against the official client documentation on **27 October 2026**. These are manual MCP configurations, not marketplace listings or vendor endorsements. Protocol integration tests use the official MCP SDK; individual client sessions are listed separately in release evidence.
 
-The intended public endpoint is `https://mcp.shiptested.com/mcp`. Use it only after domain and health verification. A protected preview is not publicly connectable. Until publication, launch the built local entry point rather than using npx.
+The public production endpoint is `https://shiptested-mcp.vercel.app/mcp`. The custom domain `mcp.shiptested.com` is awaiting DNS setup. A protected preview is not publicly connectable. Until publication, launch the built local entry point rather than using npx.
 
 ## Claude Code
 
 ```sh
-claude mcp add --transport http shiptested https://mcp.shiptested.com/mcp
+claude mcp add --transport http shiptested https://shiptested-mcp.vercel.app/mcp
 ```
 
 Local source build (replace the absolute path):
@@ -32,7 +32,7 @@ Add to `~/.codex/config.toml`:
 
 ```toml
 [mcp_servers.shiptested]
-url = "https://mcp.shiptested.com/mcp"
+url = "https://shiptested-mcp.vercel.app/mcp"
 ```
 
 For a local build, replace `url` with `command = "node"` and `args = ["/absolute/path/packages/mcp/dist/stdio.js"]`.
@@ -44,7 +44,7 @@ For a local build, replace `url` with `command = "node"` and `args = ["/absolute
 Add to `.cursor/mcp.json`:
 
 ```json
-{"mcpServers":{"shiptested":{"url":"https://mcp.shiptested.com/mcp"}}}
+{"mcpServers":{"shiptested":{"url":"https://shiptested-mcp.vercel.app/mcp"}}}
 ```
 
 For local use, replace `url` with `command` and `args` as in the local configuration above.
@@ -56,7 +56,7 @@ For local use, replace `url` with `command` and `args` as in the local configura
 Add to the `mcpServers` object in your Gemini CLI settings:
 
 ```json
-{"mcpServers":{"shiptested":{"httpUrl":"https://mcp.shiptested.com/mcp","timeout":25000}}}
+{"mcpServers":{"shiptested":{"httpUrl":"https://shiptested-mcp.vercel.app/mcp","timeout":25000}}}
 ```
 
 [Official Gemini CLI MCP guide](https://geminicli.com/docs/tools/mcp-server/).
