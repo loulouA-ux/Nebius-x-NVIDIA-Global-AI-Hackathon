@@ -200,3 +200,9 @@ External configuration audit: Preview OAuth secret is now configured; Preview st
 - Saved private report `db816723-86c4-48e3-bd4a-29c8158838e5` opened in the browser with source commit and coverage. Two manifests, no omitted supported manifests, zero returned findings; this is bounded dependency scanning, not a complete repository security assessment.
 - Signed out and loaded the exact report URL: UI displayed Report unavailable. Signed in again via GitHub and reopened that same report successfully. One saved scan remained visible; the account/session/report persistence path is now hosted-browser verified for Peter.
 - Screenshot: `../outputs/hosted-acceptance/github-account-report.png`. Remaining independent gates include a second actual account, shared-link lifecycle, customer GitHub App onboarding, Stripe lifecycle and continuous worker hosting. Production remains unchanged; the test database remains disposable.
+
+### Hosted sharing and audit acceptance — 28 October 2026
+
+- `scripts/hosted-sharing-acceptance.ts` passed against the isolated Neon database and protected deployed `/api/shared-report` endpoint. A synthetic report share returned the correct report with `readOnly:true`; invalid and revoked tokens returned 404. Both creation and revocation audit events were persisted, and sharing consumed no scan allowance.
+- The share token stayed in process memory/private temporary request configuration and was revoked in cleanup. No bearer link was logged or added to this document. Evidence: `../outputs/hosted-acceptance/sharing.json`.
+- This verifies actual database creation/revocation plus the deployed HTTP reader. It does not substitute for the browser share creation/consumption walkthrough. Browser control became unavailable with “Local browser use is disabled in Work settings”; no alternate automation was used to bypass that setting. Usage dashboard and team browser acceptance remain open.
