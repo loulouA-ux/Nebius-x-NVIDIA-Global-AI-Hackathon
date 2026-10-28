@@ -41,3 +41,18 @@ it('actual CLI emits only JSON on stdout with quiet and no-color flags',async()=
  `);
  }finally{await rm(dir,{recursive:true,force:true});}
 });
+it('managed CLI preserves explicit retry keys and rejects ambiguous options before network calls',async()=>{
+ const {mkdtemp,writeFile,rm}=await import('node:fs/promises');const {tmpdir}=await import('node:os');const {join}=await import('node:path');const dir=await mkdtemp(join(tmpdir(),'shiptested-cli-retry-'));
+ const key='12345678-1234-4234-8234-123456789abc';
+ try{
+  const transport=join(dir,'transport.mjs');await writeFile(transport,"globalThis.fetch=async(url,init)=>Response.json({received:JSON.parse(init.body)});");
+  const env={NODE_ENV:'test' as const,PATH:process.env.PATH||'',SHIPTESTED_API_ORIGIN:'https://example.test',SHIPTESTED_API_TOKEN:'st_'+'a'.repeat(64),NODE_OPTIONS:`--import=${transport}`};
+  const run=(args:string[])=>spawnSync(process.execPath,['packages/cli/dist/index.js','repo','owner/repo',...args],{encoding:'utf8',env});
+  for(let i=0;i<2;i++){
+   const result=run(['--request-key',key,'--private']);expect(result.status).toBe(0);expect(JSON.parse(result.stdout).received).toEqual({repository:'owner/repo',privateAccess:true,requestKey:key});
+   expect(result.stderr).toContain(key);expect(result.stderr).not.toContain(env.SHIPTESTED_API_TOKEN);
+  }
+  for(const args of [['--request-key'],['--request-key','invalid'],['--private','--private'],['--request-key',key,'--request-key',key]]){const result=run(args);expect(result.status).toBe(64);expect(result.stdout).toBe('');}
+  const generated=run([]);expect(JSON.parse(generated.stdout).received.requestKey).toMatch(/^[a-f0-9-]{36}$/);expect(generated.stderr).toContain(JSON.parse(generated.stdout).received.requestKey);
+ }finally{await rm(dir,{recursive:true,force:true});}
+});

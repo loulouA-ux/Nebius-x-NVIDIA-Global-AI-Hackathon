@@ -25,8 +25,18 @@ async function main(args:string[]):Promise<number>{
   let result;
   try {
    if(command==='repo'){
-    if(!rest[0]||rest.length>2||(rest[1]&&rest[1]!=='--private'))throw new UsageError('Usage: repo <GitHub URL> [--private]');
-    result=await client.scanRepository(rest[0],rest[1]==='--private');
+    if(!rest[0]||rest[0].startsWith('--'))throw new UsageError('Usage: repo <GitHub URL> [--private] [--request-key UUID]');
+    let privateAccess=false,requestKey:string|undefined;
+    for(let i=1;i<rest.length;i++){
+     if(rest[i]==='--private'&&!privateAccess)privateAccess=true;
+     else if(rest[i]==='--request-key'&&requestKey===undefined){
+      requestKey=rest[++i];
+      if(!requestKey||!/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(requestKey))throw new UsageError('--request-key requires a UUID.');
+     }else throw new UsageError('Usage: repo <GitHub URL> [--private] [--request-key UUID]');
+    }
+    requestKey??=crypto.randomUUID();
+    process.stderr.write(`Request key: ${requestKey}. Reuse with --request-key when retrying this submission.\n`);
+    result=await client.scanRepository(rest[0],privateAccess,requestKey);
    }else if(command==='usage'){if(rest.length)throw new UsageError('usage accepts no arguments.');result=await client.usage();}
    else {if(rest.length!==1)throw new UsageError(`${command} requires one ID.`);result=command==='job'?await client.job(rest[0]):await client.report(rest[0]);}
   }catch(error){if(error instanceof UsageError)throw error;throw new UsageError('Managed request failed. Check your token, allowance, IDs and configured API origin.');}

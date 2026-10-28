@@ -57,3 +57,7 @@ Provider references: https://docs.github.com/en/apps/creating-github-apps/regist
 Run `node --env-file=.env.hosted-acceptance --import tsx scripts/hosted-worker.ts` with those variables supplied. It processes one scan per cycle, waits 15 seconds after work, and records worker outcomes. Optional `SHIPTESTED_WORKER_BILLING=1` enables billing reconciliation only after billing configuration validates. Scan failures do not suppress billing work. SIGTERM/SIGINT finish the active operation and prevent the next cycle; allow at least the longest worker operation as the supervisor's shutdown grace. Errors are sanitized. Retries of jobs remain governed by database leases, not the supervisor.
 
 An always-on cloud worker/scheduler is still an activation gate: select its runtime, deploy secrets privately, bind it to the non-disposable hosted database, verify backlog/recovery and monitor costs before customer release. This script is not evidence that a recurring cloud schedule is running.
+
+## Retrying a CLI submission
+
+`shiptested repo <GitHub URL> [--private] [--request-key UUID]` writes its request key to stderr before sending. If the response is lost, repeat the same repository/private flag with that same key; the server returns the existing job without reserving another scan. Use a fresh key only for an intentionally new scan. JSON stdout remains machine-readable. This option is built on the implementation branch and is not in the published 0.1.0 package.

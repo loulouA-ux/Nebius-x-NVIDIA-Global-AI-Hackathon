@@ -1,5 +1,5 @@
 export const commands = [
- {name:'repo <GitHub URL>',description:'Queue a managed repository scan using SHIPTESTED_API_ORIGIN and SHIPTESTED_API_TOKEN. Returns a job ID; exit 0 means accepted, not security checks passed.',options:['--private']},
+ {name:'repo <GitHub URL>',description:'Queue a managed repository scan using SHIPTESTED_API_ORIGIN and SHIPTESTED_API_TOKEN. Returns a job ID; exit 0 means accepted, not security checks passed.',options:['--private','--request-key UUID (reuse when retrying the same submission)']},
  {name:'job <id>',description:'Read a managed scan job and its private report URL.',options:[]},
  {name:'report <id>',description:'Read an owned saved report from the configured service.',options:[]},
  {name:'usage',description:'Read your managed workspace scan allowance.',options:[]},

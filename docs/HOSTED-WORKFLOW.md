@@ -206,3 +206,8 @@ External configuration audit: Preview OAuth secret is now configured; Preview st
 - `scripts/hosted-sharing-acceptance.ts` passed against the isolated Neon database and protected deployed `/api/shared-report` endpoint. A synthetic report share returned the correct report with `readOnly:true`; invalid and revoked tokens returned 404. Both creation and revocation audit events were persisted, and sharing consumed no scan allowance.
 - The share token stayed in process memory/private temporary request configuration and was revoked in cleanup. No bearer link was logged or added to this document. Evidence: `../outputs/hosted-acceptance/sharing.json`.
 - This verifies actual database creation/revocation plus the deployed HTTP reader. It does not substitute for the browser share creation/consumption walkthrough. Browser control became unavailable with “Local browser use is disabled in Work settings”; no alternate automation was used to bypass that setting. Usage dashboard and team browser acceptance remain open.
+
+### CLI retry identity
+
+- Added `repo --request-key UUID` and output of generated request keys before network submission. Operators can retry the same submission across separate CLI processes without creating a new allowance reservation. Duplicate/invalid flags fail before a network call.
+- Built packages and typecheck pass; eight focused CLI/client tests pass, including actual compiled CLI invocations that verify the same request key reaches the transport twice and stdout remains JSON. Existing server idempotency was separately verified against the protected hosted API. No npm publication performed.
