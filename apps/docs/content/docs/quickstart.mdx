@@ -36,6 +36,22 @@ Import `scan` from `@heysalad/shiptested` in your ESM application. Optional AI i
 
 ## Build from source
 
-In a checked-out ShipTested repository, run `npm ci` and `npm run build:packages` with Node 22.
+In a checked-out ShipTested repository, use Node 22:
+
+```sh
+npm ci
+npm run build:packages
+node examples/inspect-lockfile.mjs
+```
+
+This first example only parses a synthetic lockfile. It makes no network requests and does not install the fixture's dependencies. To scan an existing project lockfile against live OSV data:
+
+```sh
+node examples/scan-lockfile.mjs /path/to/package-lock.json
+```
+
+Exit codes distinguish findings from incomplete coverage: `0` passed, `1` blocked, `2` review required and `3` incomplete. A report is not proof of application-level exploitability.
+
+The source branch may include changes beyond published 0.1.0. See the repository's `examples/` directory for a Node integration and a CI template, and `CONTRIBUTING.md` for the verification workflow.
 
 [Library types](/docs/library) · [Agent configuration](/docs/agents)

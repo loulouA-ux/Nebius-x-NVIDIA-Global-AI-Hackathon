@@ -1,51 +1,98 @@
 # ShipTested
 
-Earlier working name: Agent Shielda.
+**Security checks you can inspect. Release decisions you can explain.**
 
-**Check before you ship.** A pre-deployment security assessment for small teams, built around evidence and explicit coverage.
+An open-source dependency scanner with a shared TypeScript core, CLI, MCP server and hosted report workspace. Exact versions go in; findings, source evidence and explicit coverage limits come out.
 
-## Status: protected team preview
+[Documentation](https://docs.shiptested.com/docs) · [Developer guide](https://shiptested.com/developers) · [Examples](examples) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
 
-Implemented: manifest scanning, live OSV matching, Tavily search and bounded advisory extraction, NVIDIA Nemotron explanations through Nebius, member sessions, owner-scoped Neon persistence, saved reports, immutable review decisions, and exact-host proof with bounded passive HTTPS checks.
+![ShipTested — evidence-led release assessment](docs/screenshots/landing-light.png)
 
-Live provider and hosted member/storage acceptance have passed. Current evidence and remaining release gates are recorded in [implementation status](docs/IMPLEMENTATION-STATUS.md). Protected preview deployment is separate from a public production release. GitHub ingestion, automated patches, sandbox exploit verification and calibrated live-advisory severity remain outside this implementation.
+## Start locally
 
-## Run
-
-Requires Node 22. Run from this directory:
+Use **Node 22**. From this repository:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:3147. Select **Explore the demo** (no API keys or external requests), or sign in as a configured member and select **New scan** to query OSV using a pasted manifest.
+Open **http://127.0.0.1:3147** and choose **Run the demo**. The demo uses public synthetic evidence; it does not scan a private repository. Member workflows need private configuration—see [hosted operations](docs/HOSTED-OPERATIONS.md).
 
-Supported inputs: `package-lock.json` v2/v3, exact pins in `package.json` (no transitive coverage), and a conservative subset of exact Python pins in `requirements.txt`. Unsupported markers, workspace links, dependency ranges and formats are reported or rejected; they are not treated as clean.
+To explore the core without credentials or network requests:
 
-The input limit is 200 KB and 50 unique dependency versions. OSV's version query handles ecosystem-specific version semantics. Never install the demo's vulnerable dependencies. The fixture is data, not a runnable application.
+```sh
+npm run build:packages
+node examples/inspect-lockfile.mjs
+```
 
-## Private configuration
+To scan your own lockfile with live OSV queries:
 
-Copy `.env.example` to `.env.local` and enter keys privately. Never commit them or send them in chat. Restart the app after changing environment variables.
+```sh
+node packages/cli/dist/index.js scan /path/to/package-lock.json --json
+```
 
-- `DATABASE_URL`: dedicated Neon Postgres connection. Apply `npm run db:migrate` before member use.
-- `SHIPCHECK_PETER_KEY_HASH` / `SHIPCHECK_LOUISE_KEY_HASH`: SHA-256 hashes of separate random `sc_` plus 64-hex member keys; raw keys are private and entered only on `/sign-in`. Eight-hour opaque HttpOnly sessions are stored hashed; changing a member hash invalidates that member's sessions.
-- `TAVILY_API_KEY`: optional live search of at most three supplied dependency versions, followed by at most two advisory-authority extractions. Search sources are displayed as **unconfirmed**, never automatically promoted to vulnerabilities.
-- `NEBIUS_API_KEY`: optional Nemotron explanations for existing findings, requested through Nebius Token Factory.
-- `SHIPCHECK_MODEL`: default `nvidia/nemotron-3-super-120b-a12b`. The current adapter uses the fixed US Central Token Factory endpoint; this model passed the live acceptance check on 23 October 2026.
+No dependency installation or repository code execution occurs during the scan. OSV receives package names and versions. Never install the deliberately vulnerable dependencies in a demo fixture.
 
-Select the optional research checkbox. Missing keys and failed calls produce explicit incomplete coverage. There is no silent substitution of demo results. The model receives masked finding excerpts and public search snippets, never full manifests, and cannot remove findings or modify policy. Its explanations remain unverified advisory notes.
+## Choose your interface
 
-## Privacy and operating boundary
+| Interface | What it does | Reference |
+| --- | --- | --- |
+| TypeScript library | Exact-version parsing, advisory matching, findings and policy | [Core](packages/core) |
+| CLI | Terminal stages, JSON, SARIF and explicit CI exit codes | [CLI](packages/cli) |
+| MCP | Structured tools for local and remote agent workflows | [MCP](packages/mcp) |
+| Web workspace | Evidence reports, review, repository jobs and batch progress | [Hosted workflow](docs/HOSTED-WORKFLOW.md) |
+| Repair workflow | Bounded npm patch verification and human-approved draft PRs | [Implementation status](docs/IMPLEMENTATION-STATUS.md) |
 
-The dev/start scripts bind to loopback. Public visitors may run only the fixed offline demo. Live scans require a member session and durable global/per-member quotas; all project/report/decision queries filter workspace and owner. Only one scan runs at a time per server process. Provider responses are size-limited and have 15-second per-request deadlines; OSV advisory fetches and Tavily requests have explicit count limits. Full scan duration can exceed a minute if providers are slow.
+```ts
+import { readFile } from 'node:fs/promises';
+import { scan } from '@heysalad/shiptested';
 
-No source code is executed. No arbitrary target URL is accepted. Raw manifests exist transiently in the request/browser. Masked member reports, projects, hashed sessions and decision events are stored in Postgres. Offline demo reports remain in browser memory. Public research is cached for up to 24 hours with original timestamps; expired records are not reused. OSV receives package names and versions. The optional providers receive public dependency names and masked evidence. Pattern matching does not guarantee detection/redaction of all possible credential types; do not supply real credentials.
+const report = await scan({
+  filename: 'package-lock.json',
+  lockfile: await readFile('package-lock.json', 'utf8'),
+});
 
-Policy v0.1: confirmed high findings block; incomplete/snapshot checks cannot pass; other findings require review. The demo's HIGH severity comes from its OSV snapshot. Live OSV hits conservatively remain review items until severity interpretation is implemented. Runtime exploitability, git history, transitive coverage without a lockfile, and application business logic are not assessed. Staging checks inspect only four fixed public HTTPS endpoints after fresh proof; cookies are assessed by flags without retaining names or values. No fix or incident remediation is verified by this version.
+console.log(report.status);
+console.log(report.findings);
+```
 
-## Verify
+Published packages are version **0.1.0**. This development branch includes newer hosted and scanner improvements; building from source is the way to evaluate them. A protected Preview is not a production release.
+
+## Evidence, then a decision
+
+![Recorded public demo report; synthetic fixture](docs/screenshots/report-dark.png)
+
+Every report carries the checked versions, advisory references, retrieval dates and coverage state. Verified findings survive partial advisory lookup failures. Optional research and model explanations support triage; they do not set severity or remove findings.
+
+| Verdict | Meaning |
+| --- | --- |
+| **Blocked** | A high-severity finding needs attention. Other coverage can still be incomplete. |
+| **Incomplete** | Some required checks could not establish coverage. |
+| **Review required** | Findings remain for a person to assess. |
+| **Checks passed** | No findings within the completed, documented checks. |
+
+CLI exit codes are `0` passed, `1` blocked/threshold met, `2` review, `3` incomplete, `64` input error and `70` internal/output error. Incomplete coverage takes precedence in CLI exit handling.
+
+**A dependency match is not proof of exploitability.** Supported inputs are npm lockfiles v2/v3, exact npm manifest versions and a conservative subset of exact Python pins. Unresolved versions, unsupported formats and bounded discovery gaps stay explicit. General source-code analysis, Git history and application business logic are not established by these scans. Candidate fixed versions require a rescan and application tests.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    CLI[CLI] --> Core[Shared scanner]
+    MCP[MCP tools] --> Core
+    Web[Web workspace] --> Queue[Private job queue]
+    Queue --> Worker[Repository worker]
+    Worker --> Core
+    Core --> OSV[OSV exact-version evidence]
+    Core --> Report[Findings + coverage + verdict]
+    Report --> Store[Owner-scoped reports]
+```
+
+Repository access uses a server-bound GitHub App installation. Jobs pin source commits and use stable request keys, allowance reservations and worker leases. Hosted data is scoped to workspace and owner. Batch progress includes waiting, queued, running, terminal and explicitly skipped entries. [Read the hosted workflow](docs/HOSTED-WORKFLOW.md).
+
+## Develop and contribute
 
 ```sh
 npm run typecheck
@@ -55,44 +102,19 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Browser tests launch a separate production server on 127.0.0.1:3148. Tests include affected/unaffected versions, incomplete provider responses, secret masking, invalid input and responsive UI. The acceptance ledger and next milestones are in `docs/BUILD-PLAN.md`.
+The app binds to loopback. Browser tests use a separate server on port 3148. See [CONTRIBUTING.md](CONTRIBUTING.md) for workspace structure, examples and change verification.
 
-## Team and roadmap
+- [Developer quickstart](apps/docs/content/docs/quickstart.mdx)
+- [Runnable examples and CI template](examples)
+- [Self-hosting](apps/docs/content/docs/self-hosting.mdx)
+- [Security and privacy boundaries](docs/HOSTED-OPERATIONS.md)
+- [Implementation status and release evidence](docs/IMPLEMENTATION-STATUS.md)
+- [Screenshot gallery and reproduction](docs/screenshots/README.md)
 
-Louise (Partner A) owns product flow, project verification and product review. Peter (Partner B) owns provider integration, shared storage/session boundaries, scan orchestration and release coordination. Integration changes and interfaces are shared through ATR; messages are not proof of receipt or completed work.
+## Open source, explicit boundaries
 
-Remaining: independent partner review, private member-key delivery, public judging access decision, final benchmark/demo recording and submission. Beyond brief: repository ingestion, CI policy and human-reviewed patches with independent verification.
+MIT applies to original ShipTested code. Dependencies, fonts and advisory data retain their upstream terms. Advisory matching uses [OSV](https://osv.dev/); optional research uses Tavily, and optional Nemotron explanations run through Nebius. These integrations do not imply vendor endorsement.
 
-## Sources and attribution
+Do not commit `.env` files, credentials, private repository snapshots or customer reports. Keep security reports out of public issues when they contain secrets or exploit-sensitive details. See the application's [security page](https://shiptested.com/security) for its disclosure guidance.
 
-- [OSV API](https://google.github.io/osv.dev/api/) — runtime exact-version advisory matching.
-- `fixtures/lodash-advisory.json` — OSV record GHSA-35jh-r3h4-6jhm, downloaded 23 October 2026 from https://api.osv.dev/v1/vulns/GHSA-35jh-r3h4-6jhm. Retained as evidence with its upstream references; upstream data terms apply.
-- [Nebius structured output](https://docs.tokenfactory.nebius.com/ai-models-inference/json).
-- [Tavily Search](https://docs.tavily.com/documentation/api-reference/endpoint/search).
-- Lucide icons and Figtree font retain their upstream licences; Google Fonts is requested by the browser with a system-font fallback.
-
-MIT applies to original ShipTested code. Third-party dependencies and advisory data retain their licences.
-
-## Recorded live demo capture
-
-Run `node --env-file=.env.local --import tsx scripts/capture-recorded-run.ts` locally with both provider keys configured. This makes one pipeline scan using only the existing synthetic lockfile. It refuses incomplete provider evidence, checks that configured secret values are absent, and never overwrites a capture. Review the sanitized fixture before committing. `/api/demos?mode=recorded` returns an honest unavailable state if no fixture exists; `mode=offline` rebuilds the stable offline demo.
-
-### Read-only public demo mode
-
-Set `SHIPCHECK_PUBLIC_DEMO=1` on the server to allow only the landing page, reports index and fixture-backed report/finding replay. Live scans, sign-in, project/host management, repository and repair APIs return 403 before authentication, database or provider work. The health response exposes no configured-provider state in this mode. This flag does not deploy the app or change Vercel protection.
-
-Verify the running-server boundary with `npx playwright test -c playwright.public-demo.config.ts` after a production build. Normal member workflows require this flag to be unset. The npm library, CLI and MCP tools remain **IN DEVELOPMENT** and are not published.
-
-## Brand boilerplate
-
-ShipTested helps small teams check a release before it ships. Paste or drop a lockfile and it resolves exact versions, matches them against OSV advisories, looks for exposed credentials and, once you prove you own a staging host, runs passive checks against it. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds live research, but deterministic rules set the verdict, and no model can remove a finding. Every report says what was checked and what wasn't. For supported npm fixes, ShipTested tests the patch in an isolated sandbox and opens a draft pull request only after you approve it. ShipTested is open source under MIT, built by HeySalad.
-
-## Hackathon summary
-
-ShipTested is a pre-release security check for small teams. It matches exact dependency versions against OSV, masks secrets and checks verified staging hosts. NVIDIA Nemotron on Nebius Token Factory triages findings and Tavily adds dated research, while deterministic rules keep the verdict honest. Supported npm fixes are tested in a sandbox before a person approves the pull request.
-
-## Policy
-
-OSV database severity CRITICAL/HIGH maps to High, MODERATE to Medium and LOW to Low. Otherwise a valid CVSS v3 base vector maps scores ≥7 to High, ≥4 to Medium and lower scores to Low. Missing or invalid metadata stays Unrated. The highest valid v3 score is used; the vector and source are retained. CVSS is owned by FIRST and used by permission: https://www.first.org/cvss/v3.1/specification-document . Models never set severity. High findings keep the deterministic Blocked verdict.
-
-Fixed versions are advisory candidates from the matching npm package's affected interval, not tested repairs. Unsupported ecosystem range interpretation remains unknown. A grouped fix is shown only when every advisory in the group has a candidate; the highest candidate still requires a complete rescan and tests. Recorded reports retain their original captured verdict unless a separately dated metadata enrichment is explicitly supplied.
+Built by **HeySalad** for teams that want to understand what they ship.
