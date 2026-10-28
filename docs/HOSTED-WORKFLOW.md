@@ -38,10 +38,10 @@ Latest acceptance audit: 27 October 2026, 23:59 London time. The checkpoint sect
 
 | Gate | Current evidence | Still needed for completion |
 | --- | --- | --- |
-| 1. Identity/access | Local session and membership tests; protected hosted API isolation with synthetic identities | Actual GitHub browser login with two independently signed-in accounts |
+| 1. Identity/access | Local session and membership tests; protected hosted API isolation with synthetic identities | Actual second-account browser isolation (Peter browser login now verified) |
 | 2. Repository ingestion | Actual GitHub/OSV public-repository scan, pinned commit and bounded manifests; private authorization implementation tested with fixtures | Real GitHub App owner/collaborator installation and revocation acceptance |
 | 3. Durable jobs | Database lease/idempotency/cancellation tests; actual hosted worker completed a queued job | Always-on hosted scheduling and supervised failure/recovery acceptance |
-| 4. Reports | Private report persisted and retrieved through deployed API; cross-account denial verified; sharing tests pass | Browser sign-out/sign-in persistence and actual shared-report lifecycle |
+| 4. Reports | Private report persisted and retrieved through deployed API; cross-account denial verified; sharing tests pass | Actual shared-report lifecycle (Peter sign-out/sign-in persistence now verified) |
 | 5. Usage | Atomic reservation tests, actual hosted single-reservation check, eight live seat-race checks | Paid provider lifecycle and month-boundary hosted acceptance |
 | 6. Teams/audit | Database invitation, removal, revocation and audit tests; atomic credential issuance regression tests | Independent-account hosted team journey |
 | 7. Billing | Checkout/webhook/reconciliation implementation and database/SDK tests | US Stripe reconnection, private test configuration, checkout/portal/renewal/failure/cancellation acceptance |
@@ -191,3 +191,12 @@ External configuration audit: Preview OAuth secret is now configured; Preview st
 - Peter supplied the OAuth secret privately through the clipboard; it was stored as sensitive `GITHUB_CLIENT_SECRET` only on Preview branch `codex/hosted-workflow`, without printing its value. Production was unchanged.
 - Redeployment `shipcheck-l395z0wlx-hey-salad-inc.vercel.app` is READY with Preview target. The stable branch alias reaches GitHub authorization for the expected client ID and exact callback, requesting only `read:user`.
 - Browser authorization is pending Peter's action-time confirmation or his own click. The secret exchange, callback session, personal-workspace provisioning and sign-in acceptance are not yet verified. Do not mark the identity gate complete from the authorization screen alone.
+
+
+### Real GitHub account browser acceptance — 28 October 2026
+
+- Peter approved identity-only OAuth authorization. GitHub granted read-only profile access to the hosted-preview app and the callback established a session displayed as `chilu18`. No repository permission was granted by this OAuth step.
+- Through the actual browser, Peter's account queued `heysalad-ai/nicedeck` at commit `2bb5203218e88f2993ec0d96dcd997d3ba86e96e`; remaining monthly allowance changed from 5/5 to 4/5. Job `a59cf3df-6b7a-47ad-bcf5-02ed5e53cb28` completed through the deployed worker, invoked manually with private scheduler authentication.
+- Saved private report `db816723-86c4-48e3-bd4a-29c8158838e5` opened in the browser with source commit and coverage. Two manifests, no omitted supported manifests, zero returned findings; this is bounded dependency scanning, not a complete repository security assessment.
+- Signed out and loaded the exact report URL: UI displayed Report unavailable. Signed in again via GitHub and reopened that same report successfully. One saved scan remained visible; the account/session/report persistence path is now hosted-browser verified for Peter.
+- Screenshot: `../outputs/hosted-acceptance/github-account-report.png`. Remaining independent gates include a second actual account, shared-link lifecycle, customer GitHub App onboarding, Stripe lifecycle and continuous worker hosting. Production remains unchanged; the test database remains disposable.
