@@ -9,7 +9,12 @@ for(const width of [360,768,1440]) {
   await page.route('**/api/repairs',r=>r.fulfill({json:{repairs:[{id:'11111111-1111-4111-8111-111111111111',state:'verified',package_name:'@organisation/a-very-long-dependency-package-name',repository_name:'organisation/a-very-long-repository-name-for-responsive-testing',created_at:'2026-10-26T00:00:00Z'}]}}));
   async function fits(){expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);}
   for(const route of ['/','/sign-in','/repairs','/nonexistent-brand-page']){
-   await page.goto(route);await expect(page.getByRole('link',{name:'ShipTested home'})).toBeVisible();await fits();
+   await page.goto(route);
+   // Header, sidebar and footer can each provide a home link. Check every visible one.
+   const homeLinks=page.getByRole('link',{name:'ShipTested home',exact:true}).filter({visible:true});
+   await expect.poll(()=>homeLinks.count()).toBeGreaterThan(0);
+   for(const link of await homeLinks.all()){await expect(link).toBeVisible();await expect(link).toHaveAttribute('href','/');}
+   await fits();
    if(route==='/sign-in')await expect(page.getByLabel('Individual access key')).toBeVisible();
    await page.screenshot({path:`test-results/brand-${width}-${route.replaceAll('/','')||'home'}.png`,fullPage:true});
   }
