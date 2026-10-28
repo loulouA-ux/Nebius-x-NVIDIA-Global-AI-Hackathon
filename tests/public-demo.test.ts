@@ -15,12 +15,12 @@ test('public demo refuses every live API before any external request',async()=>{
   }
  }
  // Includes enqueue/status/cancel repository-scan handlers; all must fail closed.
- expect(checked).toBe(42);expect(fetch).not.toHaveBeenCalled();
+ expect(checked).toBe(44);expect(fetch).not.toHaveBeenCalled();
 });
 test('public proxy allows replay reads and refuses live pages and all writes',()=>{
  vi.stubEnv('SHIPCHECK_PUBLIC_DEMO','1');
  for(const path of ['/','/reports','/reports/demo-recorded','/reports/demo-offline/findings/test','/api/demos','/api/health'])expect(proxy(new NextRequest('http://localhost'+path)).status).toBe(200);
- for(const path of ['/scan','/sign-in','/hosts','/repairs','/reports/private-id','/api/scans','/api/auth/github/callback'])expect(proxy(new NextRequest('http://localhost'+path)).status).toBe(403);
+ for(const path of ['/scan','/sign-in','/hosts','/repairs','/reports/private-id','/batches','/security-overview','/api/scans','/api/security','/api/auth/github/callback'])expect(proxy(new NextRequest('http://localhost'+path)).status).toBe(403);
  expect(proxy(new NextRequest('http://localhost/api/demos',{method:'POST'})).status).toBe(403);
  expect(proxy(new NextRequest('http://localhost/unknown-page',{method:'POST'})).status).toBe(403);
 });
