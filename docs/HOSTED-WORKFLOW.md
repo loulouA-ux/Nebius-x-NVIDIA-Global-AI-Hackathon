@@ -49,7 +49,7 @@ Latest acceptance audit: 27 October 2026, 23:59 London time. The checkpoint sect
 | 9. Clients | Authenticated SDK/CLI/local MCP built and package-tested | Managed-client hosted acceptance, reviewed package release; published 0.1.0 does not include these additions |
 | 10. Release | 339 unit/database tests, typecheck/build, prior browser regression coverage; draft PR 18 and protected preview | Final browser acceptance, review/integration, persistent service/database provisioning, production migration and explicitly reviewed activation |
 
-External configuration audit: Preview lacks `GITHUB_CLIENT_SECRET`, `GITHUB_APP_CLIENT_SECRET`, `SHIPTESTED_CONNECTION_ENCRYPTION_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_TEAM_PRICE_ID` and `STRIPE_WEBHOOK_SECRET`. Only presence was inspected; no credential values were displayed. Stripe connector still requires reauthentication. The disposable Neon branch expires 28 October at 23:09 GMT. Production remains demo-only. Overall completion is not yet proven.
+External configuration audit: Preview OAuth secret is now configured; Preview still lacks `GITHUB_APP_CLIENT_SECRET`, `SHIPTESTED_CONNECTION_ENCRYPTION_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_TEAM_PRICE_ID` and `STRIPE_WEBHOOK_SECRET`. Only presence was inspected; no credential values were displayed. Stripe connector still requires reauthentication. The disposable Neon branch expires 28 October at 23:09 GMT. Production remains demo-only. Overall completion is not yet proven.
 
 ### Foundation checkpoint
 
@@ -184,3 +184,10 @@ External configuration audit: Preview lacks `GITHUB_CLIENT_SECRET`, `GITHUB_APP_
 - The protected preview was reachable through a direct Vercel CLI request. Replacing curl's stdin configuration with a mode-0600 file in a private temporary directory resolved the acceptance harness transport hang; cleanup removes the temporary configuration in `finally`. Secrets remain outside process arguments and logs.
 - Actual HTTP acceptance PASSED on `shipcheck-pa9wpykrj-hey-salad-inc.vercel.app` at `f9b7cbb`: anonymous denial, authenticated queue, idempotent request, cross-account job/report denial, scheduler authentication, worker completion, saved report retrieval and exactly one allowance reservation. Synthetic token cleanup runs after acceptance.
 - Evidence: `../outputs/hosted-acceptance/http-pipeline.json`, verified 27 October 2026 at 23:58 London time. Job `d166bbde-719a-4e34-8047-faffae05d440`, saved report `063931e6-ec77-49c2-86c2-afe0b9d44184`. This uses actual Neon/GitHub/OSV with synthetic authenticated identities; browser OAuth, Stripe and customer GitHub App onboarding remain unverified. Production remains demo-only.
+
+
+### Hosted identity OAuth configuration
+
+- Peter supplied the OAuth secret privately through the clipboard; it was stored as sensitive `GITHUB_CLIENT_SECRET` only on Preview branch `codex/hosted-workflow`, without printing its value. Production was unchanged.
+- Redeployment `shipcheck-l395z0wlx-hey-salad-inc.vercel.app` is READY with Preview target. The stable branch alias reaches GitHub authorization for the expected client ID and exact callback, requesting only `read:user`.
+- Browser authorization is pending Peter's action-time confirmation or his own click. The secret exchange, callback session, personal-workspace provisioning and sign-in acceptance are not yet verified. Do not mark the identity gate complete from the authorization screen alone.
