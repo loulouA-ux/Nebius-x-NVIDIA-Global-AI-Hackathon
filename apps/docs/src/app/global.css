@@ -8,3 +8,5 @@ h1,h2,h3{font-family:var(--font-display),sans-serif;text-wrap:balance}code,pre{f
 body{font-family:var(--font-body),sans-serif}
 
 .mobile-contents{margin:20px 0;padding:12px 0;border-block:1px solid var(--color-fd-border)}.mobile-contents summary{cursor:pointer}@media(min-width:1280px){.mobile-contents{display:none}}
+
+.platform-brand{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;font:600 24px/1.2 var(--font-display),sans-serif;color:var(--color-fd-foreground,var(--text))}.brand-home{color:var(--color-fd-foreground,var(--text));text-decoration:none}
