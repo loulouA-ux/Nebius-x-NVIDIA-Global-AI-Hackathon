@@ -1,3 +1,4 @@
+import {safeReturnTo, returnCookie} from '@/lib/auth-navigation';
 import {refusePublicDemo} from '@/lib/server/public-demo';
 import { database } from "@/lib/server/db";
 import { beginGitHubOAuth, githubOAuthConfig, GITHUB_OAUTH_COOKIE, assertGitHubOrigin } from "@/lib/server/github-oauth";
@@ -15,6 +16,8 @@ export async function GET(request: Request) {
     await new Store(query).quota("github-login-global",60,60000);
     const flow = beginGitHubOAuth(config);
     await saveOAuthTransaction(query,flow.transaction);
-    return new Response(null,{status:302,headers:{Location:flow.authorizationUrl,"Cache-Control":"no-store","Set-Cookie":`${GITHUB_OAUTH_COOKIE}=${flow.browserToken}; HttpOnly; SameSite=Lax; Path=/api/auth/github; Max-Age=600${config.origin.startsWith("https:")?"; Secure":""}`}});
+    const headers = new Headers({Location:flow.authorizationUrl,"Cache-Control":"no-store","Set-Cookie":`${GITHUB_OAUTH_COOKIE}=${flow.browserToken}; HttpOnly; SameSite=Lax; Path=/api/auth/github; Max-Age=600${config.origin.startsWith("https:")?"; Secure":""}`});
+    headers.append("Set-Cookie",returnCookie(safeReturnTo(new URL(request.url).searchParams.get("next")),config.origin.startsWith("https:")));
+    return new Response(null,{status:302,headers});
   } catch(e) { return failure(e); }
 }

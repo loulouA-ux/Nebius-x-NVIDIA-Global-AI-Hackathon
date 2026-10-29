@@ -108,3 +108,9 @@ body{--mono:var(--font-mono),monospace}
 button,.button,.text-button,nav a{ text-decoration:none; }
 button:hover,.button:hover,.text-button:hover,nav a:hover{text-decoration:none}
 button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+/* Keep account actions anchored and readable in the workspace rail. */
+.sidebar-account{padding-top:20px;border-top:1px solid var(--line)}
+.sidebar-preferences{margin-bottom:16px}
+.sidebar-account .member-access{margin-bottom:0!important;border-bottom:0;padding-bottom:0!important}
+.sidebar-account .member-access>div{align-items:stretch;gap:12px}
+.sidebar-account .member-access .button,.sidebar-account .member-access .text-button{justify-content:flex-start;min-height:44px}

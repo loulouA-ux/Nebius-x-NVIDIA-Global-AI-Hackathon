@@ -186,9 +186,8 @@ test("member can reopen a saved report and record a decision without changing it
     page.getByRole("heading", { name: "Blocked · 2 high-severity findings" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
-  await expect(
-    page.getByRole("link", { name: "Sign in with GitHub" }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/sign-in\?signedOut=1$/);
+  await expect(page.getByRole("status")).toContainText("You’re signed out");
 });
 
 test("expired decision session clears stale member state and offers sign-in", async ({

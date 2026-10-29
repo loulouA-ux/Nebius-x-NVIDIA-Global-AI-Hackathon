@@ -11,3 +11,13 @@ test('usage distinguishes incomplete reports, test billing and unmetered costs',
   await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:'test-results/usage-mobile.png',fullPage:true});
 });
+test('billing controls validate seats, refresh usage and refuse unsafe portal redirects',async({page})=>{
+ let reads=0,portals=0;
+ await page.route('**/api/usage',r=>{reads++;return r.fulfill({json:{remaining:5,limit:5,reserved:0,scope:'workspace',outcomes:[],verdicts:[],daily:[{day:'2026-10-29',count:0}],completedReports:0,averageDurationMs:null,cost:{detail:'Fixture costs'}}});});
+ await page.route('**/api/billing/status',r=>r.fulfill({json:{canManage:true,configured:true,testMode:true,priceMinor:300,currency:'GBP',scansPerSeat:5,plan:'team',seats:2,occupied:2,subscriptionStatus:'active'}}));
+ await page.route('**/api/billing/portal',r=>{portals++;return r.fulfill({json:{url:'https://untrusted.example/billing'}});});
+ await page.goto('/usage');await page.getByRole('button',{name:'Refresh usage'}).click();await expect.poll(()=>reads).toBeGreaterThan(1);
+ await page.getByLabel('Seats',{exact:true}).fill('1');await expect(page.getByRole('button',{name:'Continue to test checkout'})).toBeDisabled();
+ await page.getByRole('button',{name:'Manage subscription'}).click();await expect(page.locator('main').getByRole('alert')).toContainText('Unexpected billing destination.');expect(portals).toBe(1);await expect(page).toHaveURL(/\/usage$/);
+ await page.getByText('Activity · last seven days',{exact:true}).click();await expect(page.getByText('2026-10-29: 0 attempts')).toBeVisible();
+});
