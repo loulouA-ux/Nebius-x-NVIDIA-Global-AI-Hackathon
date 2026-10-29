@@ -12,5 +12,5 @@ test('upload detects format and blocks oversized files before requests',async({p
  await page.getByRole('button',{name:'Run scan',exact:true}).click();await expect(page.locator('main').getByRole('alert').filter({hasText:'50'})).toContainText('50');expect(scans).toBe(0);
 });
 test('mobile Scan action is not covered by navigation',async({page})=>{
- await page.setViewportSize({width:375,height:812});await page.goto('/?view=scan');const button=page.getByRole('button',{name:'Run scan',exact:true});await expect(button).toBeVisible();expect(await button.evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
+ await page.setViewportSize({width:375,height:812});await page.goto('/?view=scan');const button=page.getByRole('button',{name:'Run scan',exact:true});await expect(button).toBeVisible();await button.scrollIntoViewIfNeeded();await expect(button).toBeInViewport({ratio:1});await button.click({trial:true});expect(await button.evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
 });

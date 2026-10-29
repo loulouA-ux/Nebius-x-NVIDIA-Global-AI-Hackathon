@@ -1,0 +1,21 @@
+# Template for this monorepo. Copy to .github/workflows/dependency-review.yml.
+# Uses OSV over the network. It never installs the fixture's dependencies.
+name: Dependency evidence
+on: [pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build:packages
+      - name: Scan the project lockfile
+        run: node packages/cli/dist/index.js scan package-lock.json --json
+# Exit 0: checks passed; 1: blocked; 2: review required; 3: incomplete.
+# Do not use continue-on-error to turn incomplete coverage into a clean gate.

@@ -435,7 +435,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  text-decoration: underline;
+  text-decoration: none;
 }
 :global(.error) {
   padding: 14px;
@@ -820,7 +820,7 @@
 :global(.provider-icons){display:flex;gap:16px;flex-wrap:wrap}:global(.provider-icons span){display:inline-flex;gap:6px;align-items:center}
 
 :global(.sidebar-account){margin-top:auto;padding-top:32px}:global(.sidebar-account section){border:0}:global(.sidebar-account section>div){display:grid;gap:10px}:global(.report-row){color:var(--ink);background:var(--surface,var(--surface));border-bottom:1px solid var(--line);border:0;text-decoration:none}
-@media(min-width:768px){:global(.shell>main>section:first-child){display:none}:global(.shell){display:flex}:global(.shell>aside){flex:0 0 220px}:global(.shell>main){flex:999 1 560px}}
+@media(min-width:768px){:global(.shell>main>section.member-access:first-child){display:none}:global(.shell){display:flex}:global(.shell>aside){flex:0 0 220px}:global(.shell>main){flex:999 1 560px}}
 
 @media(max-width:1023px){:global(.row-package),:global(.row-cvss){display:none}:global(.report-row){grid-template-columns:75px minmax(0,1fr) 16px;min-height:64px;padding:10px 12px}}
 
@@ -835,3 +835,6 @@
 
 /* Continue the sidebar column below its sticky, viewport-height controls. */
 @media(min-width:768px){:global(.shell){background:linear-gradient(to right,var(--surface) 219px,var(--line) 219px,var(--line) 220px,transparent 220px)}}
+
+/* Actions are distinguished by their control shape, never an underline. */
+.root :global(button),.root :global(button:hover),.root :global(a.button),.root :global(a.button:hover),.root :global(nav a),.root :global(nav a:hover){text-decoration:none}

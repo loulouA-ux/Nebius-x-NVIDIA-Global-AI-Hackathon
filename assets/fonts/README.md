@@ -1,0 +1,1 @@
+ShipTested brand fonts vendored from https://github.com/google/fonts (ofl/inter, ofl/bricolagegrotesque, ofl/jetbrainsmono, ofl/caveat). Each family retains its SIL Open Font License alongside the font. Local loading preserves the brand and removes build-time Google Fonts requests.

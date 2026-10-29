@@ -11,12 +11,14 @@ test('skip navigation focuses main content',async({page})=>{
 
 test('mobile tabs are direct, keyboard accessible and omit duplicate visible sign in',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.route('**/api/session',r=>r.fulfill({status:401,json:{error:'Sign in'}}));await page.goto('/scan');
- const hosts=page.getByRole('link',{name:'Hosts',exact:true});await hosts.focus();await expect(hosts).toBeFocused();await page.keyboard.press('Enter');await expect(page).toHaveURL(/\/hosts$/);await expect(page.getByRole('heading',{name:'Staging hosts'})).toBeFocused();await expect(hosts).toHaveAttribute('aria-current','page');await expect(page.getByRole('link',{name:'Sign in with GitHub',exact:true})).toHaveCount(1);
+ const more=page.locator('.workspace-more summary');await more.focus();await page.keyboard.press('Enter');
+ const hosts=page.getByRole('navigation',{name:'Main navigation'}).filter({visible:true}).getByRole('link',{name:'Staging hosts',exact:true});await hosts.focus();await expect(hosts).toBeFocused();await page.keyboard.press('Enter');await expect(page).toHaveURL(/\/hosts$/);await expect(page.getByRole('heading',{name:'Staging hosts'})).toBeFocused();await more.click();await expect(hosts).toHaveAttribute('aria-current','page');await expect(page.getByRole('link',{name:'Sign in with GitHub',exact:true})).toHaveCount(1);
 });
 
 test('identity survives history failure and can still sign out',async({page})=>{
  await page.route('**/api/session',r=>r.fulfill({json:{actor:{id:'github:123',role:'member'}}}));
  await page.route('**/api/scans',r=>r.fulfill({status:503,json:{error:'Unavailable'}}));
+ await page.route('**/api/usage',r=>r.fulfill({status:503,json:{error:'Usage unavailable'}}));
  await page.setViewportSize({width:390,height:844});await page.goto('/scan');
  await expect(page.locator('main').getByText('GitHub account',{exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'Sign out',exact:true})).toBeVisible();

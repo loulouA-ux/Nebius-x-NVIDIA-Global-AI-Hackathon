@@ -281,3 +281,9 @@ No `public/motion/shiptested-voyage.riv` asset is present in this implementation
 - **Don't** replace the quiet clean mark with the noisy sketch treatment.
 - **Don't** add animation libraries, canvas or a Rive claim to the existing SVG implementation.
 - **Don't** treat this documentation as evidence of deployment, production approval or completion of unimplemented reference behaviors.
+
+## Public developer presentation — 28 October 2026
+
+The landing and `/developers` surfaces now use an editorial developer-infrastructure direction requested by Peter: warm paper/ink themes, Bricolage headings, Inter body, mono only for code and evidence, generous whitespace and compact hairline-separated rows. This supersedes the sailing scene **on the landing page only**. Report/operational views retain their existing evidence-first layout and semantic colors. The boat mark remains the product identity; no third-party brand identity is copied.
+
+Landing mode: Persuade. Developer guide mode: Read. The hero's leading artifact is a real public demo report summary, explicitly labelled synthetic/recorded, followed by a three-stage workflow and executable library example. No live customer data or invented metrics belong in public screenshots. At 390px the header wraps navigation, content becomes one column, and code scrolls within its own surface.

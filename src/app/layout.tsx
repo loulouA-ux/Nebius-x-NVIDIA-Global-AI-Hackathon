@@ -1,13 +1,15 @@
+import {workspaceBrowserScript} from '@/lib/workspace-browser';
 import {headers} from "next/headers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./brand-motion.css";
-import {Bricolage_Grotesque, Inter, JetBrains_Mono, Caveat} from "next/font/google";
+import "./form-controls.css";
+import localFont from 'next/font/local';
 import styles from "./workspace-styles.module.css";
-const body=Inter({subsets:["latin"],weight:["400","500","600"],display:"swap",variable:"--font-body"});
-const display=Bricolage_Grotesque({subsets:["latin"],weight:"600",display:"swap",variable:"--font-display"});
-const annotation=Caveat({subsets:["latin"],weight:"700",display:"swap",variable:"--font-annotation"});
-const mono=JetBrains_Mono({subsets:["latin"],weight:["400","500"],display:"swap",variable:"--font-mono"});
+const body=localFont({src:'../../assets/fonts/inter.ttf',weight:'400 600',display:'swap',variable:'--font-body'});
+const display=localFont({src:'../../assets/fonts/bricolagegrotesque.ttf',weight:'600',display:'swap',variable:'--font-display'});
+const annotation=localFont({src:'../../assets/fonts/caveat.ttf',weight:'700',display:'swap',variable:'--font-annotation'});
+const mono=localFont({src:'../../assets/fonts/jetbrainsmono.ttf',weight:'400 500',display:'swap',variable:'--font-mono'});
 import RouteFocus from "./route-focus";
 import SkipLink from "./skip-link";
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
@@ -24,7 +26,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const nonce=(await headers()).get("x-nonce")||undefined;
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><script nonce={nonce} dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
+      <head><script nonce={nonce} dangerouslySetInnerHTML={{__html:workspaceBrowserScript}}/><script nonce={nonce} dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
       <body className={`${styles.root} ${body.variable} ${display.variable} ${mono.variable} ${annotation.variable}`}><SkipLink /><RouteFocus/>{children}</body>
     </html>
   );

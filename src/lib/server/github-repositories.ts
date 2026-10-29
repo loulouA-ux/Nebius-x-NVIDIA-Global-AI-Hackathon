@@ -24,16 +24,47 @@ export async function githubRequest(path:string,token:string,init:RequestInit={}
  if(!path.startsWith("/")||path.startsWith("//")||path.includes("\\"))throw Error("Invalid GitHub API path.");
  return boundedJson("https://api.github.com"+path,{...init,headers:{Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"ShipTested","Content-Type":"application/json",Authorization:`Bearer ${token}`}},fetcher);
 }
-export async function installationToken(actor:Actor,repositoryId?:number,write=false,fetcher:typeof fetch=fetch,readPullRequests=false){
+export async function installationToken(actor:Actor,repositoryId?:number,write=false,fetcher:typeof fetch=fetch,readPullRequests=false,selectedInstallationId?:number){
  if(write&&!repositoryId)throw Error("Write access must be scoped to one repository.");
- const result=z.object({token:z.string().min(1)}).parse(await githubRequest(`/app/installations/${installationFor(actor)}/access_tokens`,appJwt(),{method:"POST",body:JSON.stringify({...(repositoryId?{repository_ids:[repositoryId]}:{}),permissions:write?{contents:"write",pull_requests:"write"}:{contents:"read",...(readPullRequests?{pull_requests:"read"}:{})}})},fetcher));
+ let installationId:number,repositoryIds:number[]|undefined;
+ if(brandEnv('CUSTOMER_REPOSITORIES')==='1'){
+  const {authorizedRepositoryGrant}=await import('./repository-connections');const {database}=await import('./db');
+  const grant=await authorizedRepositoryGrant(database(),actor,fetcher,repositoryId,selectedInstallationId);installationId=grant.installationId;
+  if(repositoryId&&!grant.repositoryIds.includes(repositoryId))throw new ApiError(404,'Repository is not authorized for your account.');
+  if(write&&repositoryId&&!grant.writableRepositoryIds.includes(repositoryId))throw new ApiError(403,'Your GitHub account cannot write to this repository.');
+  repositoryIds=repositoryId?[repositoryId]:grant.repositoryIds;
+  if(!repositoryIds.length)throw new ApiError(403,'No repositories are authorized for this account.');
+ }else{installationId=installationFor(actor);repositoryIds=repositoryId?[repositoryId]:undefined;}
+ const result=z.object({token:z.string().min(1)}).parse(await githubRequest(`/app/installations/${installationId}/access_tokens`,appJwt(),{method:"POST",body:JSON.stringify({...(repositoryIds?{repository_ids:repositoryIds}:{}),permissions:write?{contents:"write",pull_requests:"write"}:{contents:"read",...(readPullRequests?{pull_requests:"read"}:{})}})},fetcher));
  return result.token;
 }
+export const MAX_CONNECTED_REPOSITORIES=500;
 export async function listRepositories(actor:Actor,fetcher:typeof fetch=fetch){
- const token=await installationToken(actor,undefined,false,fetcher);
- const result=z.object({total_count:z.number().int(),repositories:z.array(repoSchema)}).parse(await githubRequest("/installation/repositories?per_page=100",token,{},fetcher));
- if(result.total_count>result.repositories.length)throw new ApiError(422,"Select a smaller GitHub App repository installation (at most 100 repositories).");
- return result.repositories;
+ if(brandEnv('CUSTOMER_REPOSITORIES')==='1'){
+  const {authorizedRepositoryGrants}=await import('./repository-connections');const {database}=await import('./db');
+  const grants=await authorizedRepositoryGrants(database(),actor,fetcher);const all:GitHubRepository[]=[];
+  for(const grant of grants){const token=await installationToken(actor,undefined,false,fetcher,false,grant.installationId);all.push(...await listTokenRepositories(token,fetcher));}
+  if(all.length>MAX_CONNECTED_REPOSITORIES||new Set(all.map(r=>r.id)).size!==all.length)throw new ApiError(409,'Repository access changed or exceeds the workspace limit.');return all;
+ }
+ return listTokenRepositories(await installationToken(actor,undefined,false,fetcher),fetcher);
+}
+async function listTokenRepositories(token:string,fetcher:typeof fetch){
+ const schema=z.object({total_count:z.number().int().min(0),repositories:z.array(repoSchema).max(100)});
+ const repositories:GitHubRepository[]=[],seen=new Set<number>();
+ let expected:number|undefined;
+ for(let page=1;page<=Math.ceil(MAX_CONNECTED_REPOSITORIES/100);page++){
+  const result=schema.parse(await githubRequest(`/installation/repositories?per_page=100&page=${page}`,token,{},fetcher));
+  if(result.total_count>MAX_CONNECTED_REPOSITORIES)throw new ApiError(422,`Select at most ${MAX_CONNECTED_REPOSITORIES} repositories in the GitHub App installation.`);
+  if(expected!==undefined&&result.total_count!==expected)throw new ApiError(409,'Repository access changed during listing. Try again.');
+  expected=result.total_count;
+  for(const repo of result.repositories){
+   if(seen.has(repo.id))throw new ApiError(409,'Repository access changed during listing. Try again.');
+   seen.add(repo.id);repositories.push(repo);
+  }
+  if(repositories.length===expected)return repositories;
+  if(repositories.length>expected||result.repositories.length<100)throw new ApiError(409,'Repository access changed during listing. Try again.');
+ }
+ throw new ApiError(422,'Repository listing exceeds the supported limit.');
 }
 export type RepositorySnapshot={repository:GitHubRepository;commit:string;tree:string;files:Record<string,string>};
 export async function repositorySnapshot(actor:Actor,repositoryId:number,fetcher:typeof fetch=fetch):Promise<RepositorySnapshot>{

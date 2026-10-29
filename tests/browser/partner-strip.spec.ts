@@ -14,12 +14,14 @@ for (const width of [1440, 1024, 390, 360]) {
       await expect(strip.getByText(label, {exact: true})).toHaveCSS('color', 'rgb(142, 152, 166)');
     }
     await page.evaluate(() => document.fonts.ready);
-    if(width===1440)expect(await strip.evaluate(el=>el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(900);
+    // Providers follow the developer section; test their fit when scrolled into view.
+    await strip.scrollIntoViewIfNeeded();
+    await expect(strip).toBeInViewport();
     const geometry = await strip.evaluate(el => {
       const rect = (e: Element) => {const r=e.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
       return [...el.querySelectorAll('.partner-strip-item')].map(item => ({
         item: rect(item), tile: rect(item.querySelector('.partner-logo-space')!),
-        logo: rect(item.querySelector('img')!), label: rect(item.querySelector('.partner-strip-label')!),
+        logo: rect([...item.querySelectorAll('img')].find(img=>getComputedStyle(img).display!=='none')!), label: rect(item.querySelector('.partner-strip-label')!),
         background: getComputedStyle(item.querySelector('.partner-logo-space')!).backgroundColor,
       }));
     });

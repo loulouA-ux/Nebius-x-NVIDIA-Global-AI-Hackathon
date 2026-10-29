@@ -10,3 +10,7 @@
 .key summary { cursor:pointer; font-weight:600; padding-block:8px; }
 .hint { color:var(--muted); font-size:14px; line-height:1.5; }
 @media(max-width:700px){ .history{margin-inline-start:0;width:100%;}.history select{width:100%;font-size:16px;} }
+.notice { color:var(--text); background:var(--raised); padding:16px; border:1px solid var(--line); border-radius:12px; line-height:1.6; }
+.account :global(.error) { font-size:14px; line-height:1.5; }
+.account :global(.error) button { display:flex; margin-top:10px; }
+.account button { min-height:44px; }

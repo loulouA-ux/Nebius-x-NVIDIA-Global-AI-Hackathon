@@ -1,4 +1,6 @@
 "use client";
+import {FolderPlus as UiFolderPlus,Globe as UiGlobe,Copy as UiCopy,ShieldCheck as UiShieldCheck,RefreshCw as UiRefreshCw} from 'lucide-react';
+
 
 import { useEffect, useState } from "react";
 import {usePathname} from "next/navigation";
@@ -197,7 +199,7 @@ export default function ProjectSetup() {
               "Project created. Publish the challenge below, then verify it.",
             )
           }
-        >
+        ><UiFolderPlus size={16} aria-hidden="true" className="action-icon"/>
           Create project and get challenge
         </button>
       </section>
@@ -233,17 +235,17 @@ export default function ProjectSetup() {
             )}
             .
           </p>
-          <div role="group" aria-label="Verification method" className="proof-methods">{(['dns','file'] as const).map(value=><button type="button" className="button" key={value} aria-pressed={method===value} onClick={()=>setMethod(value)}>{value==='dns'?'DNS TXT record':'Well-known file'}</button>)}</div>
+          <div role="group" aria-label="Verification method" className="proof-methods">{(['dns','file'] as const).map(value=><button type="button" className="button" key={value} aria-pressed={method===value} onClick={()=>setMethod(value)}><UiGlobe size={16} aria-hidden="true" className="action-icon"/>{value==='dns'?'DNS TXT record':'Well-known file'}</button>)}</div>
           <p className="quiet-note">
             {method === "dns" ? "TXT name" : "File URL"}:{" "}
             <code>
               {method === "dns"
                 ? selected.verification.challenge.txtName
                 : selected.verification.challenge.fileUrl}
-            </code><button className="button" type="button" onClick={()=>navigator.clipboard.writeText(method==='dns'?selected.verification.challenge.txtName:selected.verification.challenge.fileUrl).then(()=>setMessage('Name copied.')).catch(()=>setMessage('Copy unavailable. Select and copy the displayed name.'))}>Copy name</button>
+            </code><button className="button" type="button" onClick={()=>navigator.clipboard.writeText(method==='dns'?selected.verification.challenge.txtName:selected.verification.challenge.fileUrl).then(()=>setMessage('Name copied.')).catch(()=>setMessage('Copy unavailable. Select and copy the displayed name.'))}><UiCopy size={16} aria-hidden="true" className="action-icon"/>Copy name</button>
           </p>
           <p className="quiet-note">
-            Exact content: <code>{selected.verification.challenge.value}</code><button className="button" type="button" onClick={()=>navigator.clipboard.writeText(selected.verification.challenge.value).then(()=>setMessage("Value copied.")).catch(()=>setMessage("Copy unavailable. Select and copy the displayed value."))}>Copy value</button>
+            Exact content: <code>{selected.verification.challenge.value}</code><button className="button" type="button" onClick={()=>navigator.clipboard.writeText(selected.verification.challenge.value).then(()=>setMessage("Value copied.")).catch(()=>setMessage("Copy unavailable. Select and copy the displayed value."))}><UiCopy size={16} aria-hidden="true" className="action-icon"/>Copy value</button>
           </p>
           <p className="fineprint">
             Status: {selected.verification.status}
@@ -272,7 +274,7 @@ export default function ProjectSetup() {
                   `${selected.hostname} is verified. Proof is rechecked before every host scan.`,
                 )
               }
-            >
+            ><UiShieldCheck size={16} aria-hidden="true" className="action-icon"/>
               {busy ? "Checking…" : "Verify ownership"}
             </button>
             <button
@@ -289,7 +291,7 @@ export default function ProjectSetup() {
                   "New challenge issued. Replace the old value before verifying.",
                 )
               }
-            >
+            ><UiRefreshCw size={16} aria-hidden="true" className="action-icon"/>
               Refresh challenge
             </button>
           </div>

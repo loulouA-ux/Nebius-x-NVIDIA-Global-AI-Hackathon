@@ -1,4 +1,6 @@
 "use client";
+import {Check as UiCheck,X as UiX,RefreshCw as UiRefreshCw} from 'lucide-react';
+
 import Toast from "./components/toast";
 import { useEffect, useState } from "react";
 import type { ScanReport } from "@/lib/types";
@@ -82,7 +84,7 @@ export default function DecisionLog({
         scan verdict.
       </p>
       {report.mode === "demo" ? (
-        <div><p>Sign in to record a decision. Demo decisions are not saved.</p><button className="button" disabled>Acknowledge</button> <button className="button" disabled>Dismiss with reason</button> <a href="/sign-in">Sign in</a></div>
+        <div><p>Sign in to record a decision. Demo decisions are not saved.</p><button className="button" disabled><UiCheck size={16} aria-hidden="true" className="action-icon"/>Acknowledge</button> <button className="button" disabled><UiX size={16} aria-hidden="true" className="action-icon"/>Dismiss with reason</button> <a href="/sign-in">Sign in</a></div>
       ) : expired ? (
         <p role="alert" className="error">
           Session expired. <a href="/sign-in">Sign in again</a> to review or save decisions.
@@ -108,14 +110,14 @@ export default function DecisionLog({
               className="button"
               disabled={busy}
               onClick={() => void record("acknowledge")}
-            >
+            ><UiCheck size={16} aria-hidden="true" className="action-icon"/>
               Acknowledge
             </button>
             <button
               className="button"
               disabled={busy || !reason.trim()}
               onClick={() => void record("dismiss")}
-            >
+            ><UiX size={16} aria-hidden="true" className="action-icon"/>
               Dismiss with reason
             </button>
           </div>
@@ -125,7 +127,7 @@ export default function DecisionLog({
             </p>
           )}
           {loading && <p role="status">Loading decision history…</p>}
-          {historyError && <p role="alert">{historyError} <button className="button" onClick={() => setReload(n => n + 1)}>Reload history</button></p>}
+          {historyError && <p role="alert">{historyError} <button className="button" onClick={() => setReload(n => n + 1)}><UiRefreshCw size={16} aria-hidden="true" className="action-icon"/>Reload history</button></p>}
           {!loading && !historyError && !events.some(d => d.finding_id === findingId) && <p className="quiet-note">No decisions recorded for this finding.</p>}
           <ol aria-label="Decision history">
             {events

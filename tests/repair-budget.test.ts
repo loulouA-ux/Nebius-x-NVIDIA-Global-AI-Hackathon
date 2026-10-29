@@ -5,7 +5,8 @@ import type {Query} from "../src/lib/server/db";
 import {reserveRepairRun} from "../src/lib/server/repair-execution";
 const db=new PGlite();
 const query:Query=async(sql,params=[]) => (await db.query(sql,params)).rows as Record<string,unknown>[];
-beforeAll(async()=>{await db.exec(readFileSync("migrations/001_core.sql","utf8"));});
+beforeAll(async()=>{await db.exec(readFileSync("migrations/001_core.sql","utf8"));
+for(const f of ['002_hosted_jobs','003_workspaces','004_team_sharing'])await db.exec(readFileSync(`migrations/${f}.sql`,'utf8'));});
 afterAll(()=>db.close());
 describe("persistent total repair allowance",()=>{
  it("admits only one concurrent reservation and does not reset with daily windows",async()=>{

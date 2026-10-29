@@ -18,7 +18,7 @@ The server forces demo-only mode when VERCEL_ENV=production, even if the demo fl
 
 CSP permits only same-origin connections, local bundled fonts/assets, per-request nonced scripts/styles, no framing and no objects. Next.js requires nonces on its framework/hydration scripts as well as the theme pre-paint script; there is no unsafe-inline script permission. Inline style attributes remain allowed for existing data-driven presentation. This is a deliberate framework requirement beyond the brief's theme-script-only wording. Fonts are self-hosted by next/font; no Google font origins are needed at runtime.
 
-Each response also has one-year HSTS with includeSubDomains, nosniff, strict-origin-when-cross-origin referrer policy, denied camera/microphone/geolocation, and X-Frame-Options DENY. Nonced HTML is dynamic and not CDN-cached. The report fixture is bundled and server-rendered; replay JSON is publicly cacheable. The build needs network access to fetch the configured Google font files unless cached.
+Each response also has one-year HSTS with includeSubDomains, nosniff, strict-origin-when-cross-origin referrer policy, denied camera/microphone/geolocation, and X-Frame-Options DENY. Nonced HTML is dynamic and not CDN-cached. The report fixture is bundled and server-rendered; replay JSON is publicly cacheable. Brand fonts and their licenses are bundled in assets/fonts; builds do not fetch Google font files.
 
 `NEXT_PUBLIC_SITE_URL` must be set before building: Next.js embeds public variables. Local smoke uses a loopback Host-header probe for www; Next normalizes loopback redirects to `/`. Only the real-domain smoke proves deployed DNS/HTTPS/canonical redirection.
 

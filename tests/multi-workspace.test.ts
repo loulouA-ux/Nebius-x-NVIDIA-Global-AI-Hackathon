@@ -1,0 +1,36 @@
+import {beforeAll,afterAll,it,expect,vi,afterEach} from 'vitest';
+import {PGlite} from '@electric-sql/pglite';
+import {readFileSync} from 'node:fs';
+import type {Query} from '../src/lib/server/db';
+import {createWorkspace,renameWorkspace} from '../src/lib/server/workspaces';
+import {createGitHubSession} from '../src/lib/server/github-session';
+import {requireActor,switchWorkspace} from '../src/lib/server/session';
+const db=new PGlite();
+const q:Query=async(sql,params=[])=>(await db.query(sql,params)).rows as Record<string,unknown>[];
+beforeAll(async()=>{for(const f of ['001_core','002_hosted_jobs','003_workspaces','004_team_sharing'])await db.exec(readFileSync(`migrations/${f}.sql`,'utf8'));});
+afterAll(()=>db.close());afterEach(()=>vi.unstubAllEnvs());
+it('creates an isolated workspace without multiplying personal scan credits and restricts renaming',async()=>{
+ vi.stubEnv('SHIPTESTED_OPEN_REGISTRATION','1');await createGitHubSession(q,{githubId:'101',login:'fixture'});
+ const id=await createWorkspace(q,'github:101','  Client projects  ');
+ expect(await q('SELECT name,owner_id FROM sc_workspaces WHERE id=$1',[id])).toEqual([{name:'Client projects',owner_id:'github:101'}]);
+ expect(await q('SELECT scan_limit FROM sc_scan_allowances WHERE workspace_id=$1',[id])).toEqual([{scan_limit:0}]);
+ await expect(renameWorkspace(q,'github:102',id,'Forged')).rejects.toMatchObject({status:403});
+ await renameWorkspace(q,'github:101',id,'Renamed');
+ expect((await q('SELECT name FROM sc_workspaces WHERE id=$1',[id]))[0].name).toBe('Renamed');
+ await expect(createWorkspace(q,'github:101','\n')).rejects.toMatchObject({status:400});
+ for(let i=0;i<8;i++)await createWorkspace(q,'github:101',`Workspace ${i}`);
+ await expect(createWorkspace(q,'github:101','Too many')).rejects.toMatchObject({status:409});
+ expect((await q('SELECT scan_limit FROM sc_scan_allowances WHERE workspace_id=$1',['github:101']))[0].scan_limit).toBe(5);
+});
+it('pins each tab to an authorized workspace and rejects forged or revoked membership',async()=>{
+ vi.stubEnv('SHIPTESTED_OPEN_REGISTRATION','1');const session=await createGitHubSession(q,{githubId:'201',login:'fixture'});
+ const id=await createWorkspace(q,'github:201','Separate');
+ const request=(workspace:string)=>new Request('https://example.test/api/workspaces',{headers:{cookie:`shipcheck_session=${session.token}`,'x-shiptested-workspace':workspace}});
+ await switchWorkspace(request('github:201'),q,id);
+ expect((await requireActor(request('github:201'),q)).workspaceId).toBe('github:201');
+ expect((await requireActor(request(id),q)).workspaceId).toBe(id);
+ await expect(requireActor(request('github:101'),q)).rejects.toMatchObject({status:401});
+ await q('DELETE FROM sc_workspace_members WHERE workspace_id=$1',[id]);
+ await expect(requireActor(request(id),q)).rejects.toMatchObject({status:401});
+ expect((await requireActor(request('github:201'),q)).workspaceId).toBe('github:201');
+});

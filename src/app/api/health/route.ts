@@ -3,7 +3,7 @@ import {publicDemo} from '@/lib/server/public-demo';
 export async function GET() {
   return Response.json(
     {
-      status: publicDemo()?"demo":"preview",
+      status: publicDemo()?"demo":process.env.VERCEL_ENV==="production"?"production":"preview",
       publicDemo: publicDemo(),
       providers: {
         tavily: !publicDemo() && Boolean(process.env.TAVILY_API_KEY),
@@ -11,8 +11,8 @@ export async function GET() {
       },
       persistence: !publicDemo() && Boolean(process.env.DATABASE_URL),
       memberAccess: !publicDemo() && Boolean(
-        brandEnv("PETER_KEY_HASH") &&
-          brandEnv("LOUISE_KEY_HASH"),
+        (brandEnv("PETER_KEY_HASH") && brandEnv("LOUISE_KEY_HASH")) ||
+        (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET && brandEnv("APP_ORIGIN")),
       ),
       urlScanning: !publicDemo(),
       note: "Configuration presence only; not a live provider or database health check.",

@@ -27,9 +27,9 @@ test("history errors are not rendered as empty history and support read-only ret
  await page.route("**/api/repairs",r=>{reads++;return r.fulfill(reads===1?{status:503,json:{error:"Database unavailable"}}:{json:{repairs:[]}});});
  await page.goto("/repairs");
  await expect(page.getByText("Saved repairs could not be loaded:",{exact:false})).toBeVisible();
- await expect(page.getByText("No saved repairs yet.",{exact:false})).toHaveCount(0);
+ await expect(page.getByText("No repairs yet.",{exact:false})).toHaveCount(0);
  await page.getByRole("button",{name:"Refresh saved repairs"}).click();
- await expect(page.getByText("No saved repairs yet.",{exact:false})).toBeVisible();
+ await expect(page.getByText("No repairs yet.",{exact:false})).toBeVisible();
 });
 test("finding handoff prefills package but never assumes repository",async({page})=>{
  await page.route("**/api/repositories",r=>r.fulfill({json:{repositories:[repair.repository]}}));

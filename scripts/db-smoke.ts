@@ -15,7 +15,7 @@ try {
   );
   assert.equal((await s.getProject(actor, p.id)).id, p.id);
   await assert.rejects(() => s.getProject({ ...actor, id: "other" }, p.id));
-  const report = await runScan({ mode: "demo" });
+  const report = { ...await runScan({ mode: "demo" }), id: randomUUID() };
   await s.saveScan(actor, report, p.id);
   assert.equal((await s.getScan(actor, report.id)).status, report.status);
   await s.decide(

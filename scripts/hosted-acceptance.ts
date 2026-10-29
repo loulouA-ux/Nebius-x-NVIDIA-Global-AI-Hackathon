@@ -1,0 +1,52 @@
+/** Disposable, empty Neon test branch only. This is database/pipeline acceptance,
+ * not proof of browser OAuth or a deployed HTTP service. */
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {writeFileSync} from 'node:fs';
+import {database} from '../src/lib/server/db';
+import {createGitHubSession} from '../src/lib/server/github-session';
+import {requireActor} from '../src/lib/server/session';
+import {resolveRepository} from '../src/lib/server/repository-manifests';
+import {ScanJobs} from '../src/lib/server/scan-jobs';
+import {runRepositoryJob} from '../src/lib/server/repository-worker';
+import {Store} from '../src/lib/server/store';
+import {ReportSharing} from '../src/lib/server/report-sharing';
+import {createApiToken,requireApiActor,revokeApiToken} from '../src/lib/server/api-tokens';
+async function main(){
+ const expected=process.env.SHIPTESTED_ACCEPTANCE_DB_HOST;
+ if(!expected||new URL(process.env.DATABASE_URL||'').hostname!==expected)throw Error('Test database must be explicitly pinned.');
+ const q=database();
+ const [counts]=await q('SELECT (SELECT count(*)::int FROM sc_scans) AS reports,(SELECT count(*)::int FROM sc_github_accounts) AS accounts,(SELECT count(*)::int FROM sc_scan_jobs) AS jobs');
+ assert.deepEqual(counts,{reports:0,accounts:0,jobs:0},'Acceptance requires an empty disposable database.');
+ process.env.SHIPTESTED_GITHUB_MEMBER_IDS='900000001,900000002';
+ process.env.SHIPTESTED_OPEN_REGISTRATION='0';
+ const first=await createGitHubSession(q,{githubId:'900000001',login:'synthetic-acceptance-a'});
+ const other=await createGitHubSession(q,{githubId:'900000002',login:'synthetic-acceptance-b'});
+ const source=await resolveRepository(first.actor,'https://github.com/heysalad-ai/nicedeck',false);
+ const jobs=new ScanJobs(q),store=new Store(q),shares=new ReportSharing(q);
+ const input={repository:source.repository,commit:source.commit,tree:source.tree,private:source.private,requestKey:randomUUID()};
+ const queued=await jobs.enqueue(first.actor,input);
+ assert.equal((await jobs.enqueue(first.actor,input)).id,queued.id);
+ await assert.rejects(jobs.get(other.actor,String(queued.id)));
+ const result=await runRepositoryJob(q);
+ assert.equal(result.state,'completed');assert.ok(result.reportId);
+ const report=await store.getScan(first.actor,result.reportId);
+ await assert.rejects(store.getScan(other.actor,result.reportId));
+ const fresh=await createGitHubSession(q,{githubId:'900000001',login:'synthetic-acceptance-a'});
+ const actor=await requireActor(new Request('https://example.test',{headers:{cookie:`shipcheck_session=${fresh.token}`}}),q);
+ assert.equal((await store.getScan(actor,result.reportId)).id,result.reportId);
+ const share=await shares.create(actor,result.reportId);assert.equal((await shares.read(share.token)).id,result.reportId);
+ await shares.revoke(actor,share.id);await assert.rejects(shares.read(share.token));
+ const token=await createApiToken(q,actor,'Acceptance read-only',false);
+ const request=new Request('https://example.test',{headers:{Authorization:`Bearer ${token.token}`}});
+ assert.equal((await requireApiActor(request,q)).id,actor.id);
+ await assert.rejects(requireApiActor(request,q,true));
+ await revokeApiToken(q,actor,token.id);await assert.rejects(requireApiActor(request,q));
+ const [allowance]=await q('SELECT reserved FROM sc_scan_allowances WHERE workspace_id=$1',[actor.workspaceId]);assert.equal(allowance.reserved,1);
+ const events=await q('SELECT event_type FROM sc_workspace_events WHERE subject_id=$1 ORDER BY sequence',[queued.id]);
+ assert.deepEqual(events.map(e=>e.event_type),['scan_queued','scan_started','scan_completed']);
+ const evidence={verifiedAt:new Date().toISOString(),scope:'Actual Neon database and live public GitHub/OSV pipeline, synthetic account identities; no browser OAuth or deployed HTTP acceptance.',repository:source.repository,commit:source.commit,reportId:result.reportId,verdict:report.status,dependencies:report.dependencies.length,findings:report.findings.length,checks:['idempotent quota reservation','queued worker persistence','cross-account job/report denial','fresh-session report retrieval','share revocation','token read-only permission and revocation','atomic lifecycle audit'],reserved:allowance.reserved};
+ writeFileSync('../outputs/hosted-acceptance/database-pipeline.json',JSON.stringify(evidence,null,2)+'\n');
+ console.log(JSON.stringify(evidence));
+}
+main().catch(()=>{console.error('Acceptance failed; credentials and database/provider details suppressed. Inspect the disposable branch and local code before retrying.');process.exitCode=1;});
