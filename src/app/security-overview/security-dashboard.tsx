@@ -13,7 +13,7 @@ import styles from './security.module.css';
 export type Data=Awaited<ReturnType<typeof securityDashboard>>;
 export type Loaded=Extract<Data,{overview:unknown}>;
 export type Nav=(changes:Record<string,string|null>,options?:{keepPage?:boolean})=>void;
-const tabs=[['overview','Overview'],['findings','Findings'],['repositories','Repositories'],['coverage','Coverage'],['process','Batch process']] as const;
+const tabs=[['overview','Overview'],['findings','Remediation queue'],['repositories','Repositories'],['coverage','Coverage recovery'],['process','Batch process']] as const;
 const ACTIVE_POLL_MS=10000;
 
 export default function SecurityDashboard(){

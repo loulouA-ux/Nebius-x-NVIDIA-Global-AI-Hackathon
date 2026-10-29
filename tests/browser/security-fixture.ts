@@ -63,5 +63,5 @@ function report(i:number){
 }
 export async function respond(q:Query,url:string){
  const p=new URL(url).searchParams,get=(k:string)=>p.get(k);
- return securityDashboard(q,actor,{batch:get('batch'),view:get('view'),q:get('q'),severity:get('severity'),verdict:get('verdict'),gap:get('gap'),stage:get('stage'),state:get('state'),advisory:get('advisory'),page:get('page')},new Date('2026-10-20T14:00:00Z'));
+ return securityDashboard(q,actor,{sort:get('sort'),recovery:get('recovery'),batch:get('batch'),view:get('view'),q:get('q'),severity:get('severity'),verdict:get('verdict'),gap:get('gap'),stage:get('stage'),state:get('state'),advisory:get('advisory'),page:get('page')},new Date('2026-10-20T14:00:00Z'));
 }

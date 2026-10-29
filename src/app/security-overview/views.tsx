@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {ArrowUpRight,Search,X} from 'lucide-react';
 import {batchLabels,batchStates,type BatchState} from '@/lib/batch-progress';
-import {gapCodes,gapLabels,stageLabels,severities,verdicts,type GapCode,type Severity,type Verdict,type CoverageStage} from '@/lib/security-dashboard';
+import {remediationModes,remediationLabels,remediationDescriptions,recoveryActions,type RemediationMode,gapCodes,gapLabels,stageLabels,severities,verdicts,type GapCode,type Severity,type Verdict,type CoverageStage} from '@/lib/security-dashboard';
 import type {Loaded,Nav} from './security-dashboard';
 import styles from './security.module.css';
 
@@ -53,29 +53,29 @@ function FixLine({g}:{g:{packages:{name:string;installed:{version:string;fixedVe
  return <ul className={styles.fixList}>{g.packages.map(p=><li key={p.name}><code>{p.name}</code>{p.installed.map(i=><span key={i.version} className={styles.fixPair}><code>{i.version}</code><span aria-hidden="true">→</span>{i.fixedVersions.length?<code className={styles.fixed}>{i.fixedVersions.join(' / ')}</code>:<span className={styles.muted}>no fix recorded</span>}</span>)}{p.moreVersions?<span className={styles.muted}>+{p.moreVersions} more versions</span>:null}</li>)}</ul>;
 }
 
+function QueueRanking({value,nav}:{value:RemediationMode;nav:Nav}){
+ return <div className={styles.ranking}><Segmented<RemediationMode> label="Rank remediation queue" value={value} options={remediationModes.map(value=>({value,label:remediationLabels[value]}))} onChange={sort=>nav({sort})}/><p className={styles.note}>{remediationDescriptions[value]}</p></div>;
+}
+function FixSummary({g}:{g:Of<'fixFirst'>['fixFirst'][number]}){
+ return <span className={styles.source}>{g.packages.map(p=>p.name).join(' · ')} · {g.hasFix?'Fixed version recorded for at least one version':'No fixed version recorded'} · Open evidence for exact versions and manifests</span>;
+}
+function RecoverySteps({gaps}:{gaps:GapCode[]}){
+ const actions=recoveryActions(gaps);
+ return actions.length?<details className={styles.recoverySteps}><summary>{actions[0].title}{actions.length>1&&<small className={styles.source}>+{actions.length-1} more recovery {actions.length===2?'action':'actions'}</small>}</summary>{actions.map(a=><div key={a.code}><strong>{a.title}</strong><p>{a.action}</p></div>)}</details>:<span className={styles.muted}>No recorded dependency coverage gap. This does not establish full security coverage.</span>;
+}
+
 export function OverviewView({data,nav}:{data:Of<'fixFirst'>;nav:Nav}){
  const o=data.overview,op=o.operational;
  return <div className={styles.stackGap}>
-  <section className={styles.split} aria-labelledby="ops-h">
-   <div className={styles.panel}>
-    <h2 id="ops-h">What happened in the batch</h2>
-    <StackBar title="Repository processing" caption={`of ${n(o.batch.total)} selected repositories`} denominator={o.batch.total} segments={batchStates.map(s=>({key:s,label:batchLabels[s],count:op[s],tone:stateTone[s],onSelect:()=>nav({view:'process',state:s})}))}/>
-    <p className={styles.note}>{n(op.accepted)} scan jobs accepted · {n(op.completed)} completed · {n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} verified empty repositories skipped (not scanned) · {n(op.waiting+op.queued+op.running)} remaining. Processing state says nothing about security.</p>
-   </div>
-   <div className={styles.panel}>
-    <h2>Security verdicts</h2>
-    <StackBar title="Report verdicts" caption={`of ${n(o.verdicts.denominator)} completed reports (current revisions)`} denominator={o.verdicts.denominator} segments={verdicts.map(v=>({key:v,label:v,count:o.verdicts.counts[v],tone:verdictTone[v],onSelect:()=>nav({view:'repositories',verdict:v})}))}/>
-    <p className={styles.note}>Blocked = a high-severity advisory matched an installed version (not confirmed exploitation). Checks passed = only the supported checks passed.{o.verdicts.missingReports?` ${o.verdicts.missingReports} completed jobs have no readable report.`:''}{o.freshness.refreshedReports?` ${o.freshness.refreshedReports} reports are advisory-refresh revisions; each repository is counted once.`:''}</p>
-   </div>
-  </section>
-
+  <div className={styles.batchStrip}><span><strong>{n(op.completed)} / {n(o.batch.total)}</strong> scans completed</span><button type="button" onClick={()=>nav({view:'process'})}>{n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} skipped · {n(op.waiting+op.queued+op.running)} remaining</button><button type="button" onClick={()=>nav({view:'coverage',recovery:'needed'})}>Review coverage gaps <ArrowUpRight size={14} aria-hidden="true"/></button></div>
   <section className={styles.panel} aria-labelledby="first-h">
-   <div className={styles.sectionHead}><div><h2 id="first-h">Fix first</h2><p className={styles.note}>High, then medium advisories ordered by affected repositories, then CVSS, then whether a fixed version is recorded. This is a sort order over recorded facts, not a risk score.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}>All findings</button></div>
+   <div className={styles.sectionHead}><div><h2 id="first-h">Remediation queue</h2><p className={styles.note}>One advisory, every affected repository. Choose a ranking, then inspect the evidence before changing dependencies.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}>Open full queue</button></div>
+   <QueueRanking value={data.filters.sort} nav={nav}/>
    {data.fixFirst.length?<ol className={styles.queue}>{data.fixFirst.map((g,i)=><li key={g.key}>
     <span className={styles.rank}>{i+1}</span>
-    <div className={styles.queueMain}><button type="button" className={styles.titleButton} onClick={()=>nav({advisory:g.key},{keepPage:true})}><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span>{g.title}</button><FixLine g={g}/></div>
+    <div className={styles.queueMain}><button type="button" className={styles.titleButton} onClick={()=>nav({advisory:g.key},{keepPage:true})}><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span>{g.title}</button><FixSummary g={g}/></div>
     <div className={styles.queueMeta}><SeverityTag level={g.severity}/><span>{g.cvss!==null?`CVSS ${g.cvss.toFixed(1)}`:'CVSS not provided'}</span><span><strong>{n(g.repositories)}</strong> {g.repositories===1?'repository':'repositories'} · {n(g.occurrences)} occurrences</span></div>
-   </li>)}</ol>:<p className={styles.emptyLine}>No high or medium advisory matches in the completed reports. Coverage gaps below may still hide matches.</p>}
+   </li>)}</ol>:<p className={styles.emptyLine}>No recorded advisories match this queue. Coverage gaps may still hide matches.</p>}
   </section>
 
   <section className={styles.kpis} aria-label="Finding totals">
@@ -97,6 +97,19 @@ export function OverviewView({data,nav}:{data:Of<'fixFirst'>;nav:Nav}){
    </div>
   </section>
 
+  <section className={styles.split} aria-labelledby="ops-h">
+   <div className={styles.panel}>
+    <h2 id="ops-h">What happened in the batch</h2>
+    <StackBar title="Repository processing" caption={`of ${n(o.batch.total)} selected repositories`} denominator={o.batch.total} segments={batchStates.map(s=>({key:s,label:batchLabels[s],count:op[s],tone:stateTone[s],onSelect:()=>nav({view:'process',state:s})}))}/>
+    <p className={styles.note}>{n(op.accepted)} scan jobs accepted · {n(op.completed)} completed · {n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} verified empty repositories skipped (not scanned) · {n(op.waiting+op.queued+op.running)} remaining. Processing state says nothing about security.</p>
+   </div>
+   <div className={styles.panel}>
+    <h2>Security verdicts</h2>
+    <StackBar title="Report verdicts" caption={`of ${n(o.verdicts.denominator)} completed reports (current revisions)`} denominator={o.verdicts.denominator} segments={verdicts.map(v=>({key:v,label:v,count:o.verdicts.counts[v],tone:verdictTone[v],onSelect:()=>nav({view:'repositories',verdict:v})}))}/>
+    <p className={styles.note}>Blocked = a high-severity advisory matched an installed version (not confirmed exploitation). Checks passed = only the supported checks passed.{o.verdicts.missingReports?` ${o.verdicts.missingReports} completed jobs have no readable report.`:''}{o.freshness.refreshedReports?` ${o.freshness.refreshedReports} reports are advisory-refresh revisions; each repository is counted once.`:''}</p>
+   </div>
+  </section>
+
   <section className={styles.panel} aria-labelledby="gaps-h">
    <h2 id="gaps-h">Coverage gaps</h2>
    <p className={styles.note}>Each bar is out of {n(o.gaps.denominator)} completed reports, including Blocked ones. A report can have several gaps, so these categories overlap and must not be added together.</p>
@@ -114,16 +127,17 @@ function GapBars({counts,denominator,nav}:{counts:Record<GapCode,number>;denomin
 export function FindingsView({data,nav}:{data:Of<'findings'>;nav:Nav}){
  const f=data.findings,o=data.overview,flt=data.filters;
  return <section className={styles.panel} aria-labelledby="find-h">
-  <div className={styles.sectionHead}><div><h2 id="find-h">Findings across repositories</h2><p className={styles.note}>{n(o.findings.uniqueAdvisories)} unique advisories · {n(o.findings.affectedRepositories)} affected repositories · {n(o.findings.occurrences)} dependency occurrences. Grouped by advisory; an affected-version match is not confirmed exploitability.</p></div></div>
+  <div className={styles.sectionHead}><div><h2 id="find-h">Remediation queue</h2><p className={styles.note}>{n(o.findings.uniqueAdvisories)} unique advisories · {n(o.findings.affectedRepositories)} affected repositories · {n(o.findings.occurrences)} dependency occurrences. Grouped by advisory; an affected-version match is not confirmed exploitability.</p></div></div>
+  <QueueRanking value={flt.sort} nav={nav}/>
   <div className={styles.toolbar}><SearchBox label="Search advisory, package or repository" value={flt.q} onChange={q=>nav({q})}/>
    <Segmented<Severity> label="Filter by severity" value={flt.severity} onChange={v=>nav({severity:v})} options={[{value:null,label:'All',count:o.findings.uniqueAdvisories},...severities.map(s=>({value:s,label:sevLabel[s],count:o.findings.bySeverity[s]}))]}/>
    <Clear active={!!(flt.q||flt.severity)} nav={nav} keys={['q','severity']}/></div>
   {f.items.length?<div className={styles.tableWrap}><table className={styles.table}><caption className={styles.srOnly}>Advisories grouped across repositories</caption>
-   <thead><tr><th scope="col">Advisory</th><th scope="col">Severity</th><th scope="col">Installed → advisory fix</th><th scope="col" className={styles.num}>Repositories</th><th scope="col" className={styles.num}>Occurrences</th><th scope="col"><span className={styles.srOnly}>Evidence</span></th></tr></thead>
+   <thead><tr><th scope="col">Advisory</th><th scope="col">Severity</th><th scope="col">Remediation</th><th scope="col" className={styles.num}>Repositories</th><th scope="col" className={styles.num}>Occurrences</th><th scope="col"><span className={styles.srOnly}>Evidence</span></th></tr></thead>
    <tbody>{f.items.map(g=><tr key={g.key}>
     <th scope="row"><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span><span className={styles.cellTitle}>{g.title}</span></th>
     <td><SeverityTag level={g.severity}/><small className={styles.source}>{[g.cvss!==null&&!g.severitySources.some(x=>x.startsWith('CVSS'))?`CVSS ${g.cvss.toFixed(1)}`:null,...g.severitySources].filter(Boolean).join(' · ')||'Source not recorded'}</small></td>
-    <td><FixLine g={g}/></td>
+    <td><FixSummary g={g}/></td>
     <td className={styles.num}><strong>{n(g.repositories)}</strong><small className={styles.source}>{g.repositorySample.join(', ')}{g.repositories>3?'…':''}</small></td>
     <td className={styles.num}>{n(g.occurrences)}</td>
     <td><button type="button" className="button" onClick={()=>nav({advisory:g.key},{keepPage:true})}>Evidence<span className={styles.srOnly}> for {g.advisoryId||g.title}</span></button></td>
@@ -148,7 +162,7 @@ type RepoItem=Of<'repositories'>['repositories']['items'][number];
 function RepoTable({items,coverage}:{items:RepoItem[];coverage:boolean}){
  if(!items.length)return <p className={styles.emptyLine}>No repositories match these filters.</p>;
  return <div className={styles.tableWrap}><table className={styles.table}><caption className={styles.srOnly}>Repositories with completed reports</caption>
-  <thead><tr><th scope="col">Repository</th><th scope="col">Verdict</th>{!coverage&&<th scope="col" className={styles.num}>High</th>}{!coverage&&<th scope="col" className={styles.num}>Medium</th>}{!coverage&&<th scope="col" className={styles.num}>Low / unrated</th>}<th scope="col" className={styles.num}>Deps checked</th><th scope="col">Coverage</th><th scope="col"><span className={styles.srOnly}>Report</span></th></tr></thead>
+  <thead><tr><th scope="col">Repository</th><th scope="col">Verdict</th>{!coverage&&<th scope="col" className={styles.num}>High</th>}{!coverage&&<th scope="col" className={styles.num}>Medium</th>}{!coverage&&<th scope="col" className={styles.num}>Low / unrated</th>}<th scope="col" className={styles.num}>Deps checked</th><th scope="col">Coverage</th>{coverage&&<th scope="col">Next step</th>}<th scope="col"><span className={styles.srOnly}>Report</span></th></tr></thead>
   <tbody>{items.map(r=><tr key={r.repository}>
    <th scope="row"><span className={styles.repoName}>{r.repository}</span>{coverage&&'omissions' in r&&<CoverageDetail r={r as CoverageItem}/>}</th>
    <td><VerdictTag verdict={r.verdict}/></td>
@@ -157,6 +171,7 @@ function RepoTable({items,coverage}:{items:RepoItem[];coverage:boolean}){
    {!coverage&&<td className={styles.num}>{r.severityCounts.low} / {r.severityCounts.review}</td>}
    <td className={styles.num} data-zero={r.dependencyCount===0||undefined}>{n(r.dependencyCount)}<small className={styles.source}>{r.manifests} manifests{r.omitted?` · ${r.omitted} omitted`:''}</small></td>
    <td>{r.stage&&<span className={styles.stage} data-stage={r.stage}>{stageLabels[r.stage]}</span>}{r.gaps.filter(g=>g!=='zero_dependencies').length>0&&<ul className={styles.chips}>{r.gaps.filter(g=>g!=='zero_dependencies').map(g=><li key={g}>{gapLabels[g].label}</li>)}</ul>}</td>
+   {coverage&&<td><RecoverySteps gaps={r.gaps}/></td>}
    <td>{r.reportId&&<Link href={reportHref(r.reportId)}>Report<span className={styles.srOnly}> for {r.repository}</span></Link>}{r.refreshed&&<small className={styles.source}>refreshed revision</small>}</td>
   </tr>)}</tbody></table></div>;
 }
@@ -164,7 +179,8 @@ function RepoTable({items,coverage}:{items:RepoItem[];coverage:boolean}){
 type CoverageItem=RepoItem&{omissions:{path:string;reason:string;recorded:boolean}[];moreOmissions:number;manifestPaths:string[];dependenciesByManifest:Record<string,number>};
 function CoverageDetail({r}:{r:CoverageItem}){
  if(!r.manifestPaths.length&&!r.omissions.length)return <small className={styles.source}>No supported manifest found by discovery.</small>;
- return <details className={styles.details}><summary>{r.manifestPaths.length} scanned · {r.omissions.length+r.moreOmissions} omitted</summary>
+ return <details className={styles.details}><summary>{r.manifests} scanned · {r.omissions.length+r.moreOmissions} omitted</summary>
+  <p className={styles.note}>Scanned commit: <code>{r.commit||'Not recorded'}</code>. Showing up to 20 manifest paths; see the report for the full evidence.</p>
   {r.manifestPaths.length>0&&<ul>{r.manifestPaths.map(m=><li key={m}><code>{m}</code><span>{n(r.dependenciesByManifest[m]||0)} exact versions</span></li>)}</ul>}
   {r.omissions.length>0&&<ul>{r.omissions.map(o=><li key={o.path}><code>{o.path}</code><span data-unrecorded={!o.recorded||undefined}>{o.reason}</span></li>)}{r.moreOmissions?<li className={styles.muted}>+{r.moreOmissions} more omitted files in the report</li>:null}</ul>}
  </details>;
@@ -174,15 +190,9 @@ export function CoverageView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
  const o=data.overview,p=o.pipeline,flt=data.filters;
  const steps=[['Report saved','completed reports',p.reports],['Manifest scanned','≥1 supported manifest read',p.manifestScanned],['Exact versions resolved','≥1 pinned dependency',p.versionsResolved],['Advisory lookup complete','no provider, deadline or limit gap',p.lookupComplete]] as const;
  return <div className={styles.stackGap}>
-  <section className={styles.panel} aria-labelledby="cov-h">
-   <h2 id="cov-h">How coverage is decided</h2>
-   <p className={styles.note}>Discovery finds package-lock.json, package.json and requirements.txt (other lockfiles are recorded as unsupported). Each manifest is parsed to exact versions; only exact versions are looked up in OSV. A report can be Blocked and still have gaps.</p>
-   <ol className={styles.funnel}>{steps.map(([label,hint,value])=><li key={label}><span className={styles.funnelLabel}>{label}<small>{hint}</small></span><span className={styles.gapTrack} aria-hidden="true"><span style={{width:p.reports?`${value/p.reports*100}%`:0}}/></span><span className={styles.gapValue}><strong>{n(value)}</strong> / {n(p.reports)}</span></li>)}</ol>
-   <h3 className={styles.subhead}>Gaps (overlapping)</h3>
-   <GapBars counts={o.gaps.counts} denominator={o.gaps.denominator} nav={nav}/>
-  </section>
   <section className={styles.panel} aria-labelledby="covlist-h">
-   <h2 id="covlist-h">Repository coverage</h2>
+   <div className={styles.sectionHead}><div><h2 id="covlist-h">Coverage recovery</h2><p className={styles.note}>Recover missing evidence before trusting a clean result. These actions are guidance; no scan, retry or dependency change is started here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}>Inspect failed scans</button></div>
+   <Segmented label="Recovery scope" value={flt.recovery} options={[{value:'needed',label:'Needs recovery'},{value:null,label:'All reports'}]} onChange={recovery=>nav({recovery})}/>
    <div className={styles.toolbar}><SearchBox label="Search repositories" value={flt.q} onChange={q=>nav({q})}/>
     <label className={styles.select}><span>Gap</span><select value={flt.gap||''} onChange={e=>nav({gap:e.target.value||null})}><option value="">Any</option>{gapCodes.map(g=><option key={g} value={g}>{gapLabels[g].label} ({o.gaps.counts[g]})</option>)}</select></label>
     <label className={styles.select}><span>Stage</span><select value={flt.stage||''} onChange={e=>nav({stage:(e.target.value||null) as CoverageStage|null})}><option value="">Any</option>{(Object.keys(stageLabels) as CoverageStage[]).map(s=><option key={s} value={s}>{stageLabels[s]}</option>)}</select></label>
@@ -192,6 +202,14 @@ export function CoverageView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
    <RepoTable items={data.repositories.items} coverage/>
    <Pager {...data.repositories} nav={nav} noun="repositories"/>
   </section>
+  <section className={styles.panel} aria-labelledby="cov-h">
+   <h2 id="cov-h">How coverage is decided</h2>
+   <p className={styles.note}>Discovery finds package-lock.json, package.json and requirements.txt (other lockfiles are recorded as unsupported). Each manifest is parsed to exact versions; only exact versions are looked up in OSV. A report can be Blocked and still have gaps.</p>
+   <ol className={styles.funnel}>{steps.map(([label,hint,value])=><li key={label}><span className={styles.funnelLabel}>{label}<small>{hint}</small></span><span className={styles.gapTrack} aria-hidden="true"><span style={{width:p.reports?`${value/p.reports*100}%`:0}}/></span><span className={styles.gapValue}><strong>{n(value)}</strong> / {n(p.reports)}</span></li>)}</ol>
+   <h3 className={styles.subhead}>Gaps (overlapping)</h3>
+   <GapBars counts={o.gaps.counts} denominator={o.gaps.denominator} nav={nav}/>
+  </section>
+
  </div>;
 }
 

@@ -2,7 +2,7 @@ import type {Query} from './db';
 import type {Actor} from './store';
 import {ApiError} from './http';
 import {batchStates,type BatchState} from '../batch-progress';
-import {summarize,groupFindings,overview,lifecycle,throughput,median,fixFirstOrder,repositoryOrder,hasFix,exploitPrerequisites,explainFailure,
+import {summarize,groupFindings,overview,lifecycle,throughput,median,remediationQueue,remediationModes,repositoryOrder,hasFix,exploitPrerequisites,explainFailure,
  severities,verdicts,gapCodes,type EntryRow,type JobEvent,type RepoSummary,type AdvisoryGroup,type Severity,type Verdict,type GapCode,type CoverageStage} from '../security-dashboard';
 
 const PAGE_ROWS=50,MAX_EVENTS=6000;
@@ -68,7 +68,7 @@ async function jobIds(query:Query,actor:Actor,batchId:string){
  return new Map(rows.map(r=>[String(r.repository),String(r.id)]));
 }
 
-export type DashboardParams={batch?:string|null;view?:string|null;q?:string|null;severity?:string|null;verdict?:string|null;gap?:string|null;stage?:string|null;state?:string|null;advisory?:string|null;page?:string|null};
+export type DashboardParams={sort?:string|null;recovery?:string|null;batch?:string|null;view?:string|null;q?:string|null;severity?:string|null;verdict?:string|null;gap?:string|null;stage?:string|null;state?:string|null;advisory?:string|null;page?:string|null};
 const views=['overview','findings','repositories','coverage','process'] as const;
 const pick=<T extends string>(value:string|null|undefined,allowed:readonly T[])=>value&&(allowed as readonly string[]).includes(value)?value as T:null;
 const stages=['no_scanned_manifest','zero_resolved','partial','complete'] as const;
@@ -78,7 +78,7 @@ const groupSummary=(g:AdvisoryGroup)=>({key:g.key,advisoryId:g.advisoryId,title:
  repositories:g.repositories.length,repositorySample:g.repositories.slice(0,3),occurrences:g.occurrenceCount,hasFix:hasFix(g),
  packages:g.packages.map(p=>({...p,installed:p.installed.slice(0,8),moreVersions:Math.max(0,p.installed.length-8)})).slice(0,4)});
 const repoRow=(s:RepoSummary)=>({repository:s.repository,state:s.state,verdict:s.verdict,reportId:s.reportId,severityCounts:s.severityCounts,advisoryCount:s.advisoryCount,
- dependencyCount:s.dependencyCount,manifests:s.manifests.length,omitted:s.omissions.length,stage:s.stage,gaps:s.gaps,refreshed:s.refreshed,reportCreatedAt:s.reportCreatedAt});
+ dependencyCount:s.dependencyCount,manifests:s.manifests.length,omitted:s.omissions.length,stage:s.stage,gaps:s.gaps,refreshed:s.refreshed,reportCreatedAt:s.reportCreatedAt,commit:s.commit});
 
 export async function securityDashboard(query:Query,actor:Actor,params:DashboardParams,now=new Date()){
  const batches=await listBatches(query,actor);
@@ -88,12 +88,15 @@ export async function securityDashboard(query:Query,actor:Actor,params:Dashboard
  if(!batch)throw new ApiError(404,'Batch not found.');
  const rows=await loadBatchRows(query,actor,batch.id);
  const summaries=rows.map(summarize),byRepo=new Map(summaries.map(s=>[s.repository,s]));
- const groups=groupFindings(rows,byRepo).sort(fixFirstOrder);
+ const sort=pick(params.sort,remediationModes)||'widespread';
+ const groups=groupFindings(rows,byRepo);
+ const ranked=remediationQueue(groups,sort);
  const checkedAt=now.toISOString(),ov=overview(batch,summaries,groups,checkedAt);
  const view=pick(params.view,views)||'overview',q=(params.q||'').trim().toLowerCase().slice(0,120),page=Number(params.page)||1;
  const severity=pick(params.severity,severities as readonly Severity[]),verdict=pick(params.verdict,verdicts as readonly Verdict[]);
  const gap=pick(params.gap,gapCodes as readonly GapCode[]),stage=pick(params.stage,stages as readonly CoverageStage[]),state=pick(params.state,batchStates as readonly BatchState[]);
- const filters={view,q,severity,verdict,gap,stage,state,advisory:params.advisory||null};
+ const recovery=params.recovery==='needed'?'needed':null;
+ const filters={sort,recovery,view,q,severity,verdict,gap,stage,state,advisory:params.advisory||null};
  const base={batches,batch,overview:ov,filters};
 
  if(params.advisory){
@@ -102,17 +105,17 @@ export async function securityDashboard(query:Query,actor:Actor,params:Dashboard
    occurrenceList:g.occurrences.slice(0,500),truncated:g.occurrences.length>500}};
  }
  if(view==='overview'){
-  const fixFirst=groups.filter(g=>g.severity==='high'||g.severity==='medium').slice(0,8).map(groupSummary);
+  const fixFirst=ranked.slice(0,5).map(groupSummary);
   const attention=summaries.filter(s=>s.verdict==='Blocked').sort(repositoryOrder).slice(0,8).map(repoRow);
   const zeroChecked=summaries.filter(s=>s.verdict&&s.dependencyCount===0).length;
   return {...base,fixFirst,attention,zeroChecked};
  }
  if(view==='findings'){
-  const items=groups.filter(g=>(!severity||g.severity===severity)&&(!q||[g.advisoryId,g.title,...g.repositories,...g.packages.map(p=>p.name)].some(v=>v?.toLowerCase().includes(q))));
+  const items=ranked.filter(g=>(!severity||g.severity===severity)&&(!q||[g.advisoryId,g.title,...g.repositories,...g.packages.map(p=>p.name)].some(v=>v?.toLowerCase().includes(q))));
   return {...base,findings:paginate(items.map(groupSummary),page,25)};
  }
  if(view==='repositories'||view==='coverage'){
-  const items=summaries.filter(s=>s.verdict&&(!verdict||s.verdict===verdict)&&(!gap||s.gaps.includes(gap))&&(!stage||s.stage===stage)&&(!q||s.repository.toLowerCase().includes(q)))
+  const items=summaries.filter(s=>s.verdict&&(!(view==='coverage'&&recovery)||s.gaps.length>0)&&(!verdict||s.verdict===verdict)&&(!gap||s.gaps.includes(gap))&&(!stage||s.stage===stage)&&(!q||s.repository.toLowerCase().includes(q)))
    .sort(view==='coverage'?(a,b)=>a.dependencyCount-b.dependencyCount||a.position-b.position:repositoryOrder);
   const paged=paginate(items,page,PAGE_ROWS);
   return {...base,repositories:{...paged,items:paged.items.map(s=>view==='coverage'?{...repoRow(s),omissions:s.omissions.slice(0,20),moreOmissions:Math.max(0,s.omissions.length-20),

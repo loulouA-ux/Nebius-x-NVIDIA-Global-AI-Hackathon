@@ -133,3 +133,32 @@ describe('pure helpers',()=>{
   expect(summarize({...row,verdict:'Something else'}).verdict).toBeNull();
  });
 });
+
+it('ranks the entire remediation queue by explicit recorded facts without mutating groups',async()=>{
+ const {remediationQueue}=await import('../src/lib/security-dashboard');
+ const response=await securityDashboard(q,actor,{advisory:'osv:GHSA-aaaa'});
+ if(!('advisory' in response))throw Error();
+ const base=response.advisory;
+ const group=(key:string,repos:number,severity:'high'|'medium',cvss:number|null,fix:boolean)=>({...base,key,severity,cvss,repositories:Array.from({length:repos},(_,i)=>`r${i}`),occurrenceCount:repos,occurrences:[],packages:fix?base.packages:[]});
+ const groups=[group('wide',50,'medium',5,true),group('severe',1,'high',9.9,false),group('unknown',2,'high',null,true)];
+ expect(remediationQueue(groups,'widespread').map(g=>g.key)).toEqual(['wide','unknown','severe']);
+ expect(remediationQueue(groups,'severity').map(g=>g.key)).toEqual(['severe','unknown','wide']);
+ expect(remediationQueue(groups,'fixable').map(g=>g.key)).toEqual(['wide','unknown']);
+ expect(groups.map(g=>g.key)).toEqual(['wide','severe','unknown']);
+});
+it('validates queue modes and filters recovery without losing blocked coverage gaps',async()=>{
+ const response=await securityDashboard(q,actor,{view:'findings',sort:'untrusted'});
+ if(!('findings' in response))throw Error();expect(response.filters.sort).toBe('widespread');
+ const coverage=await securityDashboard(q,actor,{view:'coverage',recovery:'needed'});
+ if(!('repositories' in coverage))throw Error();
+ expect(coverage.repositories.items.every(r=>r.gaps.length>0)).toBe(true);
+ expect(coverage.repositories.items.some(r=>r.verdict==='Blocked')).toBe(true);
+ expect(coverage.repositories.items.find(r=>r.repository===repo('blocked-b'))?.commit).toBe('abc');
+});
+it('provides recovery guidance for every recorded gap without hiding unclassified omissions',async()=>{
+ const {gapCodes,recoveryActions}=await import('../src/lib/security-dashboard');
+ for(const gap of gapCodes)expect(recoveryActions([gap])[0].action.length).toBeGreaterThan(40);
+ const actions=recoveryActions(['zero_dependencies','python_syntax','omitted_files']);
+ expect(actions.map(a=>a.code)).toEqual(['python_syntax','omitted_files']);
+ expect(actions[0].action).not.toContain('npm');expect(recoveryActions([])).toEqual([]);
+});

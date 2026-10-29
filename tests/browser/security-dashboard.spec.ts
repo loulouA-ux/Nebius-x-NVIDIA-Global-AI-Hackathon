@@ -65,10 +65,10 @@ test('coverage shows reasons honestly and finds zero-dependency repositories',as
  await page.goto('/security-overview?view=coverage&gap=zero_dependencies');
  await expect(page.getByText('1–50 of 95 repositories')).toBeVisible();
  await page.goto('/security-overview?view=coverage&gap=omitted_files&verdict=Blocked');
- await page.getByRole('row').nth(1).locator('summary').click();
- await expect(page.getByText('Unsupported lockfile format').first()).toBeVisible();
+ await page.getByRole('row').nth(1).locator('summary').filter({hasText:/scanned/}).click();
+ await expect(page.getByRole('row').nth(1).locator('details[open]').getByText('Unsupported lockfile format',{exact:true})).toBeVisible();
  await page.goto('/security-overview?view=coverage&stage=partial');
- await page.getByRole('row').nth(1).locator('summary').click();
+ await page.getByRole('row').nth(1).locator('summary').filter({hasText:/scanned/}).click();
  await expect(page.getByText('Manifest could not be parsed or scanned').first()).toBeVisible();
  await page.goto('/security-overview?view=coverage');
  await page.screenshot({path:`${shots}/coverage-desktop-dark.png`,fullPage:true});
@@ -112,4 +112,25 @@ test('signed-out and stale states keep private data out of view',async({page})=>
  await page.unroute('**/api/security**');await serve(page,()=>finished,{status:401});
  await page.getByRole('button',{name:'Refresh',exact:true}).click();
  await expect(page.getByRole('link',{name:'Sign in with GitHub'})).toBeVisible();await expect(page.getByText('of 200 completed reports')).toHaveCount(0);
+});
+
+test('queue ranking and coverage recovery are deep-linked read-only workflows',async({page})=>{
+ await serve(page,()=>finished);await page.setViewportSize({width:1440,height:1000});
+ const writes:string[]=[];page.on('request',r=>{if(r.url().includes('/api/')&&r.method()!=='GET')writes.push(r.method()+' '+r.url());});
+ await page.goto('/security-overview?view=findings');
+ await page.getByRole('button',{name:'Highest reported severity',exact:true}).click();
+ await expect(page).toHaveURL(/sort=severity/);
+ await expect(page.getByRole('row').nth(2)).toContainText('example-template-engine');
+ await page.getByRole('button',{name:'Fix available',exact:true}).click();
+ await expect(page.getByRole('table')).not.toContainText('example-template-engine');
+ await page.reload();await expect(page.getByRole('button',{name:'Fix available',pressed:true})).toBeVisible();
+ await page.goto('/security-overview?view=coverage&gap=python_syntax&recovery=needed');
+ await expect(page.getByRole('heading',{name:'Coverage recovery',exact:true})).toBeVisible();
+ await expect(page.locator('summary').filter({hasText:'Resolve Python dependency inputs'}).first()).toBeVisible();
+ await page.locator('summary').filter({hasText:'Resolve Python dependency inputs'}).first().click();
+ await expect(page.getByText(/Provide a reproducible exact-version dependency export/).first()).toBeVisible();
+ await page.screenshot({path:`${shots}/coverage-recovery-desktop-dark.png`});
+ await expect(page.getByRole('button',{name:'Needs recovery',pressed:true})).toBeVisible();
+ await page.getByRole('button',{name:'Inspect failed scans'}).click();await expect(page).toHaveURL(/view=process.*state=failed/);
+ expect(writes).toEqual([]);
 });

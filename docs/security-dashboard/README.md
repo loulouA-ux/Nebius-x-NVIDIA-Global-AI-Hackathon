@@ -173,3 +173,19 @@ Then sign in and open `http://127.0.0.1:3147/security-overview`. Real batch data
   - `src/lib/server/batch-progress.ts`: failure codes explained in plain words
   - `src/proxy.ts`: public demo rewrites `/security-overview` to the demo-access page
   - `tests/public-demo.test.ts`: handler count 43 → 44, plus the new page and API in the refusal list
+
+### Remediation queue and coverage recovery
+
+The overview starts with a compact batch summary and five grouped advisories. The full remediation queue supports URL-persisted ranking:
+
+- `sort=widespread`: affected repository count, reported severity, then CVSS.
+- `sort=severity`: reported severity, CVSS, then affected repository count.
+- `sort=fixable`: filter to advisories with a recorded fixed version for at least one occurrence, then order by repository count, severity and CVSS.
+
+Ties use occurrence count and stable advisory key. Filtering and ranking happen across the whole owner-scoped batch before pagination. These are factual sort orders, not exploitability or exposure scores. Fix availability is partial when only some installed versions have recorded fixes. The evidence drawer retains exact versions, manifests, source links and unknown exposure.
+
+Coverage recovery (`view=coverage&recovery=needed`) filters to reports with recorded gaps, including Blocked reports. All reports remain available through the scope control. Each row provides guidance for its recorded gap, additional recovery actions, and manifest/omission evidence. Missing omission reasons remain unknown. The manifest disclosure shows the scanned commit and a bounded list; the original report retains full evidence. Failed scans remain separate in Batch process.
+
+These views only read existing reports. They do not change repositories, create repair PRs, submit scans, refresh advisories, reserve allowance, or claim that following guidance has recovered coverage. Authenticated workspace and owner filters and the public-demo refusal remain in place. No schema migration is required.
+
+Browser screenshots use the existing explicitly synthetic fixture; they are not evidence of live batch results.

@@ -151,3 +151,8 @@
  .drawerInner{padding:20px 16px 40px}.drawerHead{top:-20px;margin-top:-20px;padding-top:20px}
  .heading .headingActions{width:100%}
 }
+
+.batchStrip{display:flex;align-items:center;flex-wrap:wrap;gap:8px 24px;padding:0 0 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--body2)}
+.batchStrip strong{color:var(--text)}.batchStrip button{display:inline-flex;align-items:center;gap:4px;min-height:36px;background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer;text-align:left}.batchStrip button:hover{text-decoration:underline}
+.ranking{display:grid;justify-items:start;gap:8px;margin:16px 0 20px}.ranking .note{margin:0}
+.recoverySteps{min-width:240px;max-width:360px;line-height:1.5}.recoverySteps strong{font-weight:500;color:var(--text)}.recoverySteps p{margin:4px 0 10px;color:var(--body2)}.recoverySteps summary{cursor:pointer;color:var(--accent);min-height:32px}.recoverySteps details>div{margin-top:12px}

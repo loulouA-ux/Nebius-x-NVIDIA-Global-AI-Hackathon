@@ -10,6 +10,6 @@ export async function GET(request:Request){
  try{
   const query=database(),actor=await requireApiActor(request,query),p=new URL(request.url).searchParams;
   const get=(k:string)=>p.get(k);
-  return json(await securityDashboard(query,actor,{batch:get('batch'),view:get('view'),q:get('q'),severity:get('severity'),verdict:get('verdict'),gap:get('gap'),stage:get('stage'),state:get('state'),advisory:get('advisory'),page:get('page')}));
+  return json(await securityDashboard(query,actor,{sort:get('sort'),recovery:get('recovery'),batch:get('batch'),view:get('view'),q:get('q'),severity:get('severity'),verdict:get('verdict'),gap:get('gap'),stage:get('stage'),state:get('state'),advisory:get('advisory'),page:get('page')}));
  }catch(error){return failure(error);}
 }
