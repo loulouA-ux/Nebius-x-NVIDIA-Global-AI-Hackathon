@@ -20,6 +20,10 @@ test("repair flow requires evidence review and explicit approval before PR reque
  const approve=page.getByRole("button",{name:"Approve and create draft PR"});await expect(approve).toBeDisabled();expect(writes).toBe(0);
  await page.getByLabel("I reviewed the diff and the test evidence",{exact:false}).check();await expect(approve).toBeEnabled();
  await page.screenshot({path:"test-results/repair-review-desktop.png",fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await approve.scrollIntoViewIfNeeded();
+ await page.screenshot({path:".private/repair-approval-mobile.png"});
  await approve.click();await expect(page.getByRole("link",{name:"Open draft pull request"})).toHaveAttribute("href","https://github.com/team/demo/pull/1");expect(writes).toBe(1);
 });
 test("unconnected member sees actionable error without approving repairs",async({page})=>{
