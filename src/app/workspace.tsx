@@ -1,4 +1,6 @@
 "use client";
+import {Play as UiPlay} from 'lucide-react';
+
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import useReportNavigation from "./use-report-navigation";
@@ -142,7 +144,7 @@ export default function Home({initialReport,initialFinding,demoOnly=false}:{init
           ) : view === "scan" ? (
             <NewScan filename={filename} setFilename={setFilename} content={content} setContent={setContent} research={research} setResearch={setResearch} projectId={projectId} setProjectId={setProjectId} scan={()=>scan('live')} demo={offline=>scan('demo',!offline&&recorded===true)} project={()=>navigate('project')}/>
           ) : unavailable ? (
-            <section className="home-empty"><h1>Report unavailable</h1><p>This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.</p><Link className="button primary" href="/sign-in">Sign in</Link> <button className="button" onClick={()=>scan('demo')}>Run offline demo</button></section>
+            <section className="home-empty"><h1>Report unavailable</h1><p>This scan wasn’t saved here, or your account cannot access it. Sign in to reopen saved reports and keep future scans.</p><Link className="button primary" href="/sign-in">Sign in</Link> <button className="button" onClick={()=>scan('demo')}><UiPlay size={16} aria-hidden="true" className="action-icon"/>Run offline demo</button></section>
           ) : !report ? (
             <HomeEmpty recent={recent} open={async id=>{try{const r=await fetch(`/api/scans/${encodeURIComponent(id)}`);if(!r.ok)throw Error("Saved report unavailable. Sign in again or retry.");navigate("overview",(await r.json()).report);}catch(e){setError((e as Error).message);}}} demo={offline=>scan("demo",!offline&&recorded===true)} scan={()=>navigate("scan")} recorded={recorded}/>
           ) : (

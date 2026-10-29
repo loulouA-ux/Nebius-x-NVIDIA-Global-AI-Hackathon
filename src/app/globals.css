@@ -102,3 +102,9 @@ body{--mono:var(--font-mono),monospace}
 .phone-report-tools summary{list-style:none}.phone-report-tools summary::-webkit-details-marker{display:none}
 
 .platform-guide nav{display:flex;flex-wrap:wrap;gap:20px;margin-block:28px}.platform-guide pre{max-width:100%;overflow:auto;padding:20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font:13px/1.6 var(--mono)}.platform-guide section{margin-block:40px}
+
+/* Labelled action icons: decorative to assistive tech, consistent with navigation. */
+.action-icon{display:inline-block;flex-shrink:0;vertical-align:-.18em;margin-inline-end:.45em;pointer-events:none}
+button,.button,.text-button,nav a{ text-decoration:none; }
+button:hover,.button:hover,.text-button:hover,nav a:hover{text-decoration:none}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}

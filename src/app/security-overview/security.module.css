@@ -209,3 +209,10 @@
 
 .repoSample{white-space:normal;max-width:220px;font-size:12px;text-align:left;color:var(--body2);font-weight:400;margin-top:4px}.repoSample summary{cursor:pointer;min-height:32px;color:var(--accent);line-height:1.5}.repoSample ul{list-style:none;padding:0;margin:6px 0;display:grid;gap:8px}.repoSample li{overflow-wrap:anywhere}.repoSample span{display:block;line-height:1.5}
 @media(max-width:900px){.repoSample{max-width:none}.repoSample summary{min-height:44px;font-size:13px}}
+
+/* Keep off-screen table labels inside their own scrolling region. */
+.tableWrap{position:relative}
+/* Icon, state marker, label and values retain separate aligned columns. */
+.legend button{grid-template-columns:16px 10px minmax(0,1fr) auto 44px}
+.legend button :global(.action-icon){margin:0}
+.legendStatic{padding-inline-start:30px}

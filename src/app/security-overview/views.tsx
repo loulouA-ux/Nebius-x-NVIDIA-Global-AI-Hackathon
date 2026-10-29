@@ -1,4 +1,6 @@
 'use client';
+import {Filter as UiFilter,ChevronLeft as UiChevronLeft,ChevronRight as UiChevronRight,X as UiX,ListChecks as UiListChecks,ShieldAlert as UiShieldAlert,ScanSearch as UiScanSearch,ScanLine as UiScanLine} from 'lucide-react';
+
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {ArrowUpRight,Search,X,Wrench,FileSearch} from 'lucide-react';
@@ -24,7 +26,7 @@ function StackBar({title,caption,denominator,segments}:{title:string;caption:str
   <figcaption><span className={styles.figTitle}>{title}</span><span className={styles.figCaption}>{caption}</span></figcaption>
   <div className={styles.bar} aria-hidden="true">{segments.filter(s=>s.count>0).map(s=><span key={s.key} data-tone={s.tone} style={{flexGrow:s.count}} title={`${s.label}: ${s.count} of ${denominator}`}/>)}</div>
   <ul className={styles.legend}>{segments.map(s=><li key={s.key}>
-   {s.onSelect&&s.count>0?<button type="button" onClick={s.onSelect} aria-label={`${s.label}: ${s.count} of ${denominator}. Show these`}><Swatch tone={s.tone}/><span>{s.label}</span><strong>{n(s.count)}</strong><small>{pct(s.count,denominator)}</small></button>
+   {s.onSelect&&s.count>0?<button type="button" onClick={s.onSelect} aria-label={`${s.label}: ${s.count} of ${denominator}. Show these`}><UiFilter size={16} aria-hidden="true" className="action-icon"/><Swatch tone={s.tone}/><span>{s.label}</span><strong>{n(s.count)}</strong><small>{pct(s.count,denominator)}</small></button>
     :<span className={styles.legendStatic}><Swatch tone={s.tone}/><span>{s.label}</span><strong>{n(s.count)}</strong><small>{pct(s.count,denominator)}</small></span>}
   </li>)}</ul>
  </figure>;
@@ -40,14 +42,14 @@ function SearchBox({value,label,onChange}:{value:string;label:string;onChange:(v
  return <label className={styles.search}><Search size={16} aria-hidden="true"/><span className={styles.srOnly}>{label}</span><input type="search" placeholder={label} value={text} onChange={e=>setText(e.target.value)}/></label>;
 }
 function Segmented<T extends string>({label,value,options,onChange}:{label:string;value:T|null;options:{value:T|null;label:string;count?:number}[];onChange:(v:T|null)=>void}){
- return <div className={styles.segmented} role="group" aria-label={label}>{options.map(o=><button type="button" key={o.value??'all'} aria-pressed={value===o.value} onClick={()=>onChange(o.value)}>{o.label}{o.count!==undefined&&<strong>{n(o.count)}</strong>}</button>)}</div>;
+ return <div className={styles.segmented} role="group" aria-label={label}>{options.map(o=><button type="button" key={o.value??'all'} aria-pressed={value===o.value} onClick={()=>onChange(o.value)}><UiFilter size={16} aria-hidden="true" className="action-icon"/>{o.label}{o.count!==undefined&&<strong>{n(o.count)}</strong>}</button>)}</div>;
 }
 function Pager({page,pages,total,size,nav,noun}:{page:number;pages:number;total:number;size:number;nav:Nav;noun:string}){
  const from=total?(page-1)*size+1:0,to=Math.min(total,page*size);
  return <div className={styles.pager}><span>{total?`${n(from)}–${n(to)} of ${n(total)} ${noun}`:`0 ${noun}`}</span>{pages>1&&<span className={styles.pagerButtons}>
-  <button className="button" disabled={page<=1} onClick={()=>nav({page:String(page-1)})}>Previous</button><span aria-live="polite">Page {page} of {pages}</span><button className="button" disabled={page>=pages} onClick={()=>nav({page:String(page+1)})}>Next</button></span>}</div>;
+  <button className="button" disabled={page<=1} onClick={()=>nav({page:String(page-1)})}><UiChevronLeft size={16} aria-hidden="true" className="action-icon"/>Previous</button><span aria-live="polite">Page {page} of {pages}</span><button className="button" disabled={page>=pages} onClick={()=>nav({page:String(page+1)})}><UiChevronRight size={16} aria-hidden="true" className="action-icon"/>Next</button></span>}</div>;
 }
-function Clear({active,nav,keys}:{active:boolean;nav:Nav;keys:string[]}){return active?<button type="button" className={styles.linkButton} onClick={()=>nav(Object.fromEntries(keys.map(k=>[k,null])))}>Clear filters</button>:null;}
+function Clear({active,nav,keys}:{active:boolean;nav:Nav;keys:string[]}){return active?<button type="button" className={styles.linkButton} onClick={()=>nav(Object.fromEntries(keys.map(k=>[k,null])))}><UiX size={16} aria-hidden="true" className="action-icon"/>Clear filters</button>:null;}
 
 function FixLine({g}:{g:{packages:{name:string;installed:{version:string;fixedVersions:string[];repositories:number}[];moreVersions?:number}[]}}){
  return <ul className={styles.fixList}>{g.packages.map(p=><li key={p.name}><code>{p.name}</code>{p.installed.map(i=><span key={i.version} className={styles.fixPair}><code>{i.version}</code><span aria-hidden="true">→</span>{i.fixedVersions.length?<code className={styles.fixed}>{i.fixedVersions.join(' / ')}</code>:<span className={styles.muted}>no fix recorded</span>}</span>)}{p.moreVersions?<span className={styles.muted}>+{p.moreVersions} more versions</span>:null}</li>)}</ul>;
@@ -67,33 +69,33 @@ function RecoverySteps({gaps}:{gaps:GapCode[]}){
 export function OverviewView({data,nav}:{data:Of<'fixFirst'>;nav:Nav}){
  const o=data.overview,op=o.operational;
  return <div className={styles.stackGap}>
-  <div className={styles.batchStrip}><span><strong>{n(op.completed)} / {n(o.batch.total)}</strong> scans completed</span><button type="button" onClick={()=>nav({view:'process'})}>{n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} skipped · {n(op.waiting+op.queued+op.running)} remaining</button><button type="button" onClick={()=>nav({view:'coverage',recovery:'needed'})}>Review coverage gaps <ArrowUpRight size={14} aria-hidden="true"/></button></div>
+  <div className={styles.batchStrip}><span><strong>{n(op.completed)} / {n(o.batch.total)}</strong> scans completed</span><button type="button" onClick={()=>nav({view:'process'})}><UiX size={16} aria-hidden="true" className="action-icon"/>{n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} skipped · {n(op.waiting+op.queued+op.running)} remaining</button><button type="button" onClick={()=>nav({view:'coverage',recovery:'needed'})}>Review coverage gaps <ArrowUpRight size={14} aria-hidden="true"/></button></div>
   <section className={styles.panel} aria-labelledby="first-h">
-   <div className={styles.sectionHead}><div><h2 id="first-h" className={styles.sectionTitle}><Wrench size={18} aria-hidden="true"/>Remediation queue</h2><p className={styles.note}>One advisory, every affected repository. Choose a ranking, then inspect the evidence before changing dependencies.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}>Open full queue</button></div>
+   <div className={styles.sectionHead}><div><h2 id="first-h" className={styles.sectionTitle}><Wrench size={18} aria-hidden="true"/>Remediation queue</h2><p className={styles.note}>One advisory, every affected repository. Choose a ranking, then inspect the evidence before changing dependencies.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}><UiListChecks size={16} aria-hidden="true" className="action-icon"/>Open full queue</button></div>
    <QueueRanking value={data.filters.sort} nav={nav}/>
    {data.fixFirst.length?<ol className={styles.queue}>{data.fixFirst.map((g,i)=><li key={g.key}>
     <span className={styles.rank}>{i+1}</span>
-    <div className={styles.queueMain}><button type="button" className={styles.titleButton} onClick={()=>nav({advisory:g.key},{keepPage:true})}><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span>{g.title}</button><FixSummary g={g}/></div>
+    <div className={styles.queueMain}><button type="button" className={styles.titleButton} onClick={()=>nav({advisory:g.key},{keepPage:true})}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span>{g.title}</button><FixSummary g={g}/></div>
     <div className={styles.queueMeta}><SeverityTag level={g.severity}/><span>{g.cvss!==null?`CVSS ${g.cvss.toFixed(1)}`:'CVSS not provided'}</span><span><strong>{n(g.repositories)}</strong> {g.repositories===1?'repository':'repositories'} · {n(g.occurrences)} occurrences</span></div>
    </li>)}</ol>:<p className={styles.emptyLine}>No recorded advisories match this queue. Coverage gaps may still hide matches.</p>}
   </section>
 
   <section className={styles.kpis} aria-label="Finding totals">
-   <button type="button" onClick={()=>nav({view:'findings'})}><span>Unique advisories</span><strong>{n(o.findings.uniqueAdvisories)}</strong><small>distinct advisory IDs and credential patterns</small></button>
-   <button type="button" onClick={()=>nav({view:'repositories',verdict:null})}><span>Affected repositories</span><strong>{n(o.findings.affectedRepositories)}</strong><small>of {n(o.verdicts.denominator)} with reports</small></button>
-   <button type="button" onClick={()=>nav({view:'findings'})}><span>Dependency occurrences</span><strong>{n(o.findings.occurrences)}</strong><small>advisory × package version × manifest</small></button>
-   <div className={styles.kpiSev}><span>Unique advisories by severity</span><ul>{severities.map(s=><li key={s}><button type="button" onClick={()=>nav({view:'findings',severity:s})} aria-label={`${sevLabel[s]}: ${o.findings.bySeverity[s]} advisories`}><SeverityTag level={s}/><strong>{n(o.findings.bySeverity[s])}</strong></button></li>)}</ul></div>
+   <button type="button" onClick={()=>nav({view:'findings'})}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/><span>Unique advisories</span><strong>{n(o.findings.uniqueAdvisories)}</strong><small>distinct advisory IDs and credential patterns</small></button>
+   <button type="button" onClick={()=>nav({view:'repositories',verdict:null})}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/><span>Affected repositories</span><strong>{n(o.findings.affectedRepositories)}</strong><small>of {n(o.verdicts.denominator)} with reports</small></button>
+   <button type="button" onClick={()=>nav({view:'findings'})}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/><span>Dependency occurrences</span><strong>{n(o.findings.occurrences)}</strong><small>advisory × package version × manifest</small></button>
+   <div className={styles.kpiSev}><span>Unique advisories by severity</span><ul>{severities.map(s=><li key={s}><button type="button" onClick={()=>nav({view:'findings',severity:s})} aria-label={`${sevLabel[s]}: ${o.findings.bySeverity[s]} advisories`}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/><SeverityTag level={s}/><strong>{n(o.findings.bySeverity[s])}</strong></button></li>)}</ul></div>
   </section>
 
   <section className={styles.split}>
    <div className={styles.panel}>
-    <div className={styles.sectionHead}><h2>Blocked repositories</h2><button type="button" className={styles.linkButton} onClick={()=>nav({view:'repositories',verdict:'Blocked'})}>All {n(o.verdicts.counts.Blocked)}</button></div>
+    <div className={styles.sectionHead}><h2>Blocked repositories</h2><button type="button" className={styles.linkButton} onClick={()=>nav({view:'repositories',verdict:'Blocked'})}><UiFilter size={16} aria-hidden="true" className="action-icon"/>All {n(o.verdicts.counts.Blocked)}</button></div>
     {data.attention.length?<ul className={styles.repoList}>{data.attention.map(r=><li key={r.repository}><Link href={reportHref(r.reportId!)} className={styles.repoName}>{r.repository}</Link><span className={styles.counts}><b data-sev="high">{r.severityCounts.high} high</b> · {r.severityCounts.medium} medium · {n(r.dependencyCount)} deps checked{r.gaps.length?<> · <span className={styles.gapHint}>coverage gaps</span></>:null}</span></li>)}</ul>:<p className={styles.emptyLine}>No Blocked reports.</p>}
    </div>
    <div className={styles.panel}>
     <h2>What was not checked</h2>
     <StackBar title="Incomplete reports by cause" caption={`of ${n(o.incomplete.denominator)} Incomplete reports`} denominator={o.incomplete.denominator} segments={(['no_scanned_manifest','zero_resolved','partial'] as const).map((s,i)=>({key:s,label:stageLabels[s],count:o.incomplete.counts[s],tone:`gap${i}`,onSelect:()=>nav({view:'coverage',verdict:'Incomplete',stage:s})}))}/>
-    <button type="button" className={styles.callout} onClick={()=>nav({view:'coverage',gap:'zero_dependencies'})}><strong>{n(data.zeroChecked)}</strong><span>reports checked zero dependencies<small>of {n(o.verdicts.denominator)} completed reports, any verdict</small></span></button>
+    <button type="button" className={styles.callout} onClick={()=>nav({view:'coverage',gap:'zero_dependencies'})}><UiScanSearch size={16} aria-hidden="true" className="action-icon"/><strong>{n(data.zeroChecked)}</strong><span>reports checked zero dependencies<small>of {n(o.verdicts.denominator)} completed reports, any verdict</small></span></button>
    </div>
   </section>
 
@@ -118,7 +120,7 @@ export function OverviewView({data,nav}:{data:Of<'fixFirst'>;nav:Nav}){
  </div>;
 }
 function GapBars({counts,denominator,nav}:{counts:Record<GapCode,number>;denominator:number;nav:Nav}){
- return <ul className={styles.gapBars}>{gapCodes.map(g=><li key={g}><button type="button" onClick={()=>nav({view:'coverage',gap:g,verdict:null,stage:null})} disabled={!counts[g]} aria-label={`${gapLabels[g].label}: ${counts[g]} of ${denominator} reports`}>
+ return <ul className={styles.gapBars}>{gapCodes.map(g=><li key={g}><button type="button" onClick={()=>nav({view:'coverage',gap:g,verdict:null,stage:null})} disabled={!counts[g]} aria-label={`${gapLabels[g].label}: ${counts[g]} of ${denominator} reports`}><UiScanSearch size={16} aria-hidden="true" className="action-icon"/>
   <span className={styles.gapLabel}>{gapLabels[g].label}<small>{gapLabels[g].explain}</small></span>
   <span className={styles.gapTrack} aria-hidden="true"><span style={{width:denominator?`${counts[g]/denominator*100}%`:0}}/></span>
   <span className={styles.gapValue}><strong>{n(counts[g])}</strong> / {n(denominator)}</span></button></li>)}</ul>;
@@ -140,7 +142,7 @@ export function FindingsView({data,nav}:{data:Of<'findings'>;nav:Nav}){
     <td role="cell" data-label="Remediation"><FixSummary g={g}/></td>
     <td role="cell" data-label="Repositories" className={styles.num}><strong>{n(g.repositories)}</strong><details className={styles.repoSample}><summary>Sample repositories</summary><ul>{g.repositorySample.map(repo=><li key={repo}>{repo}</li>)}</ul>{g.repositories>3&&<span>Open evidence for all {n(g.repositories)} repositories.</span>}</details></td>
     <td role="cell" data-label="Occurrences" className={styles.num}>{n(g.occurrences)}</td>
-    <td role="cell" className={styles.rowAction}><button type="button" className="button" onClick={()=>nav({advisory:g.key},{keepPage:true})}>Evidence<span className={styles.srOnly}> for {g.advisoryId||g.title}</span></button></td>
+    <td role="cell" className={styles.rowAction}><button type="button" className="button" onClick={()=>nav({advisory:g.key},{keepPage:true})}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/>Evidence<span className={styles.srOnly}> for {g.advisoryId||g.title}</span></button></td>
    </tr>)}</tbody></table></div>:<p className={styles.emptyLine}>No advisories match these filters.</p>}
   <Pager {...f} nav={nav} noun="advisories"/>
  </section>;
@@ -191,7 +193,7 @@ export function CoverageView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
  const steps=[['Report saved','completed reports',p.reports],['Manifest scanned','≥1 supported manifest read',p.manifestScanned],['Exact versions resolved','≥1 pinned dependency',p.versionsResolved],['Advisory lookup complete','no provider, deadline or limit gap',p.lookupComplete]] as const;
  return <div className={styles.stackGap}>
   <section className={styles.panel} aria-labelledby="covlist-h">
-   <div className={styles.sectionHead}><div><h2 id="covlist-h" className={styles.sectionTitle}><FileSearch size={18} aria-hidden="true"/>Coverage recovery</h2><p className={styles.note}>Recover missing evidence before trusting a clean result. These actions are guidance; no scan, retry or dependency change is started here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}>Inspect failed scans</button></div>
+   <div className={styles.sectionHead}><div><h2 id="covlist-h" className={styles.sectionTitle}><FileSearch size={18} aria-hidden="true"/>Coverage recovery</h2><p className={styles.note}>Recover missing evidence before trusting a clean result. These actions are guidance; no scan, retry or dependency change is started here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}><UiScanLine size={16} aria-hidden="true" className="action-icon"/>Inspect failed scans</button></div>
    <Segmented label="Recovery scope" value={flt.recovery} options={[{value:'needed',label:'Needs recovery'},{value:null,label:'All reports'}]} onChange={recovery=>nav({recovery})}/>
    <div className={styles.toolbar}><SearchBox label="Search repositories" value={flt.q} onChange={q=>nav({q})}/>
     <label className={styles.select}><span>Gap</span><select value={flt.gap||''} onChange={e=>nav({gap:e.target.value||null})}><option value="">Any</option>{gapCodes.map(g=><option key={g} value={g}>{gapLabels[g].label} ({o.gaps.counts[g]})</option>)}</select></label>

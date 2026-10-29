@@ -435,7 +435,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  text-decoration: underline;
+  text-decoration: none;
 }
 :global(.error) {
   padding: 14px;
@@ -835,3 +835,6 @@
 
 /* Continue the sidebar column below its sticky, viewport-height controls. */
 @media(min-width:768px){:global(.shell){background:linear-gradient(to right,var(--surface) 219px,var(--line) 219px,var(--line) 220px,transparent 220px)}}
+
+/* Actions are distinguished by their control shape, never an underline. */
+.root :global(button),.root :global(button:hover),.root :global(a.button),.root :global(a.button:hover),.root :global(nav a),.root :global(nav a:hover){text-decoration:none}

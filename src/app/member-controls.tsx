@@ -1,4 +1,6 @@
 "use client";
+import {LogOut as UiLogOut} from 'lucide-react';
+
 import {verdictLabel} from "./components/presentation";
 import {clearReportMemory} from "./report-memory";
 import Link from "next/link";
@@ -138,7 +140,7 @@ export default function MemberControls({
                   setBusy(false);
                 }
               }}
-            >
+            ><UiLogOut size={16} aria-hidden="true" className="action-icon"/>
               Sign out
             </button>
           </>

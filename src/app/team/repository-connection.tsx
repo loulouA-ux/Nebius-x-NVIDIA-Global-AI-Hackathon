@@ -1,4 +1,8 @@
 'use client';
+import {Github as LinkGithub} from 'lucide-react';
+
+import {Github as UiGithub,Unplug as UiUnplug} from 'lucide-react';
+
 import {useEffect,useState} from 'react';
 type Status={connected:boolean;installUrl:string;expiresAt?:string;selected?:number;installations?:{id:number;account:string}[]};
 export default function RepositoryConnection(){
@@ -12,8 +16,8 @@ export default function RepositoryConnection(){
  }catch(e){setMessage((e as Error).message);}finally{setBusy(false);}}
  return <section aria-labelledby="repository-connection-heading"><h2 id="repository-connection-heading">GitHub repositories</h2><p>Sign-in proves your identity. Repository access is separate: install the app on selected repositories, then authorize the same GitHub account.</p>
  {message&&<p role="status">{message}</p>}
- {status&&<><a className="button" href={/^https:\/\/github\.com\/apps\/[a-z0-9-]+\/installations\/new$/.test(status.installUrl)?status.installUrl:undefined} target="_blank" rel="noopener noreferrer">Choose repositories on GitHub</a><button className="button" disabled={busy} onClick={()=>act('begin')}>{status.connected?'Renew GitHub authorization':'Authorize repository access'}</button>
- {status.connected&&<><p>Authorization expires {new Date(status.expiresAt!).toLocaleString()}. Access is rechecked before each scan. Disconnecting here removes the stored token; uninstall or revoke the app on GitHub to remove its provider permissions.</p>{!status.installations?.length?<p>No active installation is available to this account. Choose repositories on GitHub, then renew authorization.</p>:<ul>{status.installations.map(i=><li key={i.id}>{i.account}{status.selected===i.id?<strong>Selected</strong>:<button className="button" disabled={busy} onClick={()=>act('select',i.id)}>Use {i.account}</button>}</li>)}</ul>}<button className="button" disabled={busy} onClick={()=>act('disconnect')}>Disconnect repository access</button></>}
+ {status&&<><a className="button" href={/^https:\/\/github\.com\/apps\/[a-z0-9-]+\/installations\/new$/.test(status.installUrl)?status.installUrl:undefined} target="_blank" rel="noopener noreferrer"><LinkGithub size={16} aria-hidden="true" className="action-icon"/>Choose repositories on GitHub</a><button className="button" disabled={busy} onClick={()=>act('begin')}><UiGithub size={16} aria-hidden="true" className="action-icon"/>{status.connected?'Renew GitHub authorization':'Authorize repository access'}</button>
+ {status.connected&&<><p>Authorization expires {new Date(status.expiresAt!).toLocaleString()}. Access is rechecked before each scan. Disconnecting here removes the stored token; uninstall or revoke the app on GitHub to remove its provider permissions.</p>{!status.installations?.length?<p>No active installation is available to this account. Choose repositories on GitHub, then renew authorization.</p>:<ul>{status.installations.map(i=><li key={i.id}>{i.account}{status.selected===i.id?<strong>Selected</strong>:<button className="button" disabled={busy} onClick={()=>act('select',i.id)}><UiGithub size={16} aria-hidden="true" className="action-icon"/>Use {i.account}</button>}</li>)}</ul>}<button className="button" disabled={busy} onClick={()=>act('disconnect')}><UiUnplug size={16} aria-hidden="true" className="action-icon"/>Disconnect repository access</button></>}
  </>}
  </section>;
 }

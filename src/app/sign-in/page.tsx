@@ -1,4 +1,8 @@
 "use client";
+import {Github as LinkGithub} from 'lucide-react';
+
+import {LogIn as UiLogIn} from 'lucide-react';
+
 import MarkScene from '../components/voyage/mark-scene';
 import Link from "next/link";
 import styles from "../account-ux.module.css";
@@ -13,7 +17,7 @@ export default function SignIn() {
     <><BrandHeader /><main id="main-content" tabIndex={-1} className="auth-layout">
       <section className="auth-panel">
       <MarkScene variant="gated" tone="accent"/><h1>Sign in to ShipTested</h1>
-      <a className="button primary" href="/api/auth/github/start">Continue with GitHub</a>
+      <a className="button primary" href="/api/auth/github/start"><LinkGithub size={16} aria-hidden="true" className="action-icon"/>Continue with GitHub</a>
       <p>Save reports, record review decisions and verify staging hosts. Sign-in is limited to invited preview members.</p><h2>What ShipTested can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
       <p>
         Choose GitHub above, or use the individual access key supplied by your team below. Both methods sign you in; you do not need both.
@@ -61,7 +65,7 @@ export default function SignIn() {
             margin: "12px 0",
           }}
         />
-        <button className="button" disabled={busy}>
+        <button className="button" disabled={busy}><UiLogIn size={16} aria-hidden="true" className="action-icon"/>
           {busy ? "Signing in…" : "Sign in"}
         </button>
       </form></details>

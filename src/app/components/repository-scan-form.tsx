@@ -1,4 +1,6 @@
 'use client';
+import {RefreshCw as UiRefreshCw} from 'lucide-react';
+
 import { useEffect,useState,useRef } from 'react';
 import Link from 'next/link';
 import { Github,ArrowRight,Square } from 'lucide-react';
@@ -48,7 +50,7 @@ export default function RepositoryScanForm() {
     <p className={styles.muted}>{usage?usage.configured?`${usage.remaining} of ${usage.limit} repository scans remaining this month.`:'Repository scanning has not been provisioned for this workspace yet.':'Checking your scan allowance…'} Accepted attempts count toward the allowance, including cancelled scans.</p>
     <div className={styles.actions}><button className="button primary" disabled={busy||active||!usage?.remaining}><Github size={18} aria-hidden="true"/>{busy?'Please wait…':'Scan repository'}</button></div>
     </>}
-    {error&&<div role="alert"><p>{error}</p><button type="button" className="button" onClick={()=>setRetry(n=>n+1)}>Retry status check</button></div>}
+    {error&&<div role="alert"><p>{error}</p><button type="button" className="button" onClick={()=>setRetry(n=>n+1)}><UiRefreshCw size={16} aria-hidden="true" className="action-icon"/>Retry status check</button></div>}
     {job&&<section className={styles.status} aria-label="Repository scan status"><p role="status">{job.state==='queued'?'Queued — waiting for a scan worker.':job.state==='running'?'Scanning dependency files…':job.state==='completed'?'Scan finished. Open the report to review findings and coverage.':job.state==='failed'?'Scan failed. No clean result is implied.':job.state==='cancelled'?'Scan cancelled.':'Loading scan status…'}</p>{job.repository&&<p>{job.repository}</p>}{job.commit&&<p className={styles.muted}>Commit <code>{job.commit}</code></p>}<div className={styles.actions}>{job.state==='completed'&&job.reportUrl&&/^\/reports\/[a-f0-9-]{36}$/.test(job.reportUrl)&&<Link className="button primary" href={job.reportUrl}>Open private report<ArrowRight size={18} aria-hidden="true"/></Link>}{job.state==='queued'&&<button type="button" className="button" onClick={cancel} disabled={busy}><Square size={16} aria-hidden="true"/>Cancel queued scan</button>}</div></section>}
   </form>;
 }

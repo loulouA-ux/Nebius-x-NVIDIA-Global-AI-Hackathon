@@ -28,5 +28,6 @@ jobs:
           path: test-results/platform/repository-scan.json
       - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run test:e2e
+      - run: npx playwright test --config playwright.platform-ui.config.ts
       - run: npx playwright test --config playwright.public-demo.config.ts
       - run: npx vitest run tests/rebrand.test.ts

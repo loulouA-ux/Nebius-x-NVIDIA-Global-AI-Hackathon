@@ -1,4 +1,6 @@
 'use client';
+import {Github as LinkGithub} from 'lucide-react';
+
 import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {usePathname,useRouter,useSearchParams} from 'next/navigation';
@@ -71,7 +73,7 @@ export default function SecurityDashboard(){
     <span>{data.overview.active?'Batch in progress · updates every 10 s while visible':'Batch finished · no automatic updates'}</span>
     <span>Last successful update {lastOk?time(lastOk):'—'}{data.overview.freshness.latestReportAt&&<> · newest report {time(data.overview.freshness.latestReportAt)}</>}</span>
    </p>}
-   {error&&<div className={styles.alert} role="alert"><p>{error}{data&&!signedOut&&lastOk&&` Last successful update ${time(lastOk)}.`}</p>{signedOut&&<Link className="button" href="/sign-in">Sign in with GitHub</Link>}</div>}
+   {error&&<div className={styles.alert} role="alert"><p>{error}{data&&!signedOut&&lastOk&&` Last successful update ${time(lastOk)}.`}</p>{signedOut&&<Link className="button" href="/sign-in"><LinkGithub size={16} aria-hidden="true" className="action-icon"/>Sign in with GitHub</Link>}</div>}
    {loading&&!data&&<div className={styles.skeleton} role="status" aria-live="polite">Loading security overview…</div>}
    {!loading&&empty&&!error&&<section className={styles.emptyState}><h2>No batch registered</h2><p>A batch appears here once its private repository selection is registered. Single scans remain in <Link href="/reports">Reports</Link>.</p></section>}
    {data&&<>
