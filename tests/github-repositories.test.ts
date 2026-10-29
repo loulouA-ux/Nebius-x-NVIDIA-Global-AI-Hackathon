@@ -26,20 +26,20 @@ describe("repository access and snapshot integrity",()=>{
 
 describe('bounded installation pagination',()=>{
  const repo=(n:number)=>({id:n,name:'repo'+n,full_name:'owner/repo'+n,default_branch:'main',private:true});
- it('lists 200 authorized repositories with two fixed-path requests and read-only permissions',async()=>{
+ it.each([200,215,500])('lists %i authorized repositories with bounded fixed-path requests and read-only permissions',async(total)=>{
   setup();const pages:number[]=[];
   const fetcher:typeof fetch=async(input,init)=>{
    const url=new URL(String(input));expect(url.hostname).toBe('api.github.com');
    if(url.pathname.endsWith('access_tokens')){expect(JSON.parse(String(init?.body)).permissions).toEqual({contents:'read'});return Response.json({token:'test-token'});}
    expect(url.pathname).toBe('/installation/repositories');expect(url.searchParams.get('per_page')).toBe('100');
    const page=Number(url.searchParams.get('page'));pages.push(page);
-   return Response.json({total_count:200,repositories:Array.from({length:100},(_,i)=>repo((page-1)*100+i+1))});
+   return Response.json({total_count:total,repositories:Array.from({length:Math.min(100,total-(page-1)*100)},(_,i)=>repo((page-1)*100+i+1))});
   };
-  const repos=await listRepositories(actor,fetcher);expect(repos).toHaveLength(200);expect(repos[199].id).toBe(200);expect(pages).toEqual([1,2]);
+  const repos=await listRepositories(actor,fetcher);expect(repos).toHaveLength(total);expect(repos[total-1].id).toBe(total);expect(pages).toEqual(Array.from({length:Math.ceil(total/100)},(_,i)=>i+1));
  });
  it('refuses over-limit installations before requesting additional pages',async()=>{
   setup();let calls=0;
-  const fetcher:typeof fetch=async(input)=>{calls++;return String(input).includes('access_tokens')?Response.json({token:'test-token'}):Response.json({total_count:201,repositories:Array.from({length:100},(_,i)=>repo(i+1))});};
+  const fetcher:typeof fetch=async(input)=>{calls++;return String(input).includes('access_tokens')?Response.json({token:'test-token'}):Response.json({total_count:501,repositories:Array.from({length:100},(_,i)=>repo(i+1))});};
   await expect(listRepositories(actor,fetcher)).rejects.toMatchObject({status:422});expect(calls).toBe(2);
  });
  it.each(['duplicate','changed-total','short-page'])('rejects inconsistent %s pagination without silently dropping repositories',async(kind)=>{

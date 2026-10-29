@@ -80,3 +80,29 @@ it('does not save a provider token when membership is removed during OAuth excha
  await expect(completeRepositoryConnection(q,actor,state,flow.browserToken,'code',revokeDuringExchange)).rejects.toMatchObject({status:403});
  expect(await q('SELECT actor_id FROM sc_repository_connections')).toEqual([]);
 });
+
+it.each([215,500])('paginates %i user-authorized repositories without widening writable grants',async(total)=>{
+ await connect();await selectInstallation(q,actor,12,fetcher);
+ const pages:number[]=[];
+ const provider:typeof fetch=async(input,init)=>{
+  const url=new URL(String(input));
+  if(url.pathname==='/user/installations/12/repositories'){
+   const page=Number(url.searchParams.get('page'));pages.push(page);
+   return Response.json({total_count:total,repositories:Array.from({length:Math.min(100,total-(page-1)*100)},(_,i)=>({id:(page-1)*100+i+1,permissions:{push:(page-1)*100+i+1===215}}))});
+  }
+  return fetcher(input,init);
+ };
+ const grant=await authorizedRepositoryGrant(q,actor,provider);
+ expect(grant.repositoryIds).toEqual(Array.from({length:total},(_,i)=>i+1));
+ expect(grant.writableRepositoryIds).toEqual([215]);
+ expect(pages).toEqual(Array.from({length:Math.ceil(total/100)},(_,i)=>i+1));
+});
+it.each(['duplicate','changed-total','short-page'])('rejects %s on the third authorized repository page',async(kind)=>{
+ await connect();await selectInstallation(q,actor,12,fetcher);
+ const provider:typeof fetch=async(input,init)=>{
+  const url=new URL(String(input));if(url.pathname!=='/user/installations/12/repositories')return fetcher(input,init);
+  const page=Number(url.searchParams.get('page'));
+  return Response.json({total_count:page===3&&kind==='changed-total'?216:215,repositories:Array.from({length:page===3?(kind==='short-page'?14:15):100},(_,i)=>({id:page===3&&kind==='duplicate'?i+1:(page-1)*100+i+1}))});
+ };
+ await expect(authorizedRepositoryGrant(q,actor,provider)).rejects.toMatchObject({status:409});
+});

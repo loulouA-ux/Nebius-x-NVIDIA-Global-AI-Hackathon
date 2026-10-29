@@ -38,15 +38,15 @@ export async function installationToken(actor:Actor,repositoryId?:number,write=f
  const result=z.object({token:z.string().min(1)}).parse(await githubRequest(`/app/installations/${installationId}/access_tokens`,appJwt(),{method:"POST",body:JSON.stringify({...(repositoryIds?{repository_ids:repositoryIds}:{}),permissions:write?{contents:"write",pull_requests:"write"}:{contents:"read",...(readPullRequests?{pull_requests:"read"}:{})}})},fetcher));
  return result.token;
 }
-export const MAX_CONNECTED_REPOSITORIES=200;
+export const MAX_CONNECTED_REPOSITORIES=500;
 export async function listRepositories(actor:Actor,fetcher:typeof fetch=fetch){
  const token=await installationToken(actor,undefined,false,fetcher);
  const schema=z.object({total_count:z.number().int().min(0),repositories:z.array(repoSchema).max(100)});
  const repositories:GitHubRepository[]=[],seen=new Set<number>();
  let expected:number|undefined;
- for(let page=1;page<=2;page++){
+ for(let page=1;page<=Math.ceil(MAX_CONNECTED_REPOSITORIES/100);page++){
   const result=schema.parse(await githubRequest(`/installation/repositories?per_page=100&page=${page}`,token,{},fetcher));
-  if(result.total_count>MAX_CONNECTED_REPOSITORIES)throw new ApiError(422,'Select at most 200 repositories in the GitHub App installation.');
+  if(result.total_count>MAX_CONNECTED_REPOSITORIES)throw new ApiError(422,`Select at most ${MAX_CONNECTED_REPOSITORIES} repositories in the GitHub App installation.`);
   if(expected!==undefined&&result.total_count!==expected)throw new ApiError(409,'Repository access changed during listing. Try again.');
   expected=result.total_count;
   for(const repo of result.repositories){

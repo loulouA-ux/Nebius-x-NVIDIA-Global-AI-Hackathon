@@ -6,7 +6,7 @@ import {ApiError} from './http';
 import {TeamAccess} from './team-access';
 import {brandEnv} from '../brand-env';
 import {boundedJson} from '../providers';
-import {githubRequest} from './github-repositories';
+import {githubRequest,MAX_CONNECTED_REPOSITORIES} from './github-repositories';
 import {beginGitHubOAuth,validateGitHubTransaction} from './github-oauth';
 const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
 export const connectionCookie='shiptested_repository_flow';
@@ -81,8 +81,8 @@ export async function authorizedRepositoryGrant(q:Query,actor:Actor,fetcher:type
  const c=await connection(q,actor);
  if(!c.installationId||!(await userInstallations(c.token,fetcher)).some(i=>i.id===c.installationId))throw new ApiError(403,'Select an authorized GitHub installation.');
  const ids:number[]=[],writable:number[]=[];let expected:number|undefined;
- for(let page=1;page<=2;page++){
-  const result=z.object({total_count:z.number().int().min(0).max(200),repositories:z.array(z.object({id:z.number().int().positive().safe(),permissions:z.object({push:z.boolean().optional(),admin:z.boolean().optional()}).optional()})).max(100)}).parse(await githubRequest(`/user/installations/${c.installationId}/repositories?per_page=100&page=${page}`,c.token,{},fetcher));
+ for(let page=1;page<=Math.ceil(MAX_CONNECTED_REPOSITORIES/100);page++){
+  const result=z.object({total_count:z.number().int().min(0).max(MAX_CONNECTED_REPOSITORIES),repositories:z.array(z.object({id:z.number().int().positive().safe(),permissions:z.object({push:z.boolean().optional(),admin:z.boolean().optional()}).optional()})).max(100)}).parse(await githubRequest(`/user/installations/${c.installationId}/repositories?per_page=100&page=${page}`,c.token,{},fetcher));
   if(expected!==undefined&&expected!==result.total_count)throw new ApiError(409,'Repository access changed. Try again.');expected=result.total_count;
   for(const repo of result.repositories){if(ids.includes(repo.id))throw new ApiError(409,'Repository access changed. Try again.');ids.push(repo.id);if(repo.permissions?.push||repo.permissions?.admin)writable.push(repo.id);}
   if(ids.length===expected)return {installationId:c.installationId,repositoryIds:ids,writableRepositoryIds:writable};
