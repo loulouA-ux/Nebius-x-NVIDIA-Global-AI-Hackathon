@@ -3,7 +3,7 @@ import {publicDemo} from '@/lib/server/public-demo';
 export async function GET() {
   return Response.json(
     {
-      status: publicDemo()?"demo":"preview",
+      status: publicDemo()?"demo":process.env.VERCEL_ENV==="production"?"production":"preview",
       publicDemo: publicDemo(),
       providers: {
         tavily: !publicDemo() && Boolean(process.env.TAVILY_API_KEY),
