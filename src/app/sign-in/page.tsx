@@ -28,13 +28,10 @@ export default function SignIn() {
       <section className="auth-panel">
       <h1>Sign in to ShipTested</h1>
       {notice && <p role="status" className={styles.notice}>{notice}</p>}{authError && <p role="alert" className="error">{authError}</p>}
-      <p className={styles.hint}>Continue to your workspace. We’ll return you to where you left off.</p>
+
       <a className="button primary" href={next==='/reports'?'/api/auth/github/start':`/api/auth/github/start?next=${encodeURIComponent(next)}`}><LinkGithub size={16} aria-hidden="true" className="action-icon"/>Continue with GitHub</a>
-      <p>Use your GitHub account to access your workspace and saved reports.</p><h2>What ShipTested can see</h2><ul><li>Your GitHub profile through read:user OAuth permission.</li><li>Repositories only after you install the GitHub App, chosen separately.</li></ul>
-      <p>
-        Have an individual team access key? You can use it instead of GitHub.
-      </p>
-      <details className={styles.key} open><summary>Use a team access key instead</summary><p id="access-key-hint" className={styles.hint}>Ask your workspace owner for your individual key. This is not your GitHub password.</p><form className="auth-key-form"
+      <h2>GitHub access</h2><ul><li>Your profile (read:user).</li><li>Repository access requires a separate GitHub App installation.</li></ul>
+      <details className={styles.key} open><summary>Use an access key</summary><p id="access-key-hint" className={styles.hint}>Use the key from your workspace owner, not your GitHub password.</p><form className="auth-key-form"
         onSubmit={async (event) => {
           event.preventDefault();
           setBusy(true);

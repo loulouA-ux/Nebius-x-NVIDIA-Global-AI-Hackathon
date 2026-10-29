@@ -8,3 +8,5 @@
  .wordmark .platform-brand span{display:inline;font:inherit;color:inherit}.wordmark small{display:block;margin:6px 0 0 40px;font:13px var(--font-body);color:var(--muted)}nav a{display:inline-flex;gap:7px;align-items:center}.card h2{display:flex;align-items:center;gap:10px}@media(max-width:440px){header{flex-wrap:wrap;gap:16px}header nav{width:100%;justify-content:space-between}}
 .action-icon{display:inline-block;flex-shrink:0;vertical-align:-.18em;margin-inline-end:.45em;pointer-events:none}
 button,nav a,.actions a{text-decoration:none}button{min-height:44px}nav a{display:inline-flex;align-items:center;gap:6px;min-height:44px}
+
+textarea{min-height:160px;border-color:#7B8592;scroll-margin-block:100px}.dark textarea{border-color:#657181}textarea::placeholder{color:var(--muted);opacity:1}@media(max-width:767px){textarea{font-size:16px}}

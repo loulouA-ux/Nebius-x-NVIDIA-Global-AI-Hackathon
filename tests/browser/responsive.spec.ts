@@ -19,8 +19,10 @@ for(const width of [360,768,1440]) {
    await page.screenshot({path:`test-results/brand-${width}-${route.replaceAll('/','')||'home'}.png`,fullPage:true});
   }
   await page.goto('/scan');
-  for(const name of width<768?['Hosts','Scan']:['Staging hosts','New scan']){
-   await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name,exact:true}).click();await fits();
+  for(const name of width<768?['Staging hosts','Scan']:['Staging hosts','New scan']){
+   const nav=page.getByRole('navigation',{name:'Main navigation'}).filter({visible:true});
+   if(width<768&&name==='Staging hosts')await nav.locator('summary').click();
+   await nav.getByRole('link',{name,exact:true}).click();await fits();
   }
   await page.getByRole('button',{name:'Or try the demo',exact:false}).click();
   await expect(page.getByRole('heading',{name:'Blocked · 2 high-severity findings'})).toBeVisible();await fits();

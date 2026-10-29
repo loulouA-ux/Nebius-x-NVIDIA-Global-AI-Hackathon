@@ -6,7 +6,7 @@ import * as dbModule from '../src/lib/server/db';
 import {installationToken} from '../src/lib/server/github-repositories';
 import type {Query} from '../src/lib/server/db';
 import {createGitHubSession} from '../src/lib/server/github-session';
-import {beginRepositoryConnection,completeRepositoryConnection,connectionStatus,selectInstallation,authorizedRepositoryGrant,disconnectRepositories} from '../src/lib/server/repository-connections';
+import {beginRepositoryConnection,completeRepositoryConnection,connectionStatus,selectInstallation,authorizedRepositoryGrant,authorizedRepositoryGrants,removeInstallation,disconnectRepositories} from '../src/lib/server/repository-connections';
 const db=new PGlite();const q:Query=async(sql,params=[])=>(await db.query(sql,params)).rows as Record<string,unknown>[];
 const actor={id:'github:1',workspaceId:'github:1',role:'member' as const};
 let removed=false,identity=1;
@@ -18,7 +18,7 @@ const fetcher:typeof fetch=async(input)=>{
  if(url.pathname==='/user/installations/12/repositories')return Response.json({total_count:1,repositories:[{id:123}]});
  throw Error('Unexpected provider request');
 };
-beforeAll(async()=>{for(const f of ['001_core','002_hosted_jobs','003_workspaces','004_team_sharing','008_repository_connections'])await db.exec(readFileSync(`migrations/${f}.sql`,'utf8'));});
+beforeAll(async()=>{for(const f of ['001_core','002_hosted_jobs','003_workspaces','004_team_sharing','008_repository_connections','011_multi_workspace'])await db.exec(readFileSync(`migrations/${f}.sql`,'utf8'));});
 beforeEach(async()=>{
  await db.exec('TRUNCATE sc_workspaces CASCADE; DELETE FROM sc_sessions; DELETE FROM sc_github_accounts; DELETE FROM sc_scan_allowances;');
  vi.stubEnv('SHIPTESTED_OPEN_REGISTRATION','1');vi.stubEnv('SHIPTESTED_CUSTOMER_REPOSITORIES','1');vi.stubEnv('GITHUB_APP_CLIENT_ID','app-client');vi.stubEnv('GITHUB_APP_CLIENT_SECRET','synthetic-secret');vi.stubEnv('GITHUB_APP_ID','99');vi.stubEnv('SHIPTESTED_APP_ORIGIN','https://example.test');vi.stubEnv('SHIPTESTED_CONNECTION_ENCRYPTION_KEY','a'.repeat(64));
@@ -105,4 +105,22 @@ it.each(['duplicate','changed-total','short-page'])('rejects %s on the third aut
   return Response.json({total_count:page===3&&kind==='changed-total'?216:215,repositories:Array.from({length:page===3?(kind==='short-page'?14:15):100},(_,i)=>({id:page===3&&kind==='duplicate'?i+1:(page-1)*100+i+1}))});
  };
  await expect(authorizedRepositoryGrant(q,actor,provider)).rejects.toMatchObject({status:409});
+});
+
+it('keeps multiple authorized namespaces separate and removes access immediately',async()=>{
+ await connect();
+ const provider:typeof fetch=async(input,init)=>{
+  const path=new URL(String(input)).pathname;
+  if(path==='/user/installations')return Response.json({total_count:2,installations:[{id:12,app_id:99,account:{login:'personal'},suspended_at:null},{id:14,app_id:99,account:{login:'company'},suspended_at:null}]});
+  if(path==='/user/installations/14/repositories')return Response.json({total_count:1,repositories:[{id:456}]});
+  return fetcher(input,init);
+ };
+ await selectInstallation(q,actor,12,provider);await selectInstallation(q,actor,14,provider);
+ expect((await connectionStatus(q,actor,provider)).selectedIds.sort()).toEqual([12,14]);
+ expect((await authorizedRepositoryGrants(q,actor,provider)).map(g=>g.repositoryIds)).toEqual([[123],[456]]);
+ expect((await authorizedRepositoryGrant(q,actor,provider,456)).installationId).toBe(14);
+ await expect(authorizedRepositoryGrant(q,actor,provider,999)).rejects.toMatchObject({status:404});
+ await removeInstallation(q,actor,14);
+ await expect(authorizedRepositoryGrant(q,actor,provider,456)).rejects.toMatchObject({status:404});
+ expect((await authorizedRepositoryGrants(q,actor,provider)).map(g=>g.repositoryIds)).toEqual([[123]]);
 });

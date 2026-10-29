@@ -71,13 +71,13 @@ export function OverviewView({data,nav}:{data:Of<'fixFirst'>;nav:Nav}){
  return <div className={styles.stackGap}>
   <div className={styles.batchStrip}><span><strong>{n(op.completed)} / {n(o.batch.total)}</strong> scans completed</span><button type="button" onClick={()=>nav({view:'process'})}><UiX size={16} aria-hidden="true" className="action-icon"/>{n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} skipped · {n(op.waiting+op.queued+op.running)} remaining</button><button type="button" onClick={()=>nav({view:'coverage',recovery:'needed'})}>Review coverage gaps <ArrowUpRight size={14} aria-hidden="true"/></button></div>
   <section className={styles.panel} aria-labelledby="first-h">
-   <div className={styles.sectionHead}><div><h2 id="first-h" className={styles.sectionTitle}><Wrench size={18} aria-hidden="true"/>Remediation queue</h2><p className={styles.note}>One advisory, every affected repository. Choose a ranking, then inspect the evidence before changing dependencies.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}><UiListChecks size={16} aria-hidden="true" className="action-icon"/>Open full queue</button></div>
+   <div className={styles.sectionHead}><div><h2 id="first-h" className={styles.sectionTitle}><Wrench size={18} aria-hidden="true"/>Remediation queue</h2><p className={styles.note}>Review each advisory across affected repositories.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}><UiListChecks size={16} aria-hidden="true" className="action-icon"/>Open full queue</button></div>
    <QueueRanking value={data.filters.sort} nav={nav}/>
    {data.fixFirst.length?<ol className={styles.queue}>{data.fixFirst.map((g,i)=><li key={g.key}>
     <span className={styles.rank}>{i+1}</span>
     <div className={styles.queueMain}><button type="button" className={styles.titleButton} onClick={()=>nav({advisory:g.key},{keepPage:true})}><UiShieldAlert size={16} aria-hidden="true" className="action-icon"/><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span>{g.title}</button><FixSummary g={g}/></div>
     <div className={styles.queueMeta}><SeverityTag level={g.severity}/><span>{g.cvss!==null?`CVSS ${g.cvss.toFixed(1)}`:'CVSS not provided'}</span><span><strong>{n(g.repositories)}</strong> {g.repositories===1?'repository':'repositories'} · {n(g.occurrences)} occurrences</span></div>
-   </li>)}</ol>:<p className={styles.emptyLine}>No recorded advisories match this queue. Coverage gaps may still hide matches.</p>}
+   </li>)}</ol>:<p className={styles.emptyLine}>No matching advisories. Coverage gaps may hide findings.</p>}
   </section>
 
   <section className={styles.kpis} aria-label="Finding totals">
@@ -151,7 +151,7 @@ export function FindingsView({data,nav}:{data:Of<'findings'>;nav:Nav}){
 export function RepositoriesView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
  const r=data.repositories,o=data.overview,flt=data.filters;
  return <section className={styles.panel} aria-labelledby="repo-h">
-  <div className={styles.sectionHead}><div><h2 id="repo-h">Repositories</h2><p className={styles.note}>Repositories with a completed report, ordered Blocked first, then by high and medium matches. Failed, skipped and waiting entries are in Batch process.</p></div></div>
+  <div className={styles.sectionHead}><div><h2 id="repo-h">Repositories</h2><p className={styles.note}>Completed reports, ranked by verdict and severity. See Batch process for other entries.</p></div></div>
   <div className={styles.toolbar}><SearchBox label="Search repositories" value={flt.q} onChange={q=>nav({q})}/>
    <Segmented<Verdict> label="Filter by verdict" value={flt.verdict} onChange={v=>nav({verdict:v})} options={[{value:null,label:'All',count:o.verdicts.denominator},...verdicts.map(v=>({value:v,label:v,count:o.verdicts.counts[v]}))]}/>
    <Clear active={!!(flt.q||flt.verdict||flt.gap||flt.stage)} nav={nav} keys={['q','verdict','gap','stage']}/></div>
@@ -193,14 +193,14 @@ export function CoverageView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
  const steps=[['Report saved','completed reports',p.reports],['Manifest scanned','≥1 supported manifest read',p.manifestScanned],['Exact versions resolved','≥1 pinned dependency',p.versionsResolved],['Advisory lookup complete','no provider, deadline or limit gap',p.lookupComplete]] as const;
  return <div className={styles.stackGap}>
   <section className={styles.panel} aria-labelledby="covlist-h">
-   <div className={styles.sectionHead}><div><h2 id="covlist-h" className={styles.sectionTitle}><FileSearch size={18} aria-hidden="true"/>Coverage recovery</h2><p className={styles.note}>Recover missing evidence before trusting a clean result. These actions are guidance; no scan, retry or dependency change is started here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}><UiScanLine size={16} aria-hidden="true" className="action-icon"/>Inspect failed scans</button></div>
+   <div className={styles.sectionHead}><div><h2 id="covlist-h" className={styles.sectionTitle}><FileSearch size={18} aria-hidden="true"/>Coverage recovery</h2><p className={styles.note}>Recover missing evidence before relying on results. Guidance only; no scans or changes start here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}><UiScanLine size={16} aria-hidden="true" className="action-icon"/>Inspect failed scans</button></div>
    <Segmented label="Recovery scope" value={flt.recovery} options={[{value:'needed',label:'Needs recovery'},{value:null,label:'All reports'}]} onChange={recovery=>nav({recovery})}/>
    <div className={styles.toolbar}><SearchBox label="Search repositories" value={flt.q} onChange={q=>nav({q})}/>
     <label className={styles.select}><span>Gap</span><select value={flt.gap||''} onChange={e=>nav({gap:e.target.value||null})}><option value="">Any</option>{gapCodes.map(g=><option key={g} value={g}>{gapLabels[g].label} ({o.gaps.counts[g]})</option>)}</select></label>
     <label className={styles.select}><span>Stage</span><select value={flt.stage||''} onChange={e=>nav({stage:(e.target.value||null) as CoverageStage|null})}><option value="">Any</option>{(Object.keys(stageLabels) as CoverageStage[]).map(s=><option key={s} value={s}>{stageLabels[s]}</option>)}</select></label>
     <label className={styles.select}><span>Verdict</span><select value={flt.verdict||''} onChange={e=>nav({verdict:e.target.value||null})}><option value="">Any</option>{verdicts.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
     <Clear active={!!(flt.q||flt.gap||flt.stage||flt.verdict)} nav={nav} keys={['q','gap','stage','verdict']}/></div>
-   <p className={styles.note}>Sorted by dependencies checked, fewest first. File-level omission reasons appear only when the stored report records them; otherwise “Reason not recorded”.</p>
+   <p className={styles.note}>Fewest checked dependencies first. Missing omission details show “Reason not recorded”.</p>
    <RepoTable items={data.repositories.items} coverage/>
    <Pager {...data.repositories} nav={nav} noun="repositories"/>
   </section>
@@ -227,7 +227,7 @@ export function ProcessView({data,nav}:{data:Of<'process'>;nav:Nav}){
     <div><dt>Median run time</dt><dd>{duration(p.medianRunMs)}</dd><small>last start → terminal event</small></div>
     <div><dt>Recorded events</dt><dd>{n(p.eventsRecorded)}{p.eventsTruncated?'+':''}</dd><small>{when(p.firstEventAt)} – {when(p.lastEventAt)}</small></div>
    </dl>
-   <p className={styles.note}>Times come from the append-only job audit log. Per-stage timing (discovery, parsing, advisory lookup) is not recorded, so no stage progress or ETA is shown. Verified empty repositories were skipped before submission and are not counted as scans.</p>
+   <p className={styles.note}>Times come from job events; stage timing and ETA are unavailable. Verified empty repositories are skipped, not scanned.</p>
    {p.throughput.length>0&&<figure className={styles.throughput}><figcaption><span className={styles.figTitle}>Jobs finished per 30 minutes</span><span className={styles.figCaption}>from terminal audit events</span></figcaption>
     <div className={styles.columns} aria-hidden="true">{p.throughput.map(b=><span key={b.start} title={`${when(b.start)}: ${b.completed} completed, ${b.failed} failed`}><i style={{height:`${b.completed/max*100}%`}} data-tone="done"/><i style={{height:`${b.failed/max*100}%`}} data-tone="failed"/></span>)}</div>
     <div className={styles.axis} aria-hidden="true"><span>{when(p.throughput[0].start)}</span><span>{when(p.throughput.at(-1)!.start)}</span></div>
@@ -272,7 +272,7 @@ export function AdvisoryDrawer({batch,advisoryKey,onClose}:{batch:string;advisor
     <section><h3 className={styles.subhead}>Exploit prerequisites</h3>
      {detail.prerequisites?<dl className={styles.prereq}><div><dt>Attack vector</dt><dd>{detail.prerequisites.attackVector}</dd></div><div><dt>Complexity</dt><dd>{detail.prerequisites.attackComplexity}</dd></div><div><dt>Privileges</dt><dd>{detail.prerequisites.privilegesRequired}</dd></div><div><dt>User interaction</dt><dd>{detail.prerequisites.userInteraction}</dd></div><div><dt>Deployment exposure</dt><dd>Unknown · not recorded</dd></div></dl>
       :<p className={styles.note}>No CVSS v3 vector was recorded, so prerequisites are unknown. Deployment exposure is not recorded.</p>}
-     <p className={styles.note}>An affected-version match means the installed version falls in the advisory’s affected range. Whether the vulnerable code is reachable or deployed has not been checked.</p>
+     <p className={styles.note}>The installed version matches the advisory’s affected range. Reachability and deployment are not checked.</p>
     </section>
     <section><h3 className={styles.subhead}>Next step</h3><p>{fixes.length?<>Update to the advisory’s fixed version in each listed manifest, regenerate the lockfile and run your tests: {fixes.slice(0,4).map(f=><code key={f} className={styles.inlineFix}>{f}</code>)}{fixes.length>4?` and ${fixes.length-4} more`:''}.</>:'No fixed version is recorded for these installed versions. Read the advisory for mitigation guidance before deciding.'}</p></section>
     <section><h3 className={styles.subhead}>Installed versions</h3><FixLine g={detail}/></section>

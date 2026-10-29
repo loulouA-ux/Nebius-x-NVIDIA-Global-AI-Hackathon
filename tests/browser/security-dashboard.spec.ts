@@ -53,7 +53,7 @@ test('findings group by advisory and the evidence drawer is accessible',async({p
  await page.getByRole('button',{name:'Evidence for GHSA-syn1-0004-dddd'}).click();
  const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
  await expect(dialog.getByText('Unknown · not recorded')).toBeVisible();
- await expect(dialog.getByText(/not confirmed|has not been checked/).first()).toBeVisible();await page.waitForTimeout(400);
+ await expect(dialog.getByText('Reachability and deployment are not checked.',{exact:false})).toBeVisible();await page.waitForTimeout(400);
  await page.screenshot({path:`${shots}/evidence-drawer-desktop-dark.png`});
  await theme(page,'light');await page.reload();await expect(dialog).toBeVisible();await expect(dialog.getByText('Unknown · not recorded')).toBeVisible();await page.waitForTimeout(500);await page.screenshot({path:`${shots}/evidence-drawer-desktop-light.png`});await theme(page,'dark');
  await page.keyboard.press('Escape');await expect(dialog).toBeHidden();await expect(page).not.toHaveURL(/advisory=/);
@@ -80,7 +80,7 @@ test('process view shows waiting, failed and skipped entries with recorded times
  await page.goto('/security-overview?view=process');
  await expect(page.getByText('Batch in progress · updates every 10 s while visible')).toBeVisible();
  await expect(page.getByRole('button',{name:'Waiting to submit: 25 of 215. Show these'})).toBeVisible();
- await expect(page.getByText(/Per-stage timing .* is not recorded/)).toBeVisible();
+ await expect(page.getByText('stage timing and ETA are unavailable.',{exact:false})).toBeVisible();
  await page.getByRole('button',{name:'Failed: 7 of 215. Show these'}).click();
  await expect(page.getByRole('row').nth(1)).toContainText('HTTP 422');
  await page.getByRole('button',{name:'Skipped: 8 of 215. Show these'}).click();

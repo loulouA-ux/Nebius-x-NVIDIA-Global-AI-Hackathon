@@ -1,7 +1,9 @@
+import {workspaceBrowserScript} from '@/lib/workspace-browser';
 import {headers} from "next/headers";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./brand-motion.css";
+import "./form-controls.css";
 import localFont from 'next/font/local';
 import styles from "./workspace-styles.module.css";
 const body=localFont({src:'../../assets/fonts/inter.ttf',weight:'400 600',display:'swap',variable:'--font-body'});
@@ -24,7 +26,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const nonce=(await headers()).get("x-nonce")||undefined;
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><script nonce={nonce} dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
+      <head><script nonce={nonce} dangerouslySetInnerHTML={{__html:workspaceBrowserScript}}/><script nonce={nonce} dangerouslySetInnerHTML={{__html: `(function(){var m=window.matchMedia("(prefers-color-scheme: dark)");function apply(){var t;try{t=localStorage.getItem("shipcheck-theme")}catch(e){}document.documentElement.dataset.theme=t==="light"||t==="dark"?t:m.matches?"dark":"light"}apply();m.addEventListener("change",apply);window.addEventListener("storage",apply)})()`}}/></head>
       <body className={`${styles.root} ${body.variable} ${display.variable} ${mono.variable} ${annotation.variable}`}><SkipLink /><RouteFocus/>{children}</body>
     </html>
   );

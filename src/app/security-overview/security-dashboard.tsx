@@ -62,7 +62,7 @@ export default function SecurityDashboard(){
  return <div className="with-mobile-navigation"><BrandHeader/><MobileNavigation view="security"/><div className="shell"><WorkspaceSidebar view="security"/>
   <main id="main-content" tabIndex={-1} className={styles.page}>
    <header className={styles.heading}>
-    <div><h1>Security overview</h1><p className={styles.lede}>Dependency advisory matches and coverage for one repository batch. Scan completion and security verdicts are reported separately.</p></div>
+    <div><h1>Security overview</h1><p className={styles.lede}>Findings and coverage across this batch.</p></div>
     <div className={styles.headingActions}>
      {data&&data.batches.length>1&&<label className={styles.select}><span>Batch</span><select value={data.batch.id} onChange={e=>nav({batch:e.target.value,advisory:null})}>{data.batches.map(b=><option key={b.id} value={b.id}>{b.title} · {b.total}</option>)}</select></label>}
      <button className="button" onClick={()=>refresh.current()} disabled={busy}><RefreshCw size={16} aria-hidden="true"/>{busy?'Refreshing…':'Refresh'}</button>
@@ -75,7 +75,7 @@ export default function SecurityDashboard(){
    </p>}
    {error&&<div className={styles.alert} role="alert"><p>{error}{data&&!signedOut&&lastOk&&` Last successful update ${time(lastOk)}.`}</p>{signedOut&&<Link className="button" href="/sign-in"><LinkGithub size={16} aria-hidden="true" className="action-icon"/>Sign in with GitHub</Link>}</div>}
    {loading&&!data&&<div className={styles.skeleton} role="status" aria-live="polite">Loading security overview…</div>}
-   {!loading&&empty&&!error&&<section className={styles.emptyState}><h2>No batch registered</h2><p>A batch appears here once its private repository selection is registered. Single scans remain in <Link href="/reports">Reports</Link>.</p></section>}
+   {!loading&&empty&&!error&&<section className={styles.emptyState}><h2>No batch registered</h2><p>Register a batch to see it here. Individual scans are in <Link href="/reports">Reports</Link>.</p></section>}
    {data&&<>
     <nav className={styles.tabs} aria-label="Security overview sections">{tabs.map(([id,label])=><Link key={id} href={`${pathname}?${tabHref(params,id)}`} scroll={false} aria-current={view===id?'page':undefined}>{label}</Link>)}</nav>
     {'fixFirst' in data&&<OverviewView data={data} nav={nav}/>}
@@ -85,7 +85,7 @@ export default function SecurityDashboard(){
     {'process' in data&&<ProcessView data={data} nav={nav}/>}
    </>}
    {data&&advisoryKey&&<AdvisoryDrawer batch={data.batch.id} advisoryKey={advisoryKey} onClose={()=>nav({advisory:null},{keepPage:true})}/>}
-   <p className={styles.scope}>Scope: exact dependency versions in supported manifests, matched against OSV advisories. <strong>Blocked</strong> means a high-severity advisory matched an installed version; it is not confirmed exploitation. <strong>Checks passed</strong> means only the supported checks passed. Source code, Git history and application-level exploitability were not analysed. Deployment exposure is not recorded.</p>
+   <p className={styles.scope}>Scope: exact versions in supported manifests, checked against OSV. <strong>Blocked</strong> means a high-severity advisory match, not confirmed exploitation. <strong>Checks passed</strong> covers supported checks only. Source code, Git history, exploitability and deployment exposure are not assessed.</p>
   </main></div></div>;
 }
 function tabHref(params:URLSearchParams,view:string){const next=new URLSearchParams();const batch=params.get('batch');if(batch)next.set('batch',batch);if(view!=='overview')next.set('view',view);return next.toString();}

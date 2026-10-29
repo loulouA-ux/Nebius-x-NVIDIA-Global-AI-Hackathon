@@ -43,7 +43,7 @@ export default function RepositoryScanForm() {
   const active=!!job&&!['completed','failed','cancelled'].includes(job.state);
   return <form className={styles.form} onSubmit={submit} aria-labelledby="repository-scan-heading">
     <h2 id="repository-scan-heading">Scan a GitHub repository</h2>
-    <p className={styles.muted}>Check supported dependency files at an exact commit. Your report is saved privately; repository code never runs.</p>
+    <p className={styles.muted}>Scans supported dependency files at one commit. Reports are private; code is not executed.</p>
     {signedOut?<p><Link href="/sign-in">Sign in with GitHub</Link> to save a repository scan.</p>:<>
     <label htmlFor="repository-url">GitHub repository URL<input id="repository-url" type="text" autoComplete="off" placeholder="https://github.com/your-team/your-repo" value={repository} onChange={e=>setRepository(e.target.value)} required maxLength={250} disabled={busy||active}/></label>
     <label className={styles.check}><input type="checkbox" checked={privateAccess} onChange={e=>setPrivateAccess(e.target.checked)} disabled={busy||active}/>Use my connected GitHub App for a private repository</label>

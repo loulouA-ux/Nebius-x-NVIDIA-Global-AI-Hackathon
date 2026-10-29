@@ -57,10 +57,12 @@ export async function requireActor(
     const id = String(r.actor_id).slice(7);
     const allowed = brandEnv('OPEN_REGISTRATION')==='1' || (brandEnv("GITHUB_MEMBER_IDS") || "").split(",").map(v => v.trim()).includes(id);
     const [account] = await query("SELECT disabled FROM sc_github_accounts WHERE github_id=$1", [id]);
-    const membership=await activeMembership(query,String(r.workspace_id),String(r.actor_id));
+    const workspaceId=request.headers.get('x-shiptested-workspace')||String(r.workspace_id);
+    if(workspaceId.length>150)throw new ApiError(400,'Invalid workspace.');
+    const membership=await activeMembership(query,workspaceId,String(r.actor_id));
     if (!allowed || !account || account.disabled || !membership)
       throw new ApiError(401, "Session expired or revoked.");
-    return { id: String(r.actor_id), workspaceId: String(r.workspace_id), role: "member" };
+    return { id: String(r.actor_id), workspaceId, role: "member" };
   }
   const expected =
     r && memberHashes()[String(r.actor_id) as "peter" | "louise"];

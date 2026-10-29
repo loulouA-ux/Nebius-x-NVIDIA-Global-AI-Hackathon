@@ -12,3 +12,8 @@
 
 .content .permission {display:flex;align-items:center;gap:12px;min-height:44px;}
 .content .permission input {width:20px;height:20px;min-height:20px;flex:none;}
+
+.content>header {display:grid;gap:12px;margin-bottom:8px;}
+.content>header p {color:var(--muted);line-height:1.6;}
+.content>section>form+form {margin-top:24px;}
+.content>section>p {line-height:1.6;}

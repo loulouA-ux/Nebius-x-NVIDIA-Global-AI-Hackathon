@@ -24,12 +24,12 @@ export async function githubRequest(path:string,token:string,init:RequestInit={}
  if(!path.startsWith("/")||path.startsWith("//")||path.includes("\\"))throw Error("Invalid GitHub API path.");
  return boundedJson("https://api.github.com"+path,{...init,headers:{Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"ShipTested","Content-Type":"application/json",Authorization:`Bearer ${token}`}},fetcher);
 }
-export async function installationToken(actor:Actor,repositoryId?:number,write=false,fetcher:typeof fetch=fetch,readPullRequests=false){
+export async function installationToken(actor:Actor,repositoryId?:number,write=false,fetcher:typeof fetch=fetch,readPullRequests=false,selectedInstallationId?:number){
  if(write&&!repositoryId)throw Error("Write access must be scoped to one repository.");
  let installationId:number,repositoryIds:number[]|undefined;
  if(brandEnv('CUSTOMER_REPOSITORIES')==='1'){
   const {authorizedRepositoryGrant}=await import('./repository-connections');const {database}=await import('./db');
-  const grant=await authorizedRepositoryGrant(database(),actor,fetcher);installationId=grant.installationId;
+  const grant=await authorizedRepositoryGrant(database(),actor,fetcher,repositoryId,selectedInstallationId);installationId=grant.installationId;
   if(repositoryId&&!grant.repositoryIds.includes(repositoryId))throw new ApiError(404,'Repository is not authorized for your account.');
   if(write&&repositoryId&&!grant.writableRepositoryIds.includes(repositoryId))throw new ApiError(403,'Your GitHub account cannot write to this repository.');
   repositoryIds=repositoryId?[repositoryId]:grant.repositoryIds;
@@ -40,7 +40,15 @@ export async function installationToken(actor:Actor,repositoryId?:number,write=f
 }
 export const MAX_CONNECTED_REPOSITORIES=500;
 export async function listRepositories(actor:Actor,fetcher:typeof fetch=fetch){
- const token=await installationToken(actor,undefined,false,fetcher);
+ if(brandEnv('CUSTOMER_REPOSITORIES')==='1'){
+  const {authorizedRepositoryGrants}=await import('./repository-connections');const {database}=await import('./db');
+  const grants=await authorizedRepositoryGrants(database(),actor,fetcher);const all:GitHubRepository[]=[];
+  for(const grant of grants){const token=await installationToken(actor,undefined,false,fetcher,false,grant.installationId);all.push(...await listTokenRepositories(token,fetcher));}
+  if(all.length>MAX_CONNECTED_REPOSITORIES||new Set(all.map(r=>r.id)).size!==all.length)throw new ApiError(409,'Repository access changed or exceeds the workspace limit.');return all;
+ }
+ return listTokenRepositories(await installationToken(actor,undefined,false,fetcher),fetcher);
+}
+async function listTokenRepositories(token:string,fetcher:typeof fetch){
  const schema=z.object({total_count:z.number().int().min(0),repositories:z.array(repoSchema).max(100)});
  const repositories:GitHubRepository[]=[],seen=new Set<number>();
  let expected:number|undefined;
