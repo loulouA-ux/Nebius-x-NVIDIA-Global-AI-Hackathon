@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import {test,expect,type Page} from '@playwright/test';
 import {mkdirSync} from 'node:fs';
 import {buildFixture,respond} from './security-fixture';
@@ -133,4 +134,47 @@ test('queue ranking and coverage recovery are deep-linked read-only workflows',a
  await expect(page.getByRole('button',{name:'Needs recovery',pressed:true})).toBeVisible();
  await page.getByRole('button',{name:'Inspect failed scans'}).click();await expect(page).toHaveURL(/view=process.*state=failed/);
  expect(writes).toEqual([]);
+});
+
+test('polished queues keep every action within mobile and tablet rows',async({page})=>{
+ await serve(page,()=>finished);
+ for(const width of [390,768,900,1440]){
+  await page.setViewportSize({width,height:1000});
+  for(const view of ['findings','coverage']){
+   await page.goto(`/security-overview?view=${view}${view==='coverage'?'&gap=python_syntax&recovery=needed':''}`);
+   const first=page.getByRole('row').nth(1);await expect(first).toBeVisible();
+   if(width<=900){
+    const bounds=await first.locator('th,td').evaluateAll(cells=>cells.map(c=>({left:c.getBoundingClientRect().left,right:c.getBoundingClientRect().right})));
+    expect(bounds.every(b=>b.left>=0&&b.right<=width)).toBe(true);
+   }
+   if(view==='coverage'){
+    await first.locator('summary').filter({hasText:'Resolve Python'}).click();
+    await expect(first.getByText(/reproducible exact-version dependency export/)).toBeVisible();
+   }
+   if(width===390||width===1440){
+    for(const t of ['dark','light'] as const){
+     await theme(page,t);await page.reload();await expect(page.getByRole('row').nth(1)).toBeVisible();
+     if(view==='coverage')await page.getByRole('row').nth(1).locator('summary').filter({hasText:'Resolve Python'}).click();
+     if(width===390)await page.getByRole('row').nth(1).screenshot({path:`${shots}/${view}-polished-mobile-${t}.png`});
+     else await page.screenshot({path:`${shots}/${view}-polished-desktop-${t}.png`});
+    }
+   }
+   expect(await noOverflow(page)).toBe(true);
+  }
+ }
+});
+
+
+test('polished dashboard controls pass automated accessibility checks in both themes',async({page})=>{
+ await serve(page,()=>finished);await page.setViewportSize({width:390,height:844});
+ for(const t of ['dark','light'] as const){
+  await theme(page,t);
+  for(const view of ['findings','coverage']){
+   await page.goto(`/security-overview?view=${view}`);await expect(page.getByRole('row').nth(1)).toBeVisible();
+   const result=await new AxeBuilder({page}).include('main').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+   expect(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
+  }
+ }
+ await page.getByRole('row').nth(1).getByRole('link',{name:/Report/}).focus();
+ await expect(page.getByRole('row').nth(1).getByRole('link',{name:/Report/})).toBeFocused();
 });

@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
-import {ArrowUpRight,Search,X} from 'lucide-react';
+import {ArrowUpRight,Search,X,Wrench,FileSearch} from 'lucide-react';
 import {batchLabels,batchStates,type BatchState} from '@/lib/batch-progress';
 import {remediationModes,remediationLabels,remediationDescriptions,recoveryActions,type RemediationMode,gapCodes,gapLabels,stageLabels,severities,verdicts,type GapCode,type Severity,type Verdict,type CoverageStage} from '@/lib/security-dashboard';
 import type {Loaded,Nav} from './security-dashboard';
@@ -57,7 +57,7 @@ function QueueRanking({value,nav}:{value:RemediationMode;nav:Nav}){
  return <div className={styles.ranking}><Segmented<RemediationMode> label="Rank remediation queue" value={value} options={remediationModes.map(value=>({value,label:remediationLabels[value]}))} onChange={sort=>nav({sort})}/><p className={styles.note}>{remediationDescriptions[value]}</p></div>;
 }
 function FixSummary({g}:{g:Of<'fixFirst'>['fixFirst'][number]}){
- return <span className={styles.source}>{g.packages.map(p=>p.name).join(' · ')} · {g.hasFix?'Fixed version recorded for at least one version':'No fixed version recorded'} · Open evidence for exact versions and manifests</span>;
+ return <div className={styles.fixSummary}><span className={styles.packageNames}>{g.packages.map(p=>p.name).join(' · ')}</span><span>{g.hasFix?'Fix recorded for some versions':'No fix recorded'}</span></div>;
 }
 function RecoverySteps({gaps}:{gaps:GapCode[]}){
  const actions=recoveryActions(gaps);
@@ -69,7 +69,7 @@ export function OverviewView({data,nav}:{data:Of<'fixFirst'>;nav:Nav}){
  return <div className={styles.stackGap}>
   <div className={styles.batchStrip}><span><strong>{n(op.completed)} / {n(o.batch.total)}</strong> scans completed</span><button type="button" onClick={()=>nav({view:'process'})}>{n(op.failed+op.cancelled)} failed or cancelled · {n(op.skipped)} skipped · {n(op.waiting+op.queued+op.running)} remaining</button><button type="button" onClick={()=>nav({view:'coverage',recovery:'needed'})}>Review coverage gaps <ArrowUpRight size={14} aria-hidden="true"/></button></div>
   <section className={styles.panel} aria-labelledby="first-h">
-   <div className={styles.sectionHead}><div><h2 id="first-h">Remediation queue</h2><p className={styles.note}>One advisory, every affected repository. Choose a ranking, then inspect the evidence before changing dependencies.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}>Open full queue</button></div>
+   <div className={styles.sectionHead}><div><h2 id="first-h" className={styles.sectionTitle}><Wrench size={18} aria-hidden="true"/>Remediation queue</h2><p className={styles.note}>One advisory, every affected repository. Choose a ranking, then inspect the evidence before changing dependencies.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'findings'})}>Open full queue</button></div>
    <QueueRanking value={data.filters.sort} nav={nav}/>
    {data.fixFirst.length?<ol className={styles.queue}>{data.fixFirst.map((g,i)=><li key={g.key}>
     <span className={styles.rank}>{i+1}</span>
@@ -127,20 +127,20 @@ function GapBars({counts,denominator,nav}:{counts:Record<GapCode,number>;denomin
 export function FindingsView({data,nav}:{data:Of<'findings'>;nav:Nav}){
  const f=data.findings,o=data.overview,flt=data.filters;
  return <section className={styles.panel} aria-labelledby="find-h">
-  <div className={styles.sectionHead}><div><h2 id="find-h">Remediation queue</h2><p className={styles.note}>{n(o.findings.uniqueAdvisories)} unique advisories · {n(o.findings.affectedRepositories)} affected repositories · {n(o.findings.occurrences)} dependency occurrences. Grouped by advisory; an affected-version match is not confirmed exploitability.</p></div></div>
+  <div className={styles.sectionHead}><div><h2 id="find-h" className={styles.sectionTitle}><Wrench size={18} aria-hidden="true"/>Remediation queue</h2><p className={styles.note}>{n(o.findings.uniqueAdvisories)} unique advisories · {n(o.findings.affectedRepositories)} affected repositories · {n(o.findings.occurrences)} dependency occurrences. Grouped by advisory; an affected-version match is not confirmed exploitability.</p></div></div>
   <QueueRanking value={flt.sort} nav={nav}/>
   <div className={styles.toolbar}><SearchBox label="Search advisory, package or repository" value={flt.q} onChange={q=>nav({q})}/>
    <Segmented<Severity> label="Filter by severity" value={flt.severity} onChange={v=>nav({severity:v})} options={[{value:null,label:'All',count:o.findings.uniqueAdvisories},...severities.map(s=>({value:s,label:sevLabel[s],count:o.findings.bySeverity[s]}))]}/>
    <Clear active={!!(flt.q||flt.severity)} nav={nav} keys={['q','severity']}/></div>
-  {f.items.length?<div className={styles.tableWrap}><table className={styles.table}><caption className={styles.srOnly}>Advisories grouped across repositories</caption>
+  {f.items.length?<div className={`${styles.tableWrap} ${styles.responsiveWrap}`}><table role="table" className={`${styles.table} ${styles.responsiveTable}`}><caption className={styles.srOnly}>Advisories grouped across repositories</caption>
    <thead><tr><th scope="col">Advisory</th><th scope="col">Severity</th><th scope="col">Remediation</th><th scope="col" className={styles.num}>Repositories</th><th scope="col" className={styles.num}>Occurrences</th><th scope="col"><span className={styles.srOnly}>Evidence</span></th></tr></thead>
-   <tbody>{f.items.map(g=><tr key={g.key}>
-    <th scope="row"><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span><span className={styles.cellTitle}>{g.title}</span></th>
-    <td><SeverityTag level={g.severity}/><small className={styles.source}>{[g.cvss!==null&&!g.severitySources.some(x=>x.startsWith('CVSS'))?`CVSS ${g.cvss.toFixed(1)}`:null,...g.severitySources].filter(Boolean).join(' · ')||'Source not recorded'}</small></td>
-    <td><FixSummary g={g}/></td>
-    <td className={styles.num}><strong>{n(g.repositories)}</strong><small className={styles.source}>{g.repositorySample.join(', ')}{g.repositories>3?'…':''}</small></td>
-    <td className={styles.num}>{n(g.occurrences)}</td>
-    <td><button type="button" className="button" onClick={()=>nav({advisory:g.key},{keepPage:true})}>Evidence<span className={styles.srOnly}> for {g.advisoryId||g.title}</span></button></td>
+   <tbody role="rowgroup">{f.items.map(g=><tr role="row" key={g.key}>
+    <th role="rowheader" scope="row"><span className={styles.advId}>{g.advisoryId||'Credential pattern'}</span><span className={styles.cellTitle}>{g.title}</span></th>
+    <td role="cell" data-label="Severity"><SeverityTag level={g.severity}/><small className={styles.source}>{[g.cvss!==null&&!g.severitySources.some(x=>x.startsWith('CVSS'))?`CVSS ${g.cvss.toFixed(1)}`:null,...g.severitySources].filter(Boolean).join(' · ')||'Source not recorded'}</small></td>
+    <td role="cell" data-label="Remediation"><FixSummary g={g}/></td>
+    <td role="cell" data-label="Repositories" className={styles.num}><strong>{n(g.repositories)}</strong><details className={styles.repoSample}><summary>Sample repositories</summary><ul>{g.repositorySample.map(repo=><li key={repo}>{repo}</li>)}</ul>{g.repositories>3&&<span>Open evidence for all {n(g.repositories)} repositories.</span>}</details></td>
+    <td role="cell" data-label="Occurrences" className={styles.num}>{n(g.occurrences)}</td>
+    <td role="cell" className={styles.rowAction}><button type="button" className="button" onClick={()=>nav({advisory:g.key},{keepPage:true})}>Evidence<span className={styles.srOnly}> for {g.advisoryId||g.title}</span></button></td>
    </tr>)}</tbody></table></div>:<p className={styles.emptyLine}>No advisories match these filters.</p>}
   <Pager {...f} nav={nav} noun="advisories"/>
  </section>;
@@ -161,18 +161,18 @@ export function RepositoriesView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
 type RepoItem=Of<'repositories'>['repositories']['items'][number];
 function RepoTable({items,coverage}:{items:RepoItem[];coverage:boolean}){
  if(!items.length)return <p className={styles.emptyLine}>No repositories match these filters.</p>;
- return <div className={styles.tableWrap}><table className={styles.table}><caption className={styles.srOnly}>Repositories with completed reports</caption>
+ return <div className={`${styles.tableWrap} ${coverage?styles.responsiveWrap:''}`}><table role="table" className={`${styles.table} ${coverage?styles.responsiveTable:''}`}><caption className={styles.srOnly}>Repositories with completed reports</caption>
   <thead><tr><th scope="col">Repository</th><th scope="col">Verdict</th>{!coverage&&<th scope="col" className={styles.num}>High</th>}{!coverage&&<th scope="col" className={styles.num}>Medium</th>}{!coverage&&<th scope="col" className={styles.num}>Low / unrated</th>}<th scope="col" className={styles.num}>Deps checked</th><th scope="col">Coverage</th>{coverage&&<th scope="col">Next step</th>}<th scope="col"><span className={styles.srOnly}>Report</span></th></tr></thead>
-  <tbody>{items.map(r=><tr key={r.repository}>
-   <th scope="row"><span className={styles.repoName}>{r.repository}</span>{coverage&&'omissions' in r&&<CoverageDetail r={r as CoverageItem}/>}</th>
-   <td><VerdictTag verdict={r.verdict}/></td>
+  <tbody role="rowgroup">{items.map(r=><tr role="row" key={r.repository}>
+   <th role="rowheader" scope="row"><span className={styles.repoName}>{r.repository}</span>{coverage&&'omissions' in r&&<CoverageDetail r={r as CoverageItem}/>}</th>
+   <td role="cell" data-label="Verdict"><VerdictTag verdict={r.verdict}/></td>
    {!coverage&&<td className={styles.num} data-sev={r.severityCounts.high?'high':undefined}>{r.severityCounts.high}</td>}
    {!coverage&&<td className={styles.num}>{r.severityCounts.medium}</td>}
    {!coverage&&<td className={styles.num}>{r.severityCounts.low} / {r.severityCounts.review}</td>}
-   <td className={styles.num} data-zero={r.dependencyCount===0||undefined}>{n(r.dependencyCount)}<small className={styles.source}>{r.manifests} manifests{r.omitted?` · ${r.omitted} omitted`:''}</small></td>
-   <td>{r.stage&&<span className={styles.stage} data-stage={r.stage}>{stageLabels[r.stage]}</span>}{r.gaps.filter(g=>g!=='zero_dependencies').length>0&&<ul className={styles.chips}>{r.gaps.filter(g=>g!=='zero_dependencies').map(g=><li key={g}>{gapLabels[g].label}</li>)}</ul>}</td>
-   {coverage&&<td><RecoverySteps gaps={r.gaps}/></td>}
-   <td>{r.reportId&&<Link href={reportHref(r.reportId)}>Report<span className={styles.srOnly}> for {r.repository}</span></Link>}{r.refreshed&&<small className={styles.source}>refreshed revision</small>}</td>
+   <td role="cell" data-label="Dependencies checked" className={styles.num} data-zero={r.dependencyCount===0||undefined}>{n(r.dependencyCount)}<small className={styles.source}>{r.manifests} manifests{r.omitted?` · ${r.omitted} omitted`:''}</small></td>
+   <td role="cell" data-label="Coverage">{r.stage&&<span className={styles.stage} data-stage={r.stage}>{stageLabels[r.stage]}</span>}{r.gaps.filter(g=>g!=='zero_dependencies').length>0&&<ul className={styles.chips}>{r.gaps.filter(g=>g!=='zero_dependencies').map(g=><li key={g}>{gapLabels[g].label}</li>)}</ul>}</td>
+   {coverage&&<td role="cell" data-label="Next step"><RecoverySteps gaps={r.gaps}/></td>}
+   <td role="cell" className={styles.rowAction}>{r.reportId&&<Link href={reportHref(r.reportId)}>Report<span className={styles.srOnly}> for {r.repository}</span></Link>}{r.refreshed&&<small className={styles.source}>refreshed revision</small>}</td>
   </tr>)}</tbody></table></div>;
 }
 
@@ -191,7 +191,7 @@ export function CoverageView({data,nav}:{data:Of<'repositories'>;nav:Nav}){
  const steps=[['Report saved','completed reports',p.reports],['Manifest scanned','≥1 supported manifest read',p.manifestScanned],['Exact versions resolved','≥1 pinned dependency',p.versionsResolved],['Advisory lookup complete','no provider, deadline or limit gap',p.lookupComplete]] as const;
  return <div className={styles.stackGap}>
   <section className={styles.panel} aria-labelledby="covlist-h">
-   <div className={styles.sectionHead}><div><h2 id="covlist-h">Coverage recovery</h2><p className={styles.note}>Recover missing evidence before trusting a clean result. These actions are guidance; no scan, retry or dependency change is started here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}>Inspect failed scans</button></div>
+   <div className={styles.sectionHead}><div><h2 id="covlist-h" className={styles.sectionTitle}><FileSearch size={18} aria-hidden="true"/>Coverage recovery</h2><p className={styles.note}>Recover missing evidence before trusting a clean result. These actions are guidance; no scan, retry or dependency change is started here.</p></div><button type="button" className={styles.linkButton} onClick={()=>nav({view:'process',state:'failed'})}>Inspect failed scans</button></div>
    <Segmented label="Recovery scope" value={flt.recovery} options={[{value:'needed',label:'Needs recovery'},{value:null,label:'All reports'}]} onChange={recovery=>nav({recovery})}/>
    <div className={styles.toolbar}><SearchBox label="Search repositories" value={flt.q} onChange={q=>nav({q})}/>
     <label className={styles.select}><span>Gap</span><select value={flt.gap||''} onChange={e=>nav({gap:e.target.value||null})}><option value="">Any</option>{gapCodes.map(g=><option key={g} value={g}>{gapLabels[g].label} ({o.gaps.counts[g]})</option>)}</select></label>

@@ -189,3 +189,9 @@ Coverage recovery (`view=coverage&recovery=needed`) filters to reports with reco
 These views only read existing reports. They do not change repositories, create repair PRs, submit scans, refresh advisories, reserve allowance, or claim that following guidance has recovered coverage. Authenticated workspace and owner filters and the public-demo refusal remain in place. No schema migration is required.
 
 Browser screenshots use the existing explicitly synthetic fixture; they are not evidence of live batch results.
+
+### Responsive polish — 29 October 2026
+
+The remediation and coverage tables retain desktop comparison columns. At widths up to 900px, the same semantic rows become full-width entries, with visible field labels, wrapping identifiers and report/evidence actions inside the viewport. Recovery instructions and manifest evidence remain expandable. Repository samples are disclosed on demand so long names do not bury the evidence action. Counts and recorded-fix semantics are unchanged.
+
+The polish uses existing ShipTested typography, theme colors and Lucide icons. Focus outlines and mobile action targets are explicit; no new motion or dependencies were added. Screenshot fixtures remain synthetic. Verification covers 390, 768, 900 and 1440px, both themes, keyboard focus, and automated WCAG accessibility checks of the dashboard main region.

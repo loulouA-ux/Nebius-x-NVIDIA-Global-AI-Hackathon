@@ -156,3 +156,56 @@
 .batchStrip strong{color:var(--text)}.batchStrip button{display:inline-flex;align-items:center;gap:4px;min-height:36px;background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer;text-align:left}.batchStrip button:hover{text-decoration:underline}
 .ranking{display:grid;justify-items:start;gap:8px;margin:16px 0 20px}.ranking .note{margin:0}
 .recoverySteps{min-width:240px;max-width:360px;line-height:1.5}.recoverySteps strong{font-weight:500;color:var(--text)}.recoverySteps p{margin:4px 0 10px;color:var(--body2)}.recoverySteps summary{cursor:pointer;color:var(--accent);min-height:32px}.recoverySteps details>div{margin-top:12px}
+
+/* Evidence-first polish: shared brand tokens, compact desktop rows, full-width mobile actions. */
+.sectionTitle{display:flex;align-items:center;gap:10px}.sectionTitle svg{color:var(--accent);flex:none}
+.page .tabs{flex-wrap:nowrap;gap:6px;scrollbar-width:thin;scrollbar-color:var(--card) transparent}
+.page .tabs a{padding:12px 10px}
+.page .tabs a[aria-current=page]{border-bottom-color:var(--accent)}
+.page :is(button,a,input,select,summary):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.page :is(input,select){caret-color:var(--accent)}
+.page ::selection{background:var(--accent);color:var(--bg)}
+.sectionHead{gap:12px 24px}.sectionHead>.linkButton{flex:none}
+.ranking{gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.segmented{width:fit-content;max-width:100%;margin-bottom:8px}.segmented button{min-height:40px}
+.segmented button[aria-pressed=true]{box-shadow:none;outline:1px solid var(--card)}
+.fixSummary{display:grid;gap:3px;font-size:13px;line-height:1.5;color:var(--body2)}
+.packageNames{font-family:var(--mono);font-size:12px;color:var(--text);overflow-wrap:anywhere}
+.queue>li{padding:18px 0}.queueMain{gap:8px}.queueMeta{gap:7px;min-width:140px}
+.titleButton{font-size:15px;line-height:1.5}.titleButton .advId{font-size:12px;color:var(--muted)}
+.queueMeta>span:last-child{max-width:200px}.queueMeta strong{font-size:14px}
+.responsiveTable tbody th{width:28%;min-width:200px}.responsiveTable .num .source{white-space:normal;min-width:120px;max-width:210px;text-align:left}
+.responsiveTable td[data-label="Remediation"]{min-width:160px}
+.rowAction a{display:inline-flex;align-items:center;min-height:40px;font-weight:500;text-underline-offset:4px}
+.recoverySteps{min-width:200px;max-width:320px}.recoverySteps summary{min-height:44px;padding:4px 0;line-height:1.5;font-weight:500;list-style-position:outside;margin-left:14px}
+.recoverySteps[open]{padding:0 0 4px}.recoverySteps[open]>div{padding-top:12px;border-top:1px solid var(--line)}
+.recoverySteps p{font-size:13px;line-height:1.6}.details summary{min-height:40px;width:auto;overflow-wrap:anywhere}.details code{word-break:break-word}
+@media(max-width:900px){
+ .responsiveWrap{overflow:visible;border:0;border-radius:0;margin:0}
+ .responsiveTable,.responsiveTable tbody{display:block;width:100%}
+ .responsiveTable thead{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ .responsiveTable tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;padding:22px 0;border-top:1px solid var(--card)}
+ .responsiveTable tbody tr:last-child{border-bottom:1px solid var(--line)}
+ .responsiveTable tbody tr:hover{background:transparent}
+ .responsiveTable tbody :is(th,td){display:block;width:auto;min-width:0;max-width:none;padding:0;border:0;text-align:left!important;white-space:normal;overflow-wrap:anywhere}
+ .responsiveTable tbody th{grid-column:1/-1;font-size:15px;line-height:1.5}
+ .responsiveTable td::before{content:attr(data-label);display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px}
+ .responsiveTable td[data-label="Coverage"],.responsiveTable td[data-label="Next step"],.responsiveTable .rowAction{grid-column:1/-1}
+ .responsiveTable .rowAction::before{display:none}
+ .responsiveTable .rowAction :is(button,a){display:flex;justify-content:center;width:100%;min-height:44px;border:1px solid var(--card);border-radius:8px;padding:8px 12px;box-sizing:border-box;background:var(--raised);color:var(--text);text-decoration:none}
+ .responsiveTable .num .source{min-width:0;max-width:none}.responsiveTable .recoverySteps{min-width:0;max-width:none}
+ .responsiveTable .chips li{white-space:normal;font-size:12px}.responsiveTable .cellTitle{font-size:15px}
+}
+@media(max-width:600px){
+ .page .tabs{margin-bottom:18px}.page .tabs a{font-size:13px;min-height:44px}
+ .heading{margin-bottom:8px}.freshness{font-size:12px;margin-bottom:12px}
+ .stackGap{gap:18px}.panel{padding:18px 16px}.panel h2{font-size:18px}
+ .ranking{margin-top:14px}.ranking .segmented{display:grid;grid-template-columns:1fr;width:100%;gap:4px}.ranking .segmented button{min-height:44px;justify-content:center}
+ .toolbar{gap:12px}.toolbar .search{flex-basis:100%;min-height:44px}.toolbar .select select{min-height:44px}
+ .queue>li{grid-template-columns:20px minmax(0,1fr);column-gap:10px}.queueMeta{min-width:0;margin-top:4px;gap:8px 12px}.queueMeta>span:last-child{max-width:none;width:100%}
+ .fixSummary{font-size:13px}.batchStrip{gap:4px 16px;padding-bottom:12px}.batchStrip button{min-height:40px}
+ .details{font-size:13px}.pagerButtons{width:100%;justify-content:space-between}.pagerButtons .button{min-height:44px}
+}
+
+.repoSample{white-space:normal;max-width:220px;font-size:12px;text-align:left;color:var(--body2);font-weight:400;margin-top:4px}.repoSample summary{cursor:pointer;min-height:32px;color:var(--accent);line-height:1.5}.repoSample ul{list-style:none;padding:0;margin:6px 0;display:grid;gap:8px}.repoSample li{overflow-wrap:anywhere}.repoSample span{display:block;line-height:1.5}
+@media(max-width:900px){.repoSample{max-width:none}.repoSample summary{min-height:44px;font-size:13px}}
