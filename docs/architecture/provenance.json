@@ -1,0 +1,46 @@
+{
+  "source_document_title": "ShipCheck Project Plan V0.2",
+  "source_document_url": "https://docs.google.com/document/d/1qO_AWsA8Tkk8zwh3qgpDqoLhq17SO9D62aVLJDT3WkA/edit",
+  "document_modified_at": "2026-10-30T08:58:19.801Z",
+  "exported_date": "2026-10-30",
+  "diagram_date": "2026-10-28",
+  "figures": [
+    {
+      "figure": 2,
+      "png": "png/01-hosted-repository-scanning.png",
+      "svg": "svg/01-hosted-repository-scanning.svg",
+      "width": 1800,
+      "height": 1320,
+      "png_sha256": "9fd7a88c25f047588300748493900f526163a61f2ab82910195e5e00121ecb51",
+      "svg_sha256": "01b406528577fd9a8ea074d4f2b81c89ed63e66a890d7591a00423e4dc7540bb",
+      "matches_document_image_bytes": true
+    },
+    {
+      "figure": 3,
+      "png": "png/02-enriched-scan-and-repository-batch.png",
+      "svg": "svg/02-enriched-scan-and-repository-batch.svg",
+      "width": 1800,
+      "height": 1320,
+      "png_sha256": "6fb5e0affc4ca47501992077f7941031f245c53ab5efe99967ef5c0a895cb9b2",
+      "svg_sha256": "581c47243ae54fc9921e4eee8cbb99840e111e0de5f9c30014be9221eab2dbb1",
+      "matches_document_image_bytes": true
+    },
+    {
+      "figure": 4,
+      "png": "png/03-repair-verification-and-approval.png",
+      "svg": "svg/03-repair-verification-and-approval.svg",
+      "width": 1800,
+      "height": 1320,
+      "png_sha256": "8b03459ff8e3fa722d896dad459e1607f6f238cd2b5ba76fec3f5987e4c2b119",
+      "svg_sha256": "a5badde501fb85503c9c07e00c1339a0d541cc51e77b94b2e6fa17d5037c687f",
+      "matches_document_image_bytes": true
+    }
+  ],
+  "archived_mvp": {
+    "figure": 1,
+    "png": "archive/00-original-shipcheck-mvp.png",
+    "width": 2000,
+    "height": 1120,
+    "sha256": "b9c22ac0304ed6564f5d447d91b63370519c690e23d82fc034a79962fef49638"
+  }
+}

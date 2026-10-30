@@ -1,0 +1,36 @@
+SHIPTESTED - FINAL NARRATION
+Runtime: 2 minutes 45 seconds
+Real screen capture; waits and navigation shortened. Narration: NVIDIA Magpie Aria.
+
+00:00 - 00:16 | Repository URL
+ShipTested helps developers turn dependency warnings into reviewed, tested repairs. This is a real GitHub account and a fresh demo repository. I paste its URL and start a live scan.
+
+00:16 - 00:35 | Live scan and report
+The progress bar tracks repository checks, dependency files, advisories, and the saved report. Five advisories affect this pinned version of lodash. The report separates severity, source evidence, and checks that were not performed.
+
+00:35 - 00:48 | Finding evidence
+Opening a finding shows the affected package, the advisory, and a recommended next step. A vulnerable version does not prove the application is exploitable, so that limitation stays visible.
+
+00:48 - 01:01 | Nemotron on Nebius - live request
+Next, I scan the same repository's lockfile with AI triage enabled. This makes a real inference request to NVIDIA Nemotron, running on Nebius Token Factory.
+
+01:01 - 01:24 | Validated Nemotron notes
+The report names Nemotron Three Super and confirms five validated note selections, with zero fallbacks. Here is one selected note, linked to its finding. Nemotron chooses from scanner evidence; invented claims are rejected. The model does not change the security verdict.
+
+01:24 - 01:36 | Prepare a repair
+Back in the repository workflow, I prepare a repair for lodash. ShipTested proposes a specific dependency update and shows the patch before any change is published.
+
+01:36 - 01:48 | Review patch and verify
+The proposed upgrade moves lodash from four seventeen twenty to four eighteen one. I review the manifest change, then run verification in an isolated sandbox.
+
+01:48 - 02:01 | Sandbox tests
+ShipTested runs the project's tests before and after the update, regenerates the lockfile, and checks the resulting dependencies. The verification completes successfully.
+
+02:01 - 02:15 | Execution evidence
+The execution evidence shows passing commands and the advisory count falling from five to zero. That result covers this dependency scan; it is not a guarantee that the whole application is secure.
+
+02:15 - 02:34 | Approve and create draft PR
+After reviewing the exact patch and test evidence, I approve a draft pull request. ShipTested publishes the verified change through its GitHub App. Here is the draft on GitHub. Only the manifest and lockfile change. The original branch stays untouched until a maintainer reviews and merges it.
+
+02:34 - 02:45 | ShipTested
+From a repository URL to evidence, Nemotron-assisted review, sandbox verification, and a human-approved draft pull request. That is ShipTested.
