@@ -120,8 +120,15 @@ flowchart TD
 
 Optional Tavily research adds dated, unconfirmed context. Verified-host checks are passive and require ownership proof. Neither is demonstrated as completed in the video. Repository code runs only in the separate, explicitly enabled repair sandbox workflow—not during dependency scanning.
 
+## Built with OpenAI Codex
+
+We used **OpenAI Codex as a coding collaborator** throughout development: implementing and debugging application flows, investigating scan-worker and provider-integration issues, running automated checks, inspecting the real browser workflow, and preparing documentation and demo assets. Louise and Peter directed the product, reviewed the evidence, and approved consequential account and publication actions.
+
+Codex supported the development process. **NVIDIA Nemotron on Nebius Token Factory** powers the application's demonstrated AI-assisted finding review; deterministic scanner rules, sandbox verification and human approval retain their separate roles.
+
 ## Explore the project
 
+- **[Devpost write-up](docs/DEVPOST-SUBMISSION.md)** — paste-ready project story and how we used Codex.
 - **[Judge walkthrough](docs/RECORDED-DEMO.md)** — video chapters, test paths and recorded proof.
 - **[Local development](docs/LOCAL-DEVELOPMENT.md)** — configuration, privacy boundaries and verification commands.
 - **[Repair architecture](docs/GITHUB-REPAIR-LOOP.md)** — snapshot binding, sandbox isolation, approval and historical checkpoints.
@@ -132,6 +139,6 @@ Contributions are welcome. Keep changes focused, describe the behavior you chang
 
 ---
 
-Built by **Louise and Peter / HeySalad** for the **Nebius × NVIDIA Global AI Hackathon**. [MIT licensed](LICENSE).
+Built by **Louise and Peter / HeySalad**, with **OpenAI Codex**, for the **Nebius × NVIDIA Global AI Hackathon**. [MIT licensed](LICENSE).
 
 [OSV](https://google.github.io/osv.dev/) supplies advisory evidence. [Nebius Token Factory](https://docs.tokenfactory.nebius.com/) serves the NVIDIA model. Optional research uses [Tavily](https://docs.tavily.com/). Third-party code, fonts, icons and advisory data retain their own licences; integration does not imply endorsement.
