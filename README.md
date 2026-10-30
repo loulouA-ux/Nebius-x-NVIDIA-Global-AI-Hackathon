@@ -100,10 +100,10 @@ The vulnerable fixture is input data: **do not install its dependencies locally*
 ## How it fits together
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Lockfile or pinned repository snapshot] --> B[Exact versions + OSV evidence]
     B --> C[Deterministic report]
-    C -. Optional manifest triage .-> N[Nemotron on Nebius]
+    B -. Optional manifest triage .-> N[Nemotron on Nebius]
     N -. Validated notes only .-> C
     C --> D[Supported npm repair proposal]
     D --> E[Isolated tests + lockfile rescan]
