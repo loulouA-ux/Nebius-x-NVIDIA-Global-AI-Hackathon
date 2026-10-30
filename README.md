@@ -99,6 +99,9 @@ The vulnerable fixture is input data: **do not install its dependencies locally*
 
 ## How it fits together
 
+<details>
+<summary>View the scan and repair workflow</summary>
+
 ```mermaid
 flowchart TD
     A[Lockfile or pinned repository snapshot] --> B[Exact versions + OSV evidence]
@@ -110,6 +113,8 @@ flowchart TD
     E --> F[Human approval]
     F --> G[Draft GitHub PR]
 ```
+
+</details>
 
 **Bounded by design.** Supported inputs include npm lockfiles v2/v3, exact `package.json` pins, and a conservative subset of exact Python requirements. Coverage and size limits depend on the interface. Unsupported inputs and failed checks stay visible; they do not become a clean bill of health. Runtime exploitability, business logic and complete secret discovery are outside this scanner's scope.
 
