@@ -99,6 +99,8 @@ The vulnerable fixture is input data: **do not install its dependencies locally*
 
 ## How it fits together
 
+[**Infrastructure diagrams: PNGs, editable SVGs and Devpost captions**](docs/architecture/README.md) — the three architecture figures from our project document.
+
 <details>
 <summary>View the scan and repair workflow</summary>
 
